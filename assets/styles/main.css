@@ -1,0 +1,365 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #1a1a1a;
+}
+
+/* ============= NAVBAR ============= */
+.header {
+    background-color: #f0f6ff;
+    border-bottom: 2px solid #d9e4ff;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    width: 120px;
+}
+
+.nav-links a {
+    color: #000;
+    text-decoration: none;
+    margin: 0 30px;
+    font-size: 20px;
+    font-weight: 20500;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.login {
+    color: #0056ff;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.btn-primary {
+    background-color: #006aff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.btn-primary:hover {
+    background-color: #004dcc;
+}
+
+/* ============= HERO ============= */
+.hero {
+    background: #0084FF ;
+    color: #fff;
+    padding: 60px 10%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hero-content {
+    max-width: 550px;
+}
+
+.title {
+    font-size: 60px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.title span {
+    color: #000;
+    /*background: #fff;*/
+    padding: 0 6px;
+    border-radius: 4px;
+}
+
+.subtitle {
+    font-size: 30px;
+    margin-bottom: 25px;
+    line-height: 1.3;
+}
+
+.btn-secondary {
+    background: #003BFF;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #004dcc;
+}
+
+.hero-img img {
+    width: 180px;
+}
+
+/* ============= FEATURES ============= */
+.features {
+    background: #ffffff;
+    text-align: center;
+    padding: 50px 10%;
+}
+
+.features h2 {
+    color: #1a1a1a;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 35px;
+}
+
+.features-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 35px;
+}
+
+/* estilo general de cada tarjeta */
+.feature-item {
+    width: 170px;
+    text-align: center;
+    border-radius: 10px;
+    padding: 15px 10px;
+    transition: transform 0.2s ease-in-out;
+}
+.feature-item:hover {
+    transform: translateY(-5px);
+}
+.feature-item img {
+    width: 80px;
+    margin-bottom: 10px;
+}
+.feature-item p {
+    font-size: 14px;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Colores alternos para las tarjetas */
+.feature-item:nth-child(1),
+.feature-item:nth-child(3) {
+    background-color: #2897FF;   /* azul rey */
+}
+
+.feature-item:nth-child(2),
+.feature-item:nth-child(4) {
+    background-color: #1B5CFF;   /* azul oscuro */
+}
+
+.features .btn-secondary {
+    margin-top: 40px;
+}
+
+/* ============= WHY TASKCOLAB ============= */
+.why {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    background: #f0f6ff;
+    padding: 80px 10%;
+    position: relative;
+}
+
+/* franja azul suave detrás del recuadro */
+.why::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 60%;
+    height: 100%;
+    background: #007bff;
+    opacity: 0.12; /* se alcanza a ver pero sin dominar */
+}
+
+/* imagen más grande */
+.why-img img {
+    width: 600px;
+    max-width: 100%;
+    z-index: 1;
+}
+
+/* recuadro azul del texto */
+.why-text {
+    background: #007bff;
+    color: #fff;
+    padding: 40px 50px;
+    border-radius: 15px;
+    z-index: 2;
+    max-width: 450px;
+}
+
+.why-text h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.why-text ul {
+    list-style: none;
+    padding: 0;
+}
+
+.why-text li {
+    font-size: 18px;
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+/* puntito blanco como viñeta */
+.why-text li::before {
+    content: "•";
+    color: #fff;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+
+/* ============= MAIN FEATURES ============= */
+.main-features {
+    text-align: center;
+    padding: 60px 10%;
+}
+
+.main-features h3 {
+    font-size: 20px;
+    color: #000000;
+    margin-bottom: 35px;
+}
+
+.main-features-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 50px; /* 👈 separa el bloque de tarjetas del botón */
+}
+
+.feature-card {
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 1500px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    text-align: left;
+    transition: 0.3s ease;
+}
+
+/* Primer, tercer, quinto, etc. */
+.feature-card:nth-child(odd) {
+    background: #1B5CFF;
+}
+
+/* Segundo, cuarto, sexto, etc. */
+.feature-card:nth-child(even) {
+    background: #2897FF;
+}
+
+.feature-card img {
+    width: 60px;
+}
+
+.feature-card p {
+    font-size: 18px;
+    color: #ffffff;
+    line-height: 1.3;
+}
+
+/* 👇 separa el botón de los recuadros */
+.main-features button {
+    margin-top: 20px;
+    background-color: #1B5CFF;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Hover más claro */
+.main-features button:hover {
+    background-color: #4d8bff;
+}
+
+
+
+/* ============= CTA ============= */
+.cta {
+    background-color: #2897FF; /* azul intenso */
+    color: #fff;
+    text-align: center;
+    padding: 60px 8%;
+    border-radius: 20px;
+    max-width: 1100px;
+    margin: 50px auto; /* centrado y con espacio arriba/abajo */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* leve sombra para resaltar */
+}
+
+.cta p {
+    font-size: 38px;
+    font-weight: 600;
+    margin-bottom: 35px;
+}
+
+.cta .btn {
+    background: #fff;
+    color: #007bff;
+    padding: 18px 45px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cta .btn:hover {
+    background: #e6f0ff;
+}
+
+/* ============= FOOTER ============= */
+.footer {
+    background: #1B5CFF;
+    color: #fff;
+    text-align: center;
+    font-size: 20px;
+    padding: 30px 0;
+}
+
+.footer .colab-black {
+    color: #000; /* hace "Colab" negro */
+    font-weight: 700;
+}
+
