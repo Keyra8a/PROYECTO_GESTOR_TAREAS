@@ -12,35 +12,72 @@ body {
 
 /* ============= NAVBAR ============= */
 .header {
-    background-color: #f0f6ff;
-    border-bottom: 2px solid #d9e4ff;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 10px 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    height: 100px;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+/* Recuadro azul solo donde está el logo */
+.logo-box {
+    background-color: #1B5CFF;
+    width: 200px;        /* Ajusta este valor para hacerlo más o menos largo */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .logo {
-    width: 120px;
+    width: 100px;
+}
+
+/* Parte blanca del header */
+.nav-container {
+    flex: 4;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 70px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 120px; /* separación entre los enlaces */
 }
 
 .nav-links a {
     color: #000;
     text-decoration: none;
-    margin: 0 30px;
     font-size: 20px;
-    font-weight: 20500;
+    font-weight: 500;
+    position: relative;
+    padding: 0 10px;
 }
+.nav-links a:hover {
+    color: #1B5CFF;
+}
+
+/* 👉 Línea azul entre los enlaces */
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    right: -60px; 
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 40px; 
+    background-color: #1B5CFF; 
+}
+
 
 .nav-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 40px;
 }
 
 .login {
@@ -55,19 +92,46 @@ body {
     color: #fff;
     border: none;
     border-radius: 6px;
-    padding: 8px 14px;
+    padding: 8px 20px;
     cursor: pointer;
     font-weight: 600;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .btn-primary:hover {
     background-color: #004dcc;
 }
 
+
+/* ============= BOTONES UNIFICADOS ============= */
+.btn-secondary,
+.hero .btn-secondary,
+.features .btn-secondary,
+.main-features button {
+    background-color: #1B5CFF;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    width: 250px;         
+    height: 55px;          
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-align: center;
+    display: inline-block;
+}
+
+.btn-secondary:hover,
+.hero .btn-secondary:hover,
+.features .btn-secondary:hover,
+.main-features button:hover {
+    background-color: #004dcc;
+}
+
 /* ============= HERO ============= */
 .hero {
-    background: #0084FF ;
+    background: #0084FF;
     color: #fff;
     padding: 60px 10%;
     display: flex;
@@ -87,7 +151,6 @@ body {
 
 .title span {
     color: #000;
-    /*background: #fff;*/
     padding: 0 6px;
     border-radius: 4px;
 }
@@ -96,20 +159,6 @@ body {
     font-size: 30px;
     margin-bottom: 25px;
     line-height: 1.3;
-}
-
-.btn-secondary {
-    background: #003BFF;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 20px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-secondary:hover {
-    background: #004dcc;
 }
 
 .hero-img img {
@@ -137,7 +186,6 @@ body {
     gap: 35px;
 }
 
-/* estilo general de cada tarjeta */
 .feature-item {
     width: 170px;
     text-align: center;
@@ -145,28 +193,30 @@ body {
     padding: 15px 10px;
     transition: transform 0.2s ease-in-out;
 }
+
 .feature-item:hover {
     transform: translateY(-5px);
 }
+
 .feature-item img {
     width: 80px;
     margin-bottom: 10px;
 }
+
 .feature-item p {
     font-size: 14px;
     color: #fff;
     font-weight: 600;
 }
 
-/* Colores alternos para las tarjetas */
 .feature-item:nth-child(1),
 .feature-item:nth-child(3) {
-    background-color: #2897FF;   /* azul rey */
+    background-color: #2897FF;
 }
 
 .feature-item:nth-child(2),
 .feature-item:nth-child(4) {
-    background-color: #1B5CFF;   /* azul oscuro */
+    background-color: #1B5CFF;
 }
 
 .features .btn-secondary {
@@ -184,7 +234,6 @@ body {
     position: relative;
 }
 
-/* franja azul suave detrás del recuadro */
 .why::before {
     content: "";
     position: absolute;
@@ -193,17 +242,15 @@ body {
     width: 60%;
     height: 100%;
     background: #007bff;
-    opacity: 0.12; /* se alcanza a ver pero sin dominar */
+    opacity: 0.12;
 }
 
-/* imagen más grande */
 .why-img img {
     width: 600px;
     max-width: 100%;
     z-index: 1;
 }
 
-/* recuadro azul del texto */
 .why-text {
     background: #007bff;
     color: #fff;
@@ -232,7 +279,6 @@ body {
     position: relative;
 }
 
-/* puntito blanco como viñeta */
 .why-text li::before {
     content: "•";
     color: #fff;
@@ -240,7 +286,6 @@ body {
     left: 0;
     top: 0;
 }
-
 
 /* ============= MAIN FEATURES ============= */
 .main-features {
@@ -259,7 +304,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 25px;
-    margin-bottom: 50px; /* 👈 separa el bloque de tarjetas del botón */
+    margin-bottom: 50px;
 }
 
 .feature-card {
@@ -274,12 +319,10 @@ body {
     transition: 0.3s ease;
 }
 
-/* Primer, tercer, quinto, etc. */
 .feature-card:nth-child(odd) {
     background: #1B5CFF;
 }
 
-/* Segundo, cuarto, sexto, etc. */
 .feature-card:nth-child(even) {
     background: #2897FF;
 }
@@ -293,38 +336,20 @@ body {
     color: #ffffff;
     line-height: 1.3;
 }
-
-/* 👇 separa el botón de los recuadros */
-.main-features button {
-    margin-top: 20px;
-    background-color: #1B5CFF;
-    color: #fff;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
+.feature-card:hover {
+    transform: translateY(-5px);
 }
-
-/* Hover más claro */
-.main-features button:hover {
-    background-color: #4d8bff;
-}
-
-
 
 /* ============= CTA ============= */
 .cta {
-    background-color: #2897FF; /* azul intenso */
+    background-color: #2897FF;
     color: #fff;
     text-align: center;
     padding: 60px 8%;
     border-radius: 20px;
     max-width: 1100px;
-    margin: 50px auto; /* centrado y con espacio arriba/abajo */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* leve sombra para resaltar */
+    margin: 50px auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .cta p {
@@ -359,7 +384,109 @@ body {
 }
 
 .footer .colab-black {
-    color: #000; /* hace "Colab" negro */
+    color: #000;
     font-weight: 700;
+}
+
+/* ============= SECCION LOGINN ============= */
+/* ==== FONDO ==== */
+.login-background {
+    background: #0084FF url('../img/imagenfondologin.png') center center no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+
+/* ==== TARJETA LOGIN ==== */
+.login-card {
+    
+    background: rgba(255, 255, 255, 0.8);
+    padding: 40px 60px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    text-align: center;
+    width: 320px;
+}
+
+.login-card h2 {
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #000;
+}
+
+/* ==== CAMPOS ==== */
+.login-card label {
+    display: block;
+    text-align: left;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.login-card input {
+    background: #003BFF;
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background-color: #1B5CFF;
+    opacity: 0.5;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+/* ==== BOTÓN ==== */
+.login-card button {
+    background-color: #1B5CFF;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 0;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-card button:hover {
+    background-color: #004dcc;
+}
+
+/* ==== ENLACE ==== */
+.register-link {
+    display: block;
+    margin-top: 15px;
+    color: #004dcc;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+
+/* ==== LOGO SUPERIOR ==== */
+.logo-header {
+    background: #1B5CFF;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 20px; /* espacio interno */
+    border-radius: 10px; /* bordes redondeados opcionales */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* leve sombra */
+}
+
+.logo-header img {
+    width: 90px;
+    height: auto;
 }
 
