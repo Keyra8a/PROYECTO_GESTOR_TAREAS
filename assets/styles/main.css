@@ -22,7 +22,7 @@ body {
 /* Recuadro azul solo donde está el logo */
 .logo-box {
     background-color: #1B5CFF;
-    width: 200px;        /* Ajusta este valor para hacerlo más o menos largo */
+    width: 200px;       
     height: 100%;
     display: flex;
     justify-content: center;
@@ -46,7 +46,7 @@ body {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 120px; /* separación entre los enlaces */
+    gap: 120px; 
 }
 
 .nav-links a {
@@ -61,7 +61,8 @@ body {
     color: #1B5CFF;
 }
 
-/* 👉 Línea azul entre los enlaces */
+
+/* Línea azul entre los enlaces */
 .nav-links a::after {
     content: "";
     position: absolute;
@@ -85,6 +86,9 @@ body {
     font-weight: 500;
     text-decoration: none;
     font-size: 20px;
+}
+.login:hover {
+    text-decoration: underline;
 }
 
 .btn-primary {
@@ -133,7 +137,7 @@ body {
 .hero {
     background: #0084FF;
     color: #fff;
-    padding: 60px 10%;
+    padding: 60px 15%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -144,7 +148,7 @@ body {
 }
 
 .title {
-    font-size: 60px;
+    font-size: 80px;
     font-weight: 700;
     margin-bottom: 10px;
 }
@@ -156,7 +160,7 @@ body {
 }
 
 .subtitle {
-    font-size: 30px;
+    font-size: 40px;
     margin-bottom: 25px;
     line-height: 1.3;
 }
@@ -174,7 +178,7 @@ body {
 
 .features h2 {
     color: #1a1a1a;
-    font-size: 18px;
+    font-size: 30px;
     font-weight: 600;
     margin-bottom: 35px;
 }
@@ -204,7 +208,7 @@ body {
 }
 
 .feature-item p {
-    font-size: 14px;
+    font-size: 25px;
     color: #fff;
     font-weight: 600;
 }
@@ -240,7 +244,7 @@ body {
     right: 0;
     top: 0;
     width: 60%;
-    height: 100%;
+    height: 90%;
     background: #007bff;
     opacity: 0.12;
 }
@@ -261,7 +265,7 @@ body {
 }
 
 .why-text h3 {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 700;
     margin-bottom: 20px;
     text-align: center;
@@ -273,7 +277,7 @@ body {
 }
 
 .why-text li {
-    font-size: 18px;
+    font-size: 32px;
     margin-bottom: 10px;
     padding-left: 20px;
     position: relative;
@@ -294,7 +298,7 @@ body {
 }
 
 .main-features h3 {
-    font-size: 20px;
+    font-size: 30px;
     color: #000000;
     margin-bottom: 35px;
 }
@@ -303,7 +307,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px;
+    gap: 20px;
     margin-bottom: 50px;
 }
 
@@ -311,7 +315,7 @@ body {
     padding: 20px;
     border-radius: 10px;
     width: 90%;
-    max-width: 1500px;
+    max-width: 1100px;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -332,7 +336,7 @@ body {
 }
 
 .feature-card p {
-    font-size: 18px;
+    font-size: 20px;
     color: #ffffff;
     line-height: 1.3;
 }
@@ -432,21 +436,20 @@ body {
 }
 
 .login-card input {
-    background: #003BFF;
+    background-color: rgba(27, 92, 255, 0.55); 
     color: #ffffff;
     width: 100%;
     padding: 10px;
     border-radius: 8px;
-    border: none;
-    background-color: #1B5CFF;
-    opacity: 0.5;
+    border: 1.5px solid transparent;
     margin-bottom: 18px;
     font-size: 14px;
-    outline: none; 
+    outline: none;
 }
+
 .login-card input:focus {
-    border-color: #ffffff; /* borde blanco al enfocar */
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.7); /* suave resplandor blanco */
+    border-color: #ffffff; 
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.7); 
     color: #ffffff;
     background-color: rgba(27, 92, 255, 0.8);
 }
@@ -474,7 +477,7 @@ body {
     margin-top: 15px;
     color: #004dcc;
     text-decoration: none;
-    font-size: 13px;
+    font-size: 16px;
 }
 
 
@@ -484,12 +487,18 @@ body {
     position: absolute;
     top: 0px;
     left: 0px;
-    padding: 20px; /* espacio interno */
-    border-radius: 0px; /* bordes redondeados opcionales */
+    padding: 20px; 
+    border-radius: 0px; 
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* leve sombra */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+.logo-header:hover {
+    background: #004dcc; 
+    transform: scale(1.05); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
 }
 
 .logo-header img {
@@ -497,8 +506,588 @@ body {
     height: auto;
 }
 .register-link:hover {
-    color: #000000;
+    text-decoration: underline;
 }
+
+/* ==================== TABLEROS ==================== */
+
+.why-tableros {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    padding: 60px 10%;
+    flex-wrap: wrap;
+}
+
+/* Recuadros */
+.why-box {
+    width: 500px;
+    height: 300px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+}
+
+/* Recuadro blanco */
+.white-box img {
+    width: 100%;
+    height: auto;
+}
+
+/* Recuadro azul */
+.blue-box {
+    background-color: #1B5CFF;
+    color: #ffffff;
+    text-align: center;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.blue-box h3 {
+    font-size: 30px;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.blue-box img {
+    width: 90px;
+    height: auto;
+}
+
+/* Hover sutil */
+.white-box:hover, .blue-box:hover {
+    transform: translateY(-5px);
+    transition: 0.3s ease;
+}
+
+
+
+/* --- FEATURES TABLEROS --- */
+.features-tableros {
+    background: #ffffff;
+    text-align: center;
+    font-size: 36px;
+    padding: 60px 10%;
+}
+
+.features-grid-tableros {
+    display: flex;
+    flex-direction: column; /* uno debajo del otro */
+    align-items: center;
+    gap: 25px; /* separación entre recuadros */
+}
+
+/* Recuadro individual */
+.feature-item-tableros {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    width: 500px;
+    border-radius: 12px;
+    padding: 20px 25px;
+    transition: all 0.3s ease;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+/* Texto dentro del recuadro */
+.feature-item-tableros p {
+    font-size: 30px;
+    font-weight: 400;
+    margin: 0;
+}
+
+/* Imagen a la derecha */
+.feature-item-tableros img {
+    width: 100px;
+    height: auto;
+}
+
+/* Colores alternados */
+.feature-item-tableros:nth-of-type(2) {
+    background-color: #1B5CFF;
+}
+.feature-item-tableros:nth-of-type(3) {
+    background-color: #2897FF;
+}
+.feature-item-tableros:nth-of-type(4) {
+    background-color: #1B5CFF;
+}
+
+/* Hover igual que login/registro */
+.feature-item-tableros:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(27, 92, 255, 0.5);
+}
+
+/* Botón final */
+.features-tableros .btn-secondary {
+    margin-top: 40px;
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #1B5CFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.features-tableros .btn-secondary:hover {
+    background-color: #174ed1;
+    transform: scale(1.05);
+}
+
+/* === MAIN FEATURES: un solo recuadro con texto vertical e imágenes a la derecha === */
+.main-features-tableros {
+    text-align: center;
+    padding: 60px 0;
+}
+
+/* Recuadro azul completo */
+.main-features-box {
+    background-color: #1B5CFF;
+    color: #fff;
+    max-width: 1100px;
+    width: 90%;
+    max-width: Cx;
+    margin: 0 auto;
+    padding: 40px 60px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgb(255, 255, 255);
+}
+
+/* Título */
+.main-features-box h3 {
+    color:#f0f6ff;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+/* Contenedor de los pasos */
+.main-features-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Cada paso */
+.step {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    /*justify-content: flex-start;*/
+    text-align: left;
+}
+
+/* Números dentro de círculos */
+.circle {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+/* Texto de cada paso */
+.step p {
+    font-size: 25px;
+    flex: 1;
+}
+
+/* Botón */
+.main-features-tableros .btn-primary {
+    margin-top: 30px;
+    padding: 15px 20px;
+    font-size: 18px;
+
+}
+/* Logo con hover en la esquina superior izquierda */
+.logo-box-todo {
+    background-color: #1B5CFF;
+    width: 200px;        /* Ajusta este valor para hacerlo más o menos largo */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.logo-box-todo:hover {
+    background: #004dcc; 
+    transform: scale(1.05); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+
+
+/* ==================== TAREAS ============================== */
+/* ==== SECCIÓN WHY-TAREAS ==== */
+.why-tareas {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 50px;
+  padding: 50px 10%;
+  position: relative;
+}
+
+/* Cada bloque de tarea (parte 1 y parte 2) */
+.why-tareas > div {
+  flex: 1;
+  text-align: left;
+}
+
+/* Línea vertical al centro */
+.why-tareas::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #1B5CFF;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Título de cada parte */
+.why-tareas h3 {
+  font-size: 30px;
+  color: #000;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Caja de cada fila (tarea asignada, fecha, prioridad, etc.) */
+.why-box-tareas {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.why-box-tareas img {
+  width: 30px;
+  height: 30px;
+}
+
+.why-box-tareas p {
+  font-size: 20px;
+  color: #000;
+  margin: 0;
+}
+
+
+/* ==== SECCIÓN FUNCIONES DE TAREAS ==== */
+.features-task {
+  text-align: center;
+  background-color: #fff;
+  padding: 60px 10%;
+}
+
+.features-task-box h3:first-of-type {
+  font-size: 36px;
+  margin-bottom: 25px;
+  color: #000;
+}
+
+.features-steps {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  margin: 0 auto 25px;
+  max-width: 700px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step img {
+  width: 25px;
+}
+
+.step p {
+  font-size: 25px;
+  color: #000;
+}
+
+.features-task-box h3:last-of-type {
+  font-size: 30px;
+  color: #000;
+  margin: 30px 0 10px;
+}
+
+.features-task button {
+  background-color: #1B5CFF;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 18px 42px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.features-task button:hover {
+  background-color: #004dcc;
+}
+
+/* ==== SECCIÓN DE TRES RECUADROS AZULES ==== */
+.mmain-features {
+  background-color: #fff;
+  text-align: center;
+  padding: 50px 10%;
+}
+
+.main-features-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.feature-item-task {
+  background-color: #1B5CFF;
+  border-radius: 12px;
+  padding: 20px 25px;
+  width: 350px;
+  font-size: 30px;
+  color: #fff;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.feature-item-task :hover {
+  transform: translateY(-5px);
+  background-color: #004dcc;
+}
+
+.feature-item-task-task p {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 5;
+  max-width: 80%;
+}
+
+.feature-item-task img {
+  width: 90px;
+  height: auto;
+}
+
+/* Botón debajo */
+.mmain-features button {
+  background-color: #1B5CFF;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.mmain-features button:hover {
+  background-color: #004dcc;
+}
+
+/* ================== SECCION USUARIOS ======================= */
+
+.why-usuarios {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background-color: #ffffff;
+  padding: 60px 10%;
+  gap: 50px;
+}
+
+.why-parte1-usuarios {
+  flex: 1;
+}
+
+.why-parte1-usuarios h3 {
+  font-size: 40px;
+  color: #000;
+  margin-bottom: 15px;
+}
+
+.why-parte1-usuarios p {
+  font-size: 20px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.why-parte2-usuarios {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.why-box-usuarios {
+  background-color: #f8faff;
+  border: 1px solid #d9e3ff;
+  border-radius: 12px;
+  padding: 25px 30px;
+  width: 350px;
+  text-align: left;
+  box-shadow: 0px 3px 8px rgba(0,0,0,0.05);
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* espacio entre foto y texto */
+  margin-bottom: 15px;
+}
+
+.user-header img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.user-info h3 {
+  font-size: 30px;
+  color: #000;
+  margin: 0;
+}
+
+.user-info h4 {
+  font-size: 15px;
+  color: #000000;
+  margin-top: 5px;
+}
+
+.why-box-usuarios ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.why-box-usuarios li {
+  font-size: 20px;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+/* ======= SECCIÓN FEATURES (Roles y Seguridad) ======= */
+.features-usuarios {
+  background-color: #fff;
+  padding: 60px 10%;
+  text-align: center;
+}
+
+.features-grid-usuarios {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+/* Títulos y descripciones generales */
+.features-grid-usuarios > div:first-child {
+  flex-basis: 100%;
+  text-align: center;
+}
+
+.features-grid-usuarios h3 {
+  font-size: 40px;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.features-grid-usuarios p {
+  font-size: 20px;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Tarjetas individuales */
+.feature-item-usuarios {
+  background-color: #f8faff;
+  border: 1px solid #d9e3ff;
+  border-radius: 12px;
+  padding: 25px 20px;
+  width: 250px;
+  text-align: center;
+  box-shadow: 0px 3px 8px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.feature-item-usuarios:hover {
+  transform: translateY(-5px);
+}
+
+.feature-item-usuarios img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+.feature-item-usuarios h3 {
+  font-size: 25px;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.feature-item-usuarios p {
+  font-size: 18px;
+  color: #444;
+}
+
+/* ======= BOTÓN ======= */
+.btn-secondary {
+  background-color: #1b5cff;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #0d47d4;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
