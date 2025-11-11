@@ -1,0 +1,237 @@
+/* ==== PANTALLA GESTOR DE TAREAS ==== */
+
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f9ff;
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 100px 1fr 80px;
+  height: 100vh;
+
+}
+.logo-box {
+    background-color: #1B5CFF;
+    width: 200px;       
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    width: 100px;
+}
+.logo-header {
+    background: #1B5CFF;
+    position:absolute;
+    top: 0px;
+    left: 0px;
+    padding: 30px; 
+    border-radius: 0px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+.logo-header:hover {
+    background: #004dcc; 
+    transform: scale(1.05); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+}
+
+.logo-header img {
+    width: 90px;
+    height: auto;
+    align-content: center;
+}
+
+.logo-box-todo:hover {
+    background: #004dcc; 
+    transform: scale(1.05); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+
+/* NAVBAR SUPERIOR */
+/* ==== HEADER ==== */
+.header {
+  grid-area: header;
+  color: rgb(0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 4px solid #0047c3; ;
+}
+
+/* 🔹 Contenedor que agrupa logo + pestaña */
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 0px; /* separación entre logo y pestaña */
+}
+
+.logo-box-todo {
+  background-color: #1B5CFF;
+  width: 200px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tab-container {
+  display: flex;
+  align-items: center;
+}
+
+.tab {
+  background-color: #1B5CFF;
+  color: #ffffff;
+  padding: 30px 20px;
+  border-radius: 0px;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border: 3.5px solid #ffffff; 
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info img {
+  width: 70px;
+  height: 80px;
+  margin-right: 10px;
+  cursor: pointer;
+
+}
+
+
+
+/* MENÚ LATERAL */
+.sidebar {
+  font-size: 20px;
+  grid-area: sidebar;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  gap: 10px;
+  border-right: 4px solid #1B5CFF;
+}
+
+.sidebar a {
+  background-color: #1B5CFF;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #0047c3;
+  color: white;
+}
+.sidebar a {
+  display: flex;
+  justify-content: space-between; /* texto a la izquierda, imagen a la derecha */
+  align-items: center;
+}
+
+.sidebar a img {
+  width: 16px;        /* tamaño más pequeño */
+  height: 16px;
+  margin-left: 8px;   /* pequeña separación del texto */
+}
+
+/* CONTENIDO PRINCIPAL */
+.main-content {
+  font-size: 50px;  
+  grid-area: main;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.task-blue {
+  color: #007bff;
+  font-weight: 700;
+}
+.task-black{
+    color:#000;
+}
+
+/* Botón + al lado de la pestaña */
+.add-tab {
+  background: none;
+  border: none;
+  color: #000000; /* color inicial del + */
+  font-size: 40px;
+  font-weight: bold;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.add-tab:hover {
+  color: #0047c3; /* azul intenso solo en el signo + */
+}
+
+/* Círculo del perfil con la letra Z */
+.user-circle {
+  background-color: #2897FF;
+  color: #000000;
+  /*border: 3px solid #1B5CFF;*/
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 25px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.profile-circle {
+  width: 50px;
+  height: 50px;
+  background-color: #1B5CFF; /* azul igual al header */
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  margin-left: 10px;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+
+/* FOOTER */
+.footer {
+  grid-area: footer;
+  background-color: #1B5CFF;
+  color: white;
+  text-align: center;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

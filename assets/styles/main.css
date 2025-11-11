@@ -57,7 +57,7 @@ body {
     position: relative;
     padding: 0 10px;
 }
-.nav-links a:hover {
+.nav-links,  a:hover {
     color: #1B5CFF;
 }
 
@@ -144,7 +144,7 @@ body {
 }
 
 .hero-content {
-    max-width: 550px;
+    max-width: 900px;
 }
 
 .title {
@@ -608,6 +608,10 @@ body {
     width: 100px;
     height: auto;
 }
+.main-features-box,
+.main-features-box * {
+  color: #fff !important;
+}
 
 /* Colores alternados */
 .feature-item-tableros:nth-of-type(2) {
@@ -941,6 +945,9 @@ body {
   justify-content: center;
   font-size: 10px;
 }
+.why-parte2-usuarios:hover{
+    transform: translateY(-5px);
+}
 
 .why-box-usuarios {
   background-color: #f8faff;
@@ -1028,10 +1035,21 @@ body {
   border: 1px solid #d9e3ff;
   border-radius: 12px;
   padding: 25px 20px;
-  width: 250px;
+  width: 350px;
+  text-align: left;
   text-align: center;
   box-shadow: 0px 3px 8px rgba(0,0,0,0.05);
   transition: transform 0.3s ease;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feature-item-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .feature-item-usuarios:hover {
@@ -1041,27 +1059,27 @@ body {
 .feature-item-usuarios img {
   width: 60px;
   height: 60px;
-  margin-bottom: 10px;
 }
 
 .feature-item-usuarios h3 {
   font-size: 25px;
   color: #000;
-  margin-bottom: 8px;
+  margin-bottom: 0px;
 }
 
 .feature-item-usuarios p {
   font-size: 18px;
   color: #444;
+  text-align: justify;
 }
 
 /* ======= BOTÓN ======= */
 .btn-secondary {
   background-color: #1b5cff;
   color: #fff;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 500;
-  border: none;
+  margin-top: 30px;;
   border-radius: 8px;
   padding: 12px 28px;
   cursor: pointer;
@@ -1071,6 +1089,338 @@ body {
 .btn-secondary:hover {
   background-color: #0d47d4;
 }
+
+/* ====== SECCIÓN TIPOS DE REPORTES ====== */
+.features-reportes {
+  background-color: #fff;
+  text-align: center;
+  padding: 60px 10%;
+}
+
+.features-grid-reportes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 35px;
+}
+
+.features-grid-reportes h3 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+/* Contenedor principal de los ítems */
+.feactures-item-repo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Cada ítem individual */
+.item-header-repo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: #f8f9ff;
+  border: 2px solid #d3dcff;
+  border-radius: 12px;
+  padding: 20px 25px;
+  width: 300px;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.item-header-repo:hover {
+  background-color: #e9efff;
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen de cada tipo de reporte */
+.item-header-repo img {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+/* Texto al lado derecho */
+.item-header-repo p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+/* =================== SECCIÓN PRINCIPAL (VENTAJAS DE REPORTES) ============== */
+.features-reportes {
+  background-color: #fff;
+  text-align: center;
+  padding: 60px 10%;
+}
+
+.features-grid-reportes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 35px;
+}
+
+/* Título principal */
+.features-grid-reportes h3 {
+  font-size: 35px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 30px;
+}
+
+/* Contenedor de los ítems */
+.feactures-item-repo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* Cada recuadro (Tipo de reporte) */
+.item-header-repo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border: 1px solid #cfd6ff;
+  border-radius: 10px;
+  padding: 25px 20px;
+  width: 230px;
+  height: 200px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.item-header-repo:hover {
+  transform: translateY(-5px);
+  border-color: #6a8dff;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* Imagen arriba */
+.item-header-repo img {
+  width: 85px;
+  height: 85px;
+  margin-bottom: 10px;
+}
+
+/* Texto debajo */
+.item-header-repo p {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+  text-align: center;
+}
+
+/* ====== SECCIÓN PRINCIPAL (VENTAJAS DE REPORTES) ====== */
+.main-features-reportes {
+  text-align: center;
+  padding: 60px 10%;
+  background-color: #fff;
+}
+
+.main-features-reportes h3 {
+  font-size: 30px;
+
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 30px;
+}
+
+.main-features-reportes p {
+  font-size: 25px;
+  color: #333;
+  margin-bottom: 35px;
+}
+
+/* Lista de ventajas */
+.main-features-list-repo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Cada tarjeta azul */
+.feature-card-repo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #fff;
+  padding: 20px 35px;
+  border-radius: 10px;
+  width: 650px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.feature-card-repo:hover {
+  transform: scale(1.03);
+}
+
+/* Colores alternos */
+.feature-card-repo:nth-child(1),
+.feature-card-repo:nth-child(3) {
+  background: linear-gradient(90deg, #36A0FF, #00A2FF); /* azul claro */
+}
+
+.feature-card-repo:nth-child(2),
+.feature-card-repo:nth-child(4) {
+  background: linear-gradient(90deg, #004DFF, #0029FF); /* azul más oscuro */
+}
+
+/* Imagen al lado izquierdo */
+.feature-card-repo img {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+/* Texto a la derecha */
+.feature-card-repo p {
+  color:white;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  text-align: left;
+}
+
+/* Botón */
+.main-features-reportes .btn-primary {
+  background: linear-gradient(90deg, #0072FF, #0041FF);
+  color: #fff;
+  border: none;
+  padding: 15px 75px;
+  border-radius: 8px;
+  margin-top: 40px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.main-features-reportes .btn-primary:hover {
+  background: linear-gradient(90deg, #0055CC, #002EBB);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+
+
+
+
+/* ========================== MENUS DE LOS NAVBAR ================================*/
+/* ======== MENÚ DESPLEGABLE NAVBAR ======== */
+.nav-item {
+  position: relative;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dropdown-toggle,
+.dropdown-menu a:hover h4,
+.dropdown-menu a:hover p a:hover {
+  color: #1b5cff; /* azul de tu diseño */
+  
+}
+
+
+.arrow {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* justo debajo del enlace */
+  left: 50%; /* empieza en el centro horizontal */
+  transform: translateX(-50%); /* lo mueve para centrarlo */
+  background-color: #ffffff; /* o el color de fondo que uses */
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  min-width: 230px; /* puedes ajustarlo si quieres */
+  z-index: 1000;
+  display: none; /* por defecto oculto */
+  transform: translateX(-50%) translateX(0px);
+}
+
+.dropdown-menu h4 {
+  font-size: 16px;
+  text-align: center;
+  color: #000;
+  margin: 0;
+}
+
+.dropdown-menu p {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.4;
+}
+
+
+/* ESTADO ACTIVO */
+.dropdown.active .dropdown-menu {
+  display: block;
+}
+
+.dropdown.active .arrow {
+  transform: rotate(180deg);
+}
+
+/* Quita cualquier borde o línea en los submenús */
+.dropdown-menu,
+.dropdown-menu * {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Si la línea viene de un pseudo-elemento (::before o ::after) */
+.dropdown-menu a::before,
+.dropdown-menu a::after,
+.dropdown-menu h4::before,
+.dropdown-menu h4::after {
+  content: none !important;
+  border: none !important;
+}
+
+/* Además, aseguramos que no tenga un underline azul */
+.dropdown-menu a {
+  text-decoration: none !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

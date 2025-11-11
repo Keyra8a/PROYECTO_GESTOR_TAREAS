@@ -10,16 +10,56 @@
     <!-- NAVBAR -->
     <header class="header">
         <div class="logo-box-todo">
-            <a href="../index.html"><img src="../assets/img/logo.png" width="30" alt="logo_tareas" class="logo"> </a> 
+            <a href="../index.html">
+            <img src="../assets/img/logo.png" width="30" alt="logo_tareas" class="logo">
+            </a>
         </div>
 
         <nav class="nav-container">
             <div class="nav-links">
-                        <a href="../view/tablero.html" >Tableros</a> 
-                        <a href="../view/tareas.html">Tareas</a>
-                        <a href="../view/usuarios.html">Usuarios</a>
-                        <a href="../view/reportes.html">Reportes</a>
-                    </div>
+
+            <div class="nav-item dropdown">
+                <a class="dropdown-toggle">Tableros <span class="arrow">▼</span></a>
+                <div class="dropdown-menu">
+                <a href="../view/tablero.html">
+                    <h4>Administración de tableros</h4>
+                    <p>Consulta, crea, elimina o edita tus tableros.</p>
+                </a>
+                </div>
+            </div>
+
+            <div class="nav-item dropdown">
+                <a class="dropdown-toggle">Tareas <span class="arrow">▼</span></a>
+                <div class="dropdown-menu">
+                <a href="../view/tareas.html">
+                    <h4>Gestionar tareas</h4>
+                    <p>Crea, asigna y monitorea tus tareas de forma sencilla.</p>
+                </a>
+                </div>
+            </div>
+
+            <div class="nav-item dropdown">
+                <a class="dropdown-toggle">Usuarios <span class="arrow">▼</span></a>
+                <div class="dropdown-menu">
+                <a href="../view/usuarios.html">
+                    <h4>Géstor de usuario</h4>
+                    <p>Crea y edita tu usuario dentro de tus tableros.</p>
+                </a>
+                </div>
+            </div>
+
+            <div class="nav-item dropdown">
+                <a class="dropdown-toggle">Reportes <span class="arrow">▼</span></a>
+                <div class="dropdown-menu">
+                <a href="../view/reportes.html">
+                    <h4>Panel de reportes</h4>
+                    <p>Visualizar el progreso, análiza el rendimiento y mejora la productividad de tu equipo.</p>
+                </a>
+                </div>
+            </div>
+
+            </div>
+
             <div class="nav-actions">
             <a href="../view/login.html" class="login">Iniciar sesión</a>
             <a href="../view/registro.html">
@@ -28,6 +68,9 @@
             </div>
         </nav>
     </header>
+
+
+
 
     <!-- HERO SECTION -->
     <section class="hero">
@@ -82,18 +125,24 @@
                 </p>
             </div>
             <div class="feature-item-usuarios">
-                <img src="../assets/img/admi-user.png" alt="imagen de roles de usuario">
-                <h3>Administrador</h3>
+                <div class="feature-item-header">
+                    <img src="../assets/img/admi-user.png" alt="imagen de roles de usuario">
+                    <h3>Administrador</h3>
+                </div>
                 <p>Crea tableros, asigna tareas y gestiona usuarios de los distintos tableros que puedes elaborar</p>
             </div>
             <div class="feature-item-usuarios">
-                <img src="../assets/img/colabora-user.png" alt="imagen de roles de usuario">
-                <h3>Colaborador</h3>
+                <div class="feature-item-header">
+                    <img src="../assets/img/colabora-user.png" alt="imagen de roles de usuario">
+                    <h3>Colaborador</h3>
+                </div>
                 <p>Edita tareas, comenta y actualiza el progreso del tablero</p>
             </div>
             <div class="feature-item-usuarios">
-                <img src="../assets/img/invitado-user.png" alt="imagen de roles de usuario">
-                <h3>Invitado</h3>
+                <div class="feature-item-header">
+                    <img src="../assets/img/invitado-user.png" alt="imagen de roles de usuario">
+                    <h3>Invitado</h3>
+                </div>
                 <p>Solo puede ver tableros y tareas asignadas</p>
             </div>
             <div>
@@ -102,12 +151,13 @@
                     directamente desde tu perfil.
                 </p>
                 <a href="../view/registro.html">
-                    <button class="btn-secondary">Ver mis colaboradores</button>
+                    <button class="btn-secondary">Construye tu equipo</button>
                 </a>
             </div>
         </div>
     </section>
 
+    <!-- FEACTURES MAIN -->
      <section class="features-usuarios">
         <div class="features-grid-usuarios">
             <div>
@@ -118,18 +168,24 @@
                 </p>
             </div>
             <div class="feature-item-usuarios">
-                <img src="../assets/img/candado-user.png" alt="imagen de roles de usuario">
-                <h3>Autenticación segura</h3>
+                <div class="feature-item-header">
+                    <img src="../assets/img/candado-user.png" alt="imagen de roles de usuario">
+                    <h3>Autenticación segura</h3>
+                </div>
                 <p>Protege tu cuenta con contraseña cifrada y verificación en dos pasos.</p>
             </div>
             <div class="feature-item-usuarios">
-                <img src="../assets/img/sincro-user.png" alt="imagen de roles de usuario">
-                <h3>Sincronización</h3>
+                <div class="feature-item-header">
+                    <img src="../assets/img/sincro-user.png" alt="imagen de roles de usuario">
+                    <h3>Sincronización</h3>
+                </div>
                 <p>Los cambios en tareas, tableros o usuarios se actualizan en tiempo real.</p>
             </div>
             <div class="feature-item-usuarios">
-                <img src="../assets/img/historia-user.png" alt="imagen de roles de usuario">
-                <h3>Historial de actividad</h3>
+                <div class="feature-item-header">
+                    <img src="../assets/img/historia-user.png" alt="imagen de roles de usuario">
+                    <h3>Historial de actividad</h3>
+                </div>
                 <p>Revisa acciones recientes y cambios realizados en cada proyecto</p>
             </div>
         </div>
@@ -148,5 +204,7 @@
     <footer class="footer">
         <p>© 2025 Task<span class="colab-black">Colab</span> - Todos los derechos reservados.</p>
     </footer>
+
+    <script src="../assets/javascript/menu.js"></script>
 </body>
 </html>
