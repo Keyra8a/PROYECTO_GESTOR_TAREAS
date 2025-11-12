@@ -34,22 +34,113 @@
 
   <!-- MENÚ LATERAL -->
   <nav class="sidebar">
-    <a href="/tableros.html">Tableros <img src="/assets/img/flecha.png"></a>
-    <a href="/tareas.html">Tareas <img src="/assets/img/flecha.png"></a>
-    <a href="/reportes.html">Reportes <img src="/assets/img/flecha.png"></a>
-    <a href="/usuarios.html">Usuarios <img src="/assets/img/flecha.png"></a>
-    <a href="/perfil.html">Perfil <img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="tableros">Tableros <img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="tareas">Tareas <img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="reportes">Reportes <img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="usuarios">Usuarios <img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="perfil">Perfil <img src="/assets/img/flecha.png"></a>
   </nav>
+
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="main-content">
-    <h2>Bienvenido a <span class="task-blue">Task</span>Colab</h2>
-    <p>¡Bienvenido a tu espacio de trabajo, Zahir Fernando!</p>
+    <!-- INICIO -->
+    <section id="inicio" class="seccion activa">
+      <h2>Bienvenido a <span class="task-blue">Task</span>Colab</h2>
+      <p>¡Bienvenido a tu espacio de trabajo, Zahir Fernando!</p>
+    </section>
+
+    <!-- Sección de tableros -->
+    <section id="tableros" class="seccion">
+      <h2 class="titulo-tableros">Mis Tableros</h2>
+      <div class="contenedor-tableros">
+        <div class="columna">
+          <h3>Pendiente <button class="add-card" data-seccion="pendiente">+</button></h3>
+          <div class="tarjetas"></div>
+        </div>
+        <div class="columna">
+          <h3>En proceso <button class="add-card">+</button></h3>
+          <div class="tarjetas"></div>
+        </div>
+        <div class="columna">
+          <h3>Completado <button class="add-card">+</button></h3>
+          <div class="tarjetas"></div>
+        </div>
+      </div>
+    </section>
+    <!-- FORMULARIO AÑADIR TARJETA -->
+    <section id="formulario-tarjeta" class="seccion">
+      <h2>Mis Tableros</h2>
+
+      <div class="form-tarjeta">
+        <h3>Añadir Tarjeta - Pendiente</h3>
+
+        <form>
+          <label>Título de la tarea</label>
+          <input type="text" placeholder="Diseñar encabezado principal">
+
+          <label>Descripción detallada</label>
+          <textarea placeholder="Hacer la creación de elementos y estilos para el diseño."></textarea>
+
+          <label>Asignar a:</label>
+          <select>
+            <option>Ana García</option>
+            <option>José Pérez</option>
+            <option>María López</option>
+          </select>
+
+          <label>Prioridad:</label>
+          <select>
+            <option>Alta prioridad</option>
+            <option>Media prioridad</option>
+            <option>Baja prioridad</option>
+          </select>
+
+          <label>Fecha límite:</label>
+          <p>23/10/2025</p>
+
+          <div class="botones">
+            <button type="button" class="cancelar">Cancelar</button>
+            <button type="submit" class="crear">Crear tarjeta</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+
+    <!-- TAREAS -->
+    <section id="tareas" class="seccion">
+      <h2>Mis Tareas</h2>
+      <p>Aquí aparecerán tus tareas.</p>
+    </section>
+
+    <!-- REPORTES -->
+    <section id="reportes" class="seccion">
+      <h2>Reportes</h2>
+      <p>Aquí irán tus reportes.</p>
+    </section>
+
+    <!-- USUARIOS -->
+    <section id="usuarios" class="seccion">
+      <h2>Usuarios</h2>
+      <p>Aquí estarán los usuarios del sistema.</p>
+    </section>
+
+    <!-- PERFIL -->
+    <section id="perfil" class="seccion">
+      <h2>Perfil</h2>
+      <p>Configuración de usuario.</p>
+    </section>
   </main>
+
+  
+
 
   <!-- FOOTER -->
   <footer class="footer">
     <p>© 2025 Task<span class="task-black">Colab</span> - Todos los derechos reservados.</p>
   </footer>
+
+  <script src="/assets/javascript/menu.js"></script>
 </body>
 </html>

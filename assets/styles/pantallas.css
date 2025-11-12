@@ -1,5 +1,4 @@
-/* ==== PANTALLA GESTOR DE TAREAS ==== */
-
+/* === ESTILOS GENERALES === */
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
@@ -12,226 +11,297 @@ body {
   grid-template-columns: 200px 1fr;
   grid-template-rows: 100px 1fr 80px;
   height: 100vh;
-
-}
-.logo-box {
-    background-color: #1B5CFF;
-    width: 200px;       
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.logo {
-    width: 100px;
-}
-.logo-header {
-    background: #1B5CFF;
-    position:absolute;
-    top: 0px;
-    left: 0px;
-    padding: 30px; 
-    border-radius: 0px; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-}
-.logo-header:hover {
-    background: #004dcc; 
-    transform: scale(1.05); 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
-}
-
-.logo-header img {
-    width: 90px;
-    height: auto;
-    align-content: center;
-}
-
-.logo-box-todo:hover {
-    background: #004dcc; 
-    transform: scale(1.05); 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-
-/* NAVBAR SUPERIOR */
-/* ==== HEADER ==== */
+/* === HEADER === */
 .header {
   grid-area: header;
-  color: rgb(0, 0, 0);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-
-  border-bottom: 4px solid #0047c3; ;
+  align-items: center;
+  border-bottom: 4px solid #0047c3;
 }
 
-/* 🔹 Contenedor que agrupa logo + pestaña */
 .left-section {
   display: flex;
   align-items: center;
-  gap: 0px; /* separación entre logo y pestaña */
 }
 
 .logo-box-todo {
-  background-color: #1B5CFF;
+  background-color: #1b5cff;
   width: 200px;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: 0.3s;
+}
+.logo-box-todo:hover {
+  background: #004dcc;
+  transform: scale(1.05);
 }
 
+.logo {
+  width: 100px;
+}
+
+/* Pestaña superior */
 .tab-container {
   display: flex;
   align-items: center;
 }
-
 .tab {
-  background-color: #1B5CFF;
-  color: #ffffff;
+  background-color: #1b5cff;
+  color: #fff;
   padding: 30px 20px;
-  border-radius: 0px;
+  border: 3.5px solid #fff;
   font-weight: bold;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  border: 3.5px solid #ffffff; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.add-tab {
+  background: none;
+  border: none;
+  font-size: 40px;
+  font-weight: bold;
+  margin-left: 10px;
+  color: #000;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.add-tab:hover {
+  color: #0047c3;
 }
 
+/* Usuario */
 .user-info {
   display: flex;
   align-items: center;
   gap: 15px;
 }
-
 .user-info img {
   width: 70px;
   height: 80px;
-  margin-right: 10px;
   cursor: pointer;
-
 }
-
-
-
-/* MENÚ LATERAL */
-.sidebar {
-  font-size: 20px;
-  grid-area: sidebar;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  padding: 15px;
-  gap: 10px;
-  border-right: 4px solid #1B5CFF;
-}
-
-.sidebar a {
-  background-color: #1B5CFF;
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 10px;
-  border-radius: 5px;
-  transition: 0.3s;
-}
-
-.sidebar a:hover {
-  background-color: #0047c3;
-  color: white;
-}
-.sidebar a {
-  display: flex;
-  justify-content: space-between; /* texto a la izquierda, imagen a la derecha */
-  align-items: center;
-}
-
-.sidebar a img {
-  width: 16px;        /* tamaño más pequeño */
-  height: 16px;
-  margin-left: 8px;   /* pequeña separación del texto */
-}
-
-/* CONTENIDO PRINCIPAL */
-.main-content {
-  font-size: 50px;  
-  grid-area: main;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.task-blue {
-  color: #007bff;
-  font-weight: 700;
-}
-.task-black{
-    color:#000;
-}
-
-/* Botón + al lado de la pestaña */
-.add-tab {
-  background: none;
-  border: none;
-  color: #000000; /* color inicial del + */
-  font-size: 40px;
-  font-weight: bold;
-  margin-left: 10px;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.add-tab:hover {
-  color: #0047c3; /* azul intenso solo en el signo + */
-}
-
-/* Círculo del perfil con la letra Z */
-.user-circle {
-  background-color: #2897FF;
-  color: #000000;
-  /*border: 3px solid #1B5CFF;*/
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 25px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
 .profile-circle {
   width: 50px;
   height: 50px;
-  background-color: #1B5CFF; /* azul igual al header */
-  color: rgb(0, 0, 0);
+  background-color: #1b5cff;
+  color: #000;
   font-weight: bold;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 25px;
-  margin-left: 10px;
-  margin-right: 10px;
-  transition: background-color 0.3s ease;
+}
+/* === SECCIÓN DE INICIO === */
+#inicio {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  color: #000;
 }
 
+#inicio h2 {
+  font-size: 60px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
 
-/* FOOTER */
-.footer {
-  grid-area: footer;
-  background-color: #1B5CFF;
-  color: white;
-  text-align: center;
+#inicio p {
+  font-size: 22px;
+  color: #333;
+}
+/* === SIDEBAR === */
+.sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  border-right: 4px solid #1b5cff;
+}
+.sidebar a {
+  background-color: #1b5cff;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
   font-size: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+}
+.sidebar a:hover {
+  background-color: #0047c3;
+}
+.sidebar img {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.main-content {
+  grid-area: main;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+.task-blue { color: #007bff; font-weight: 700; }
+.task-black { color: #000; }
+
+.seccion { display: none; }
+.seccion.activa { display: block; }
+
+/* === SECCIÓN TABLEROS === */
+.titulo-tableros {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.contenedor-tableros {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.columna {
+  background-color: #1e5eff;
+  color: white;
+  width: 250px;
+  min-height: 500px;
+  border-radius: 10px;
+  padding: 0 15px 15px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.columna h3 {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 8px;
+  font-size: 30px;
+  margin: 0;
+  padding: 10px 0;
+  border-bottom: 2px solid white;
+  width: 100%;
+  text-align: center;
+}
+.add-card {
+  background: none;
+  border: none;
+  color: rgb(0, 0, 0);
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.add-card:hover {
+  transform: scale(1.2);
+  color: white;
+}
+.seccion{
+  display: none;
+}
+.seccion.activa{
+  display: block;
+}
+#inicio.activa {
+  display: flex;
+}
+
+/* === FORMULARIO TARJETA === */
+.form-tarjeta {
+  border: 2px solid #1b5cff;
+  border-radius: 10px;
+  padding: 20px 30px;
+  width: 600px;
+  margin: 0 auto;
+  background: white;
+}
+
+.form-tarjeta h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 22px;
+  border-bottom: 2px solid #1b5cff;
+  padding-bottom: 5px;
+}
+
+.form-tarjeta form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-tarjeta label {
+  font-weight: bold;
+  text-align: left;
+}
+
+.form-tarjeta input,
+.form-tarjeta textarea,
+.form-tarjeta select {
+  background: #1b5cff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 15px;
+}
+
+.form-tarjeta textarea {
+  resize: none;
+  height: 80px;
+}
+
+.form-tarjeta .botones {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.form-tarjeta .botones button {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-tarjeta .cancelar {
+  background: #a1b3ff;
+  color: #000;
+}
+
+.form-tarjeta .crear {
+  background: #0052ff;
+  color: #fff;
+}
+
+
+/* === FOOTER === */
+.footer {
+  grid-area: footer;
+  background-color: #1b5cff;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
 }
