@@ -55,22 +55,24 @@
       <h2 class="titulo-tableros">Mis Tableros</h2>
       <div class="contenedor-tableros">
         <div class="columna">
-          <h3>Pendiente <button class="add-card" data-seccion="pendiente">+</button></h3>
+          <h3>Pendiente <button id="btnAñadirPendiente" class="add-card" data-seccion="pendiente">+</button></h3>
           <div class="tarjetas"></div>
         </div>
-        <div class="columna">
-          <h3>En proceso <button class="add-card">+</button></h3>
+
+        <div class="columna proceso">
+          <h3>En proceso <button class="add-card" data-seccion="proceso">+</button></h3>
           <div class="tarjetas"></div>
         </div>
-        <div class="columna">
-          <h3>Completado <button class="add-card">+</button></h3>
+
+        <div class="columna completado">
+          <h3>Completado <button class="add-card" data-seccion="completado">+</button></h3>
           <div class="tarjetas"></div>
         </div>
       </div>
     </section>
     <!-- FORMULARIO AÑADIR TARJETA -->
     <section id="formulario-tarjeta" class="seccion">
-      <h2>Mis Tableros</h2>
+      <h2 class="titulo">Mis Tableros</h2>
 
       <div class="form-tarjeta">
         <h3>Añadir Tarjeta - Pendiente</h3>
@@ -97,7 +99,8 @@
           </select>
 
           <label>Fecha límite:</label>
-          <p>23/10/2025</p>
+          <input class="date" type="date">
+
 
           <div class="botones">
             <button type="button" class="cancelar">Cancelar</button>
@@ -107,12 +110,74 @@
       </div>
     </section>
 
+    <!-- Sección de confirmación de eliminación -->
+    <section id="eliminarTarjeta" class="seccion">
+      <div class="alerta-eliminar">
+        <h3>Eliminar Tarjeta</h3>
+        <img src="/assets/img/alerta.png" alt="Alerta">
+        <p>¿Estás seguro de que deseas eliminar esta tarjeta?<br><strong>Esta acción no se puede deshacer.</strong> </p>
+        <div class="botones-alerta">
+          <button id="cancelarEliminar">Cancelar</button>
+          <button id="confirmarEliminar">Eliminar</button>
+        </div>
+      </div>
+    </section>
+
 
     <!-- TAREAS -->
     <section id="tareas" class="seccion">
-      <h2>Mis Tareas</h2>
-      <p>Aquí aparecerán tus tareas.</p>
+      <h2 class="titulo-tareas">Mis tareas</h2>
+
+      <div class="tabla-contenedor">
+        <table class="tabla-tareas">
+          <thead>
+            <tr>
+              <th> <img src="/assets/img/seleccion.png" class="icono-completado" alt="Completado"></th>
+              <th>Tarea</th>
+              <th>Tablero</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th><img src="/assets/img/icono-usuario.png" class="icono-completado" alt="Completado"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td>Diseñar pantalla de login</td>
+              <td>UI Principal</td>
+              <td>Pendiente</td>
+              <td>2025-11-12</td>
+              <td>Keyra Yariely Grijalva Ochoa</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Diseñar pantalla de login</td>
+              <td>UI Principal</td>
+              <td>Pendiente</td>
+              <td>2025-11-12</td>
+              <td>Keyra Yariely Grijalva Ochoa</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Diseñar pantalla de login</td>
+              <td>UI Principal</td>
+              <td>Pendiente</td>
+              <td>2025-11-12</td>
+              <td>Keyra Yariely Grijalva Ochoa</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Diseñar pantalla de login</td>
+              <td>UI Principal</td>
+              <td>Pendiente</td>
+              <td>2025-11-12</td>
+              <td>Keyra Yariely Grijalva Ochoa</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
+
 
     <!-- REPORTES -->
     <section id="reportes" class="seccion">
@@ -130,6 +195,18 @@
     <section id="perfil" class="seccion">
       <h2>Perfil</h2>
       <p>Configuración de usuario.</p>
+    </section>
+
+    <section id="cerrarSesion" class="seccion">
+      <div class="alerta-eliminar">
+        <h3>Cerrar Sesión</h3>
+        <img src="/assets/img/alerta.png" alt="Alerta de cierre">
+        <p>Por favor confirme que desea cerrar sesión.</p>
+        <div class="botones-alerta">
+          <button id="cancelarCerrarSesion">Cancelar</button>
+          <button id="confirmarCerrarSesion">Confirmar</button>
+        </div>
+      </div>
     </section>
   </main>
 

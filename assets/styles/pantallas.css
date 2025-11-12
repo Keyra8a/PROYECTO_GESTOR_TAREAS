@@ -49,6 +49,7 @@ body {
 .tab-container {
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 .tab {
   background-color: #1b5cff;
@@ -225,8 +226,12 @@ body {
 }
 
 /* === FORMULARIO TARJETA === */
+.titulo {
+  font-size: 40px; 
+  margin-bottom: auto;
+}
 .form-tarjeta {
-  border: 2px solid #1b5cff;
+  border: 3px solid #1b5cff;
   border-radius: 10px;
   padding: 20px 30px;
   width: 600px;
@@ -237,7 +242,7 @@ body {
 .form-tarjeta h3 {
   text-align: center;
   margin-bottom: 15px;
-  font-size: 22px;
+  font-size: 30px;
   border-bottom: 2px solid #1b5cff;
   padding-bottom: 5px;
 }
@@ -263,9 +268,19 @@ body {
   padding: 8px;
   font-size: 15px;
 }
+input::placeholder,
+textarea::placeholder {
+  color: white;
+}
+/* Selects un poco más grandes */
+select {
+  font-size: 18px;
+  padding: 10px;
+}
 
 .form-tarjeta textarea {
   resize: none;
+  color: white;
   height: 80px;
 }
 
@@ -279,7 +294,7 @@ body {
 .form-tarjeta .botones button {
   border: none;
   border-radius: 6px;
-  padding: 8px 20px;
+  padding: 8px 90px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -293,6 +308,261 @@ body {
   background: #0052ff;
   color: #fff;
 }
+.main-content {
+  padding-bottom: 60px; /* espacio seguro abajo */
+}
+
+.tarjeta {
+  background-color: #2897FF;
+  color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  width: 220px;
+  font-size: 20px;
+  font-family: Arial, sans-serif;
+}
+/* separa las tarjetas de la línea blanca del título */
+.columna .tarjetas {
+  margin-top: 15px;
+}
+
+.tarjeta h4 {
+  color:#000;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.tarjeta p {
+  color: black;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0;
+}
+
+.icono {
+  width: 50px;
+  height: 50px;
+}
+
+.botones-tarjeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+.botones-derecha{
+  display: flex;
+  gap: 6px;
+}
+/* === BOTONES === */
+.botones-tarjeta button {
+  background-color: #0047ff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 35px;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: background 0.3s;
+}
+
+.botones-tarjeta button:hover {
+  background-color: #002fb3;
+}
+
+.tarjeta .acciones button {
+  background: #003BFF;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.2s;
+}
+
+.tarjeta .acciones button:hover {
+  background: #0047c3;
+}
+.icono-basura {
+  width: 30px;
+  height: 35px;
+  vertical-align: middle;
+  filter: invert(0);
+}
+
+.tarjeta .acciones button.eliminar {
+  background: #003BFF;
+}
+
+.tarjeta .acciones button.eliminar:hover {
+  background: #0047c3;
+}
+.tarjeta{
+  margin-bottom: 15px;
+}
+
+/* === SECCIÓN ELIMINAR TARJETA === */
+#eliminarTarjeta {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+#eliminarTarjeta.activa {
+  display: flex;
+}
+
+.alerta-eliminar {
+  background: white;
+  border: 4px solid #1b5cff; /* borde azul alrededor */
+  border-radius: 12px;
+  width: 600px;
+  text-align: center;
+  padding: 30px 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.alerta-eliminar h3 {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1b5cff;
+  margin: 0 0 10px 0;
+  border-bottom: 3px solid #1b5cff; /* línea abajo */
+}
+
+.alerta-eliminar img {
+  width: 150px;
+  height: 150px;
+  margin: 15px 0;
+}
+
+.alerta-eliminar p {
+  color: #333;
+  font-size: 20px;
+  margin: 10px 0 25px 0;
+}
+
+/* Botones */
+.botones-alerta {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.botones-alerta button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 60px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+#cancelarEliminar, #cancelarCerrarSesion {
+  background: #a1b3ff;
+  color: #000;
+}
+
+#confirmarEliminar, #confirmarCerrarSesion {
+  background: #0052ff;
+  color: white;
+}
+
+#cancelarEliminar, #confirmarCerrarSesion:hover {
+  background: #7f97ff;
+}
+
+#confirmarEliminar, #cancelarCerrarSesion:hover {
+  background: #003bcc;
+}
+
+#cerrarSesion {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+#cerrarSesion.activa {
+  display: flex;
+}
+
+
+/* === SECCIÓN TAREAS === */
+.titulo-tareas{
+  font-size: 50px;
+}
+.tabla-tareas {
+  width: 90%;
+  margin: 40px auto;
+  border-collapse: collapse;
+  border: 3.5px solid #007bff;
+  background-color: #ffffff;
+  color: white;
+  font-size: 25px;
+  text-align: center;
+  min-height: 400px; /* tamaño fijo grande */
+}
+
+.tabla-tareas th,
+.tabla-tareas td {
+  border: 3.5px solid #007bff;
+  color:#000;
+  padding: 12px;
+  vertical-align: middle;
+}
+.tabla-tareas td{
+  font-size: 20px;
+}
+
+.tabla-tareas th {
+  background-color: #ffffff;
+  color: black;
+  font-weight: bold;
+}
+
+.icono-completado,
+.icono-usuario {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.icono-completado:hover {
+  transform: scale(1.1);
+}
+
+.estado {
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+}
+
+.estado.pendiente {
+  background-color: #e67e22;
+}
+
+.estado.en-progreso {
+  background-color: #3498db;
+}
+
+.estado.completada {
+  background-color: #2ecc71;
+}
+
+/* asegura altura mínima incluso sin tareas */
+.tabla-tareas tbody {
+  height: 300px;
+}
+
+
 
 
 /* === FOOTER === */
