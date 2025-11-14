@@ -39,6 +39,7 @@
     <a href="#" data-section="reportes">Reportes <img src="/assets/img/flecha.png"></a>
     <a href="#" data-section="usuarios">Usuarios <img src="/assets/img/flecha.png"></a>
     <a href="#" data-section="perfil">Perfil <img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="index"><img src="/assets/img/casita.png" width="30px" height="30px"><img src="/assets/img/flecha.png"></a>
   </nav>
 
 
@@ -51,56 +52,65 @@
     </section>
 
     <!-- Sección de tableros -->
-    <section id="tableros" class="seccion">
-      <h2 class="titulo-tableros">Mis Tableros</h2>
+    <section id="tableros" class="seccion activa">
+      <h2 class="titulo-tableros">Mis tableros</h2>
       <div class="contenedor-tableros">
         <div class="columna">
-          <h3>Pendiente <button id="btnAñadirPendiente" class="add-card" data-seccion="pendiente">+</button></h3>
+          <div class="titulo-columna">
+            <h3>Pendiente</h3>
+            <button class="add-card" data-seccion="pendiente">+</button>
+          </div>
           <div class="tarjetas"></div>
         </div>
-
-        <div class="columna proceso">
-          <h3>En proceso <button class="add-card" data-seccion="proceso">+</button></h3>
+        <div class="columna">
+          <div class="titulo-columna">
+            <h3>En proceso</h3>
+            <button class="add-card" data-seccion="proceso">+</button>
+          </div>
           <div class="tarjetas"></div>
         </div>
-
-        <div class="columna completado">
-          <h3>Completado <button class="add-card" data-seccion="completado">+</button></h3>
+        <div class="columna">
+          <div class="titulo-columna">
+            <h3>Completado</h3>
+            <button class="add-card" data-seccion="completado">+</button>
+          </div>
           <div class="tarjetas"></div>
         </div>
       </div>
     </section>
+
     <!-- FORMULARIO AÑADIR TARJETA -->
     <section id="formulario-tarjeta" class="seccion">
       <h2 class="titulo">Mis Tableros</h2>
 
       <div class="form-tarjeta">
-        <h3>Añadir Tarjeta - Pendiente</h3>
+        <h3 id="titulo-form-tarjeta">Añadir Tarjeta - Pendiente</h3>
 
-        <form>
+        <form id="form-tarjeta">
           <label>Título de la tarea</label>
-          <input type="text" placeholder="Diseñar encabezado principal">
+          <input type="text" placeholder="Diseñar encabezado principal" required>
 
           <label>Descripción detallada</label>
-          <textarea placeholder="Hacer la creación de elementos y estilos para el diseño."></textarea>
+          <textarea placeholder="Hacer la creación de elementos y estilos para el diseño." required></textarea>
 
           <label>Asignar a:</label>
-          <select>
+          <select required>
+            <option value="">Seleccionar usuario</option>
             <option>Ana García</option>
             <option>José Pérez</option>
             <option>María López</option>
           </select>
 
           <label>Prioridad:</label>
-          <select>
+          <select required>
+            <option value="">Seleccionar prioridad</option>
             <option>Alta prioridad</option>
             <option>Media prioridad</option>
             <option>Baja prioridad</option>
           </select>
 
           <label>Fecha límite:</label>
-          <input class="date" type="date">
-
+          <input class="date" type="date" required>
 
           <div class="botones">
             <button type="button" class="cancelar">Cancelar</button>
@@ -110,23 +120,47 @@
       </div>
     </section>
 
+
+
     <!-- Sección de confirmación de eliminación -->
     <section id="eliminarTarjeta" class="seccion">
       <div class="alerta-eliminar">
-        <h3>Eliminar Tarjeta</h3>
-        <img src="/assets/img/alerta.png" alt="Alerta">
-        <p>¿Estás seguro de que deseas eliminar esta tarjeta?<br><strong>Esta acción no se puede deshacer.</strong> </p>
+        <h3 id="tituloAlerta">Eliminar Tarjeta</h3>
+
+        <!-- AQUÍ AGREGUÉ EL ID NECESARIO PARA CAMBIAR LA IMAGEN -->
+        <img id="iconoAlerta" src="/assets/img/alerta.png" alt="Alerta">
+
+        <p id="textoAlerta">
+          ¿Estás seguro de que deseas eliminar esta tarjeta?<br>
+          <strong>Esta acción no se puede deshacer.</strong>
+        </p>
+
         <div class="botones-alerta">
           <button id="cancelarEliminar">Cancelar</button>
           <button id="confirmarEliminar">Eliminar</button>
         </div>
       </div>
+
+      
     </section>
+
+  
+
+
+
 
 
     <!-- TAREAS -->
     <section id="tareas" class="seccion">
-      <h2 class="titulo-tareas">Mis tareas</h2>
+      <h2 class="titulo-tareas">Tareas</h2>
+      <div class="encabezado-tareas">
+        <button id="btn-borrar-tareas" class="btn-basura" style="display: none;">
+          <img src="/assets/img/basura.png" alt="Eliminar tareas" />
+        </button>
+
+        <button class="btn-azul">Añadir tarea</button>
+      </div>
+
 
       <div class="tabla-contenedor">
         <table class="tabla-tareas">
@@ -142,7 +176,7 @@
           </thead>
           <tbody>
             <tr>
-              <td></td>
+              <td><div class="check-cuadro"></div></td>
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
@@ -150,7 +184,7 @@
               <td>Keyra Yariely Grijalva Ochoa</td>
             </tr>
             <tr>
-              <td></td>
+              <td><div class="check-cuadro"></div></td>
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
@@ -158,7 +192,7 @@
               <td>Keyra Yariely Grijalva Ochoa</td>
             </tr>
             <tr>
-              <td></td>
+              <td><div class="check-cuadro"></div></td>
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
@@ -166,7 +200,7 @@
               <td>Keyra Yariely Grijalva Ochoa</td>
             </tr>
             <tr>
-              <td></td>
+              <td><div class="check-cuadro"></div></td>
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
@@ -177,24 +211,309 @@
         </table>
       </div>
     </section>
+    <!-- FORMULARIO AÑADIR TAREA -->
+    <section id="formulario-tarea" class="seccion">
+      <h2 class="titulo">Tareas</h2>
+
+      <div class="form-tarea">
+        <h3>Añadir Tarea</h3>
+
+        <form>
+          <!-- TÍTULO -->
+          <label for="titulo-tarea">Título de la tarea</label>
+          <input type="text" id="titulo-tarea" placeholder="Ejemplo: Diseñar pantalla de inicio">
+
+          <!-- DESCRIPCIÓN -->
+          <label for="descripcion-tarea">Descripción detallada</label>
+          <textarea id="descripcion-tarea" placeholder="Describe los detalles y objetivos de la tarea..."></textarea>
+
+          <!-- ASIGNAR A -->
+          <div class="fila">
+            <label for="asignar-a">Asignar a:</label>
+            <input type="text" id="asignar-a" placeholder="Nombre del responsable">
+          </div>
+
+          <!-- ESTADO -->
+          <div class="fila">
+            <label for="estado">Estado:</label>
+            <select id="estado">
+              <option value="pendiente">Pendiente</option>
+              <option value="proceso">En proceso</option>
+              <option value="completada">Completada</option>
+            </select>
+          </div>
+
+          <!-- PRIORIDAD -->
+          <div class="fila">
+            <label for="prioridad">Prioridad:</label>
+            <select id="prioridad">
+              <option value="baja">Baja prioridad</option>
+              <option value="media">Media prioridad</option>
+              <option value="alta">Alta prioridad</option>
+            </select>
+          </div>
+
+          <!-- FECHA -->
+          <div class="fila">
+            <label for="fecha">Fecha límite:</label>
+            <input type="date" id="fecha">
+          </div>
+
+          <!-- BOTONES -->
+          <div class="botones">
+            <button type="button" class="cancelar">Cancelar</button>
+            <button type="submit" class="crear">Añadir tarea</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+
 
 
     <!-- REPORTES -->
-    <section id="reportes" class="seccion">
-      <h2>Reportes</h2>
-      <p>Aquí irán tus reportes.</p>
+    <div id="reportes" class="seccion">
+      <h2 class="titulo-reportes">Reportes</h2>
+      <div class="descripcion-exportar">
+          <p class="descripcion-reportes">Ver métricas y estadísticas generales del sistema.</p>
+          <button id="btn-exportar-pdf" class="btn-exportar">Exportar PDF</button>
+
+        </div>
+
+      <div class="tarjetas-metricas">
+        <div class="tarjeta-metrica">
+          <h3>Total de tareas</h3>
+          <p>3</p>
+        </div>
+        <div class="tarjeta-metrica">
+          <h3>Pendiente</h3>
+          <p>1</p>
+        </div>
+        <div class="tarjeta-metrica">
+          <h3>En proceso</h3>
+          <p>1</p>
+        </div>
+        <div class="tarjeta-metrica">
+          <h3>Completado</h3>
+          <p>1</p>
+        </div>
+      </div>
+
+      <div class="contenedor-barras">
+        <div class="recuadro">
+          <h3>Progreso por tablero</h3>
+          <div class="barra">
+            <span>Pendiente</span>
+            <div class="barra-contenido">
+              <div class="barra-progreso" style="width: 100%"></div>
+            </div>
+            <span class="porcentaje">100%</span>
+          </div>
+
+          <div class="barra">
+            <span>En proceso</span>
+            <div class="barra-contenido">
+              <div class="barra-progreso" style="width: 90%"></div>
+            </div>
+            <span class="porcentaje">90%</span>
+          </div>
+
+          <div class="barra">
+            <span>Completado</span>
+            <div class="barra-contenido">
+              <div class="barra-progreso" style="width: 50%"></div>
+            </div>
+            <span class="porcentaje">50%</span>
+          </div>
+        </div>
+
+        <div class="recuadro">
+          <h3>Usuarios activos</h3>
+          <div class="barra">
+            <span>Zahir Fernando</span>
+            <div class="barra-contenido">
+              <div class="barra-progreso" style="width: 60%"></div>
+            </div>
+            <span class="porcentaje">60%</span>
+          </div>
+
+          <div class="barra">
+            <span>Renier Lucero</span>
+            <div class="barra-contenido">
+              <div class="barra-progreso" style="width: 80%"></div>
+            </div>
+            <span class="porcentaje">80%</span>
+          </div>
+
+          <div class="barra">
+            <span>Keyra Yariely</span>
+            <div class="barra-contenido">
+              <div class="barra-progreso" style="width: 20%"></div>
+            </div>
+            <span class="porcentaje">20%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="recuadro tareas-atrasadas">
+        <h3>Tareas atrasadas</h3>
+        <div class="contenido-atrasadas">
+          <p>¡En este momento no se encuentran tareas atrasadas!</p>
+          <img src="/assets/img/like.png" alt="Like" class="icono-like">
+        </div>
+      </div>
+    </div>
+
+
+    <!-- SECCIÓN USUARIOS -->
+    <section id="usuarios" class="seccion">
+        <h2 class="titulo-seccion">Usuarios</h2>
+
+        <div class="tabla-contenedor">
+            <table class="tabla-tareas">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo electrónico</th>
+                        <th>Tareas asignadas</th>
+                        <th>Notas</th>
+                    </tr>
+                </thead>
+
+                <tbody class="tabla-usuarios">
+                    <tr data-id="1">
+                        <td>Juan Pérez</td>
+                        <td>juan.perez@example.com</td>
+                        <td>5</td>
+                        <td>Responsable de tareas urgentes</td>
+                    </tr>
+
+                    <tr data-id="2">
+                        <td>María López</td>
+                        <td>maria.lopez@example.com</td>
+                        <td>3</td>
+                        <td>Apoya en tareas de diseño</td>
+                    </tr>
+
+                    <tr data-id="3">
+                        <td>Carlos Martínez</td>
+                        <td>carlos.martinez@example.com</td>
+                        <td>7</td>
+                        <td>Encargado del seguimiento semanal</td>
+                    </tr>
+
+                    <tr data-id="4">
+                        <td>Ana Torres</td>
+                        <td>ana.torres@example.com</td>
+                        <td>2</td>
+                        <td>Nueva integrante del equipo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 
-    <!-- USUARIOS -->
-    <section id="usuarios" class="seccion">
-      <h2>Usuarios</h2>
-      <p>Aquí estarán los usuarios del sistema.</p>
+    <!-- SECCIÓN DETALLES DE USUARIO -->
+    <section id="detalleUsuario" class="seccion">
+        <h2 class="titulo-seccion">Detalles de usuarios</h2>
+
+        <div class="detalle-caja">
+            <div class="detalle-titulo">Detalles</div>
+
+            <div class="detalle-contenido">
+                <div class="fila-detalle">
+                    <span class="campo">Nombre completo:</span>
+                    <span id="detNombre" class="valor"></span>
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Correo electrónico:</span>
+                    <span id="detCorreo" class="valor"></span>
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Tareas asignadas:</span>
+                    <span id="detTareas" class="valor"></span>
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Estado:</span>
+                    <span id="detEstado" class="valor">Activo</span>
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Última actualización:</span>
+                    <span id="detFecha" class="valor">00/00/0000</span>
+                </div>
+            </div>
+
+            <div class="detalle-botones">
+                <button id="btnVolverUsuario" class="btn-volver">↩</button>
+                <button id="btnEditarUsuario" class="btn-editar">Editar</button>
+                <button id="btnEliminarUsuario" class="btn-eliminar-usuario">
+                    <img src="/assets/img/basura.png" class="icono-bote">
+                </button>
+            </div>
+        </div>
     </section>
+
+    <!-- SECCIÓN EDITAR USUARIO -->
+    <section id="editarUsuario" class="seccion" >
+        <h2 class="titulo-seccion">Editar</h2>
+
+        <div class="detalle-caja">
+            <div class="detalle-titulo">Editar</div>
+
+            <div class="detalle-contenido">
+                <div class="fila-detalle">
+                    <span class="campo">Nombre completo:</span>
+                    <input id="editNombre" class="input-editar" type="text">
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Correo electrónico:</span>
+                    <input id="editCorreo" class="input-editar" type="email">
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Tareas asignadas:</span>
+                    <input id="editTareas" class="input-editar" type="number">
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Estado:</span>
+                    <input id="editEstado" class="input-editar" type="text">
+                </div>
+
+                <div class="fila-detalle">
+                    <span class="campo">Última actualización:</span>
+                    <input id="editFecha" class="input-editar" type="text">
+                </div>
+            </div>
+
+            <div class="detalle-botones">
+                <button id="btnCancelarEditar" class="btn-volver">↩</button>
+                <button id="btnAceptarEditar" class="btn-editar">Aceptar</button>
+                <button id="btnEliminarUsuarioEdit" class="btn-eliminar-usuario">
+                    <img src="/assets/img/basura.png" class="icono-bote">
+                </button>
+            </div>
+        </div>
+    </section>
+
+
+
+
 
     <!-- PERFIL -->
     <section id="perfil" class="seccion">
       <h2>Perfil</h2>
       <p>Configuración de usuario.</p>
+    </section>
+
+    <!-- REGRESAR A INDEX -->
+    <section id="regresar" class="seccion">
+
     </section>
 
     <section id="cerrarSesion" class="seccion">
@@ -208,6 +527,9 @@
         </div>
       </div>
     </section>
+
+
+
   </main>
 
   
