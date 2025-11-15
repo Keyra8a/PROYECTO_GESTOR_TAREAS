@@ -1,35 +1,236 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Ocultar la casita y el botón admin inmediatamente al cargar
+  setTimeout(() => {
+    const linkCasita = document.querySelector('.sidebar a[data-section="inicio"]');
+    const botonAdmin = document.querySelector('.sidebar a[data-section="admin"]');
+    if (linkCasita) {
+      linkCasita.style.display = "none";
+    }
+    if (botonAdmin) {
+      botonAdmin.style.display = "none";
+    }
+  }, 10);
+
+  // --- VARIABLES GLOBALES MEJORADAS ---
+  let seccionAntesDeEliminar = null;
+  let ultimaSeccionActiva = null;
+  let filaEditando = null;
+
   // --- FUNCIONES GENERALES ---
   const mostrarSeccion = (id) => {
-    document.querySelectorAll(".seccion").forEach((s) => s.classList.remove("activa"));
-    document.getElementById(id)?.classList.add("activa");
+    // Primero ocultar TODAS las secciones
+    document.querySelectorAll(".seccion").forEach((s) => {
+      s.classList.remove("activa");
+      // NO aplicar display: none a las alertas
+      if (!s.id.includes("eliminarTarjeta") && !s.id.includes("cerrarSesion")) {
+        s.style.display = "none";
+      }
+    });
+    
+    // Luego mostrar solo la sección activa
+    const seccion = document.getElementById(id);
+    if (seccion) {
+      seccion.classList.add("activa");
+      // NO forzar display block para las alertas - mantener su CSS original
+      if (!seccion.id.includes("eliminarTarjeta") && !seccion.id.includes("cerrarSesion") && seccion.id !== "inicio") {
+        seccion.style.display = "block";
+      } else if (seccion.id === "inicio") {
+        seccion.style.display = "flex";
+      }
+    }
+    
+    // LÓGICA PARA LA CASITA
+    const linkCasita = document.querySelector('.sidebar a[data-section="inicio"]');
+    if (linkCasita) {
+      if (id === "inicio") {
+        linkCasita.style.display = "none";
+      } else {
+        linkCasita.style.display = "flex";
+      }
+    }
+    
+    // Mostrar el botón admin SOLO cuando se clickee "usuarios"
+    const botonAdmin = document.querySelector('.sidebar a[data-section="admin"]');
+    if (botonAdmin) {
+      if (id === "usuarios") {
+        botonAdmin.style.display = "flex";
+      } else {
+        botonAdmin.style.display = "none";
+      }
+    }
   };
 
-  const mostrarAlerta = (tipo) => {
-    const seccionEliminar = document.getElementById("eliminarTarjeta");
-    const titulo = document.getElementById("tituloAlerta");
-    const texto = document.getElementById("textoAlerta");
-    if (!seccionEliminar || !titulo || !texto) return;
+  // --- SISTEMA UNIFICADO DE ALERTAS ---
+  function configurarAlerta(titulo, mensaje, tipo = "alerta", config) {
+    const tituloAlerta = document.getElementById("tituloAlerta");
+    const textoAlerta = document.getElementById("textoAlerta");
+    const iconoAlerta = document.getElementById("iconoAlerta");
+    const btnCancelar = document.getElementById("cancelarEliminar");
+    const btnConfirmar = document.getElementById("confirmarEliminar");
 
-    if (tipo === "tarjeta") {
-      titulo.textContent = "Eliminar Tarjeta";
-      texto.innerHTML = `¿Estás seguro de que deseas eliminar esta tarjeta?<br><strong>Esta acción no se puede deshacer.</strong>`;
-    } else if (tipo === "tarea") {
-      titulo.textContent = "Eliminar Tarea";
-      texto.innerHTML = `¿Deseas eliminar esta tarea?<br><strong>La tarea se eliminará de la tabla.</strong>`;
+    if (!tituloAlerta || !textoAlerta || !iconoAlerta || !btnCancelar || !btnConfirmar) return;
+
+    // Configurar contenido básico
+    tituloAlerta.textContent = titulo;
+    textoAlerta.innerHTML = mensaje;
+    iconoAlerta.src = tipo === "exito" ? "/assets/img/exito.png" : "/assets/img/alerta.png";
+
+    // Configurar botones según el tipo de alerta
+    if (config?.soloAceptar) {
+      btnCancelar.style.display = "none";
+      btnConfirmar.textContent = "Aceptar";
+    } else {
+      btnCancelar.style.display = "inline-block";
+      btnConfirmar.textContent = config?.textoConfirmar || "Confirmar";
     }
 
+    // Limpiar event listeners previos
+    btnCancelar.replaceWith(btnCancelar.cloneNode(true));
+    btnConfirmar.replaceWith(btnConfirmar.cloneNode(true));
+
+    // Obtener nuevas referencias después del clone
+    const nuevoBtnCancelar = document.getElementById("cancelarEliminar");
+    const nuevoBtnConfirmar = document.getElementById("confirmarEliminar");
+
+    // Configurar acciones
+    if (config?.onCancelar) {
+      nuevoBtnCancelar.addEventListener("click", config.onCancelar);
+    } else {
+      nuevoBtnCancelar.addEventListener("click", () => {
+        if (seccionAntesDeEliminar) {
+          mostrarSeccion(seccionAntesDeEliminar);
+        } else {
+          mostrarSeccion("admin");
+        }
+      });
+    }
+
+    if (config?.onConfirmar) {
+      nuevoBtnConfirmar.addEventListener("click", config.onConfirmar);
+    }
+
+    // Mostrar la alerta
     mostrarSeccion("eliminarTarjeta");
-  };
+  }
 
-  // Variable global para recordar la sección antes de mostrar la alerta
-  let seccionAntesDeEliminar = null;
+  // --- ALERTAS ESPECÍFICAS ---
+  function mostrarAlertaEliminarTarjeta(tarjeta) {
+    seccionAntesDeEliminar = document.querySelector(".seccion.activa")?.id || "tableros";
+    
+    configurarAlerta(
+      "Eliminar Tarjeta",
+      "¿Estás seguro de que deseas eliminar esta tarjeta?<br><strong>Esta acción no se puede deshacer.</strong>",
+      "alerta",
+      {
+        textoConfirmar: "Eliminar",
+        onConfirmar: () => {
+          tarjeta.remove();
+          mostrarAlertaExito("Tarjeta eliminada correctamente", "tableros");
+        }
+      }
+    );
+  }
 
-  // Función mejorada para mostrar alerta y guardar la sección actual
-  function mostrarAlertaConSeccion(tipo) {
+  function mostrarAlertaEliminarTareas() {
+    seccionAntesDeEliminar = "tareas";
+    
+    configurarAlerta(
+      "Eliminar Tareas",
+      "¿Estás seguro de que deseas eliminar las tareas seleccionadas?<br><strong>Esta acción no se puede deshacer.</strong>",
+      "alerta",
+      {
+        textoConfirmar: "Eliminar",
+        onConfirmar: () => {
+          document.querySelectorAll(".tabla-tareas .check-cuadro.checked")
+            .forEach((c) => c.closest("tr").remove());
+          actualizarBotonBasura();
+          mostrarAlertaExito("Tareas eliminadas correctamente", "tareas");
+        }
+      }
+    );
+  }
+
+  function mostrarAlertaExito(mensaje, seccionRegreso = "admin") {
+    configurarAlerta(
+      "Éxito",
+      mensaje,
+      "exito",
+      {
+        soloAceptar: true,
+        onConfirmar: () => {
+          mostrarSeccion(seccionRegreso);
+        }
+      }
+    );
+  }
+
+  // --- FUNCIONALIDAD PARA EXPORTAR PDF EN REPORTES ---
+  function inicializarExportarPDF() {
+    const btnExportarPDF = document.getElementById("btn-exportar-pdf");
+    
+    btnExportarPDF?.addEventListener("click", function() {
+      mostrarAlertaExportarPDF();
+    });
+  }
+
+  function mostrarAlertaExportarPDF() {
+    // GUARDAR LA SECCIÓN ACTUAL ANTES DE MOSTRAR LA ALERTA
     const activa = document.querySelector(".seccion.activa");
     seccionAntesDeEliminar = activa ? activa.id : null;
-    mostrarAlerta(tipo);
+    
+    configurarAlerta(
+      "Exportar PDF",
+      "¿Estás seguro de que deseas exportar el reporte a PDF?",
+      "alerta",
+      {
+        textoConfirmar: "Exportar",
+        onConfirmar: () => {
+          // Aquí va la lógica para exportar a PDF
+          exportarAPDF();
+          mostrarAlertaExitoPDF();
+        },
+        onCancelar: () => {
+          if (seccionAntesDeEliminar) {
+            mostrarSeccion(seccionAntesDeEliminar);
+          } else {
+            mostrarSeccion("reportes");
+          }
+        }
+      }
+    );
+  }
+
+  function exportarAPDF() {
+    // Esta es una función simulada - necesitarías una librería como jsPDF
+    console.log("Exportando a PDF...");
+    // Ejemplo con jsPDF:
+    /*
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Reporte de Tareas", 20, 20);
+    doc.save("reporte.pdf");
+    */
+    
+    // Por ahora mostramos un alert
+    alert("Funcionalidad de exportar PDF - Aquí se implementaría con una librería como jsPDF");
+  }
+
+  function mostrarAlertaExitoPDF() {
+    configurarAlerta(
+      "Exportar PDF",
+      "Reporte exportado a PDF correctamente",
+      "exito",
+      {
+        soloAceptar: true,
+        onConfirmar: () => {
+          if (seccionAntesDeEliminar) {
+            mostrarSeccion(seccionAntesDeEliminar);
+          } else {
+            mostrarSeccion("reportes");
+          }
+        }
+      }
+    );
   }
 
   // --- NAVEGACIÓN LATERAL ---
@@ -39,6 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarSeccion(link.dataset.section);
     });
   });
+
+  // Mostrar INICIO por defecto
   mostrarSeccion("inicio");
 
   // --- TABLEROS: BOTONES DE AÑADIR TARJETA ---
@@ -46,9 +249,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const formularioTarjeta = document.getElementById("formulario-tarjeta");
   const tituloFormularioTarjeta = document.getElementById("titulo-form-tarjeta");
   const formTarjeta = document.getElementById("form-tarjeta");
-  const btnCancelarTarjeta = formularioTarjeta.querySelector(".cancelar");
+  const btnCancelarTarjeta = formularioTarjeta?.querySelector(".cancelar");
 
-  let columnaDestino = null; // guardará dónde insertar la nueva tarjeta
+  let columnaDestino = null;
 
   botonesAddCard.forEach((boton) => {
     boton.addEventListener("click", () => {
@@ -65,12 +268,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- CANCELAR FORMULARIO TARJETA ---
-  btnCancelarTarjeta.addEventListener("click", () => {
+  btnCancelarTarjeta?.addEventListener("click", () => {
     mostrarSeccion("tableros");
   });
 
   // --- CREAR TARJETA ---
-  formTarjeta.addEventListener("submit", (e) => {
+  formTarjeta?.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const titulo = formTarjeta.querySelector('input[type="text"]').value.trim();
@@ -112,7 +315,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const actualizarBotonBasura = () => {
     const seleccionadas = document.querySelectorAll(".tabla-tareas .check-cuadro.checked").length;
-    btnBasura.style.display = seleccionadas > 0 ? "inline-block" : "none";
+    if (btnBasura) {
+      btnBasura.style.display = seleccionadas > 0 ? "inline-block" : "none";
+    }
   };
 
   tabla?.addEventListener("click", (e) => {
@@ -122,13 +327,15 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarBotonBasura();
   });
 
-  btnBasura?.addEventListener("click", () => mostrarAlertaConSeccion("tarea"));
+  btnBasura?.addEventListener("click", () => {
+    mostrarAlertaEliminarTareas();
+  });
 
   // --- FORMULARIO AÑADIR TAREA ---
   const btnAñadirTarea = document.querySelector(".btn-azul");
   const formularioTarea = document.getElementById("formulario-tarea");
-  const formTarea = formularioTarea.querySelector("form");
-  const btnCancelarTarea = formularioTarea.querySelector(".cancelar");
+  const formTarea = formularioTarea?.querySelector("form");
+  const btnCancelarTarea = formularioTarea?.querySelector(".cancelar");
   const tablaBody = document.querySelector(".tabla-tareas tbody");
 
   btnAñadirTarea?.addEventListener("click", () => {
@@ -168,46 +375,10 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarSeccion("tareas");
   });
 
-  // --- ALERTAS ELIMINAR ---
-  const cancelarEliminar = document.getElementById("cancelarEliminar");
-  const confirmarEliminar = document.getElementById("confirmarEliminar");
-
-  cancelarEliminar?.addEventListener("click", () => {
-    const pendiente = document.querySelector(".pendiente-eliminar");
-    if (pendiente) pendiente.classList.remove("pendiente-eliminar");
-
-    if (seccionAntesDeEliminar) {
-      mostrarSeccion(seccionAntesDeEliminar);
-    } else {
-      mostrarSeccion("tareas");
-    }
-    seccionAntesDeEliminar = null;
-  });
-
-  confirmarEliminar?.addEventListener("click", () => {
-    const tarjetaEliminar = document.querySelector(".pendiente-eliminar");
-    if (tarjetaEliminar) {
-      tarjetaEliminar.remove();
-    } else {
-      document.querySelectorAll(".tabla-tareas .check-cuadro.checked")
-        .forEach((c) => c.closest("tr").remove());
-    }
-
-    if (seccionAntesDeEliminar) {
-      mostrarSeccion(seccionAntesDeEliminar);
-    } else {
-      mostrarSeccion("tareas");
-    }
-    seccionAntesDeEliminar = null;
-    actualizarBotonBasura();
-  });
-
   // --- CERRAR SESIÓN ---
   const iconCerrar = document.querySelector(".user-info a img");
   const cancelarCerrar = document.getElementById("cancelarCerrarSesion");
   const confirmarCerrar = document.getElementById("confirmarCerrarSesion");
-
-  let ultimaSeccionActiva = null;
 
   iconCerrar?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -239,8 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnEliminar) {
       const tarjeta = btnEliminar.closest(".tarjeta");
       if (tarjeta) {
-        tarjeta.classList.add("pendiente-eliminar");
-        mostrarAlertaConSeccion("tarjeta");
+        mostrarAlertaEliminarTarjeta(tarjeta);
       }
       return;
     }
@@ -261,204 +431,303 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   });
-  //VARIABLES DE ALERTA GLOBAL
 
-  const alerta = document.getElementById("eliminarTarjeta");
-  const tituloAlerta = document.getElementById("tituloAlerta");
-  const textoAlerta = document.getElementById("textoAlerta");
-  const iconoAlerta = document.getElementById("iconoAlerta");
-  const btnCancelar = document.getElementById("cancelarEliminar");
-  const btnConfirmar = document.getElementById("confirmarEliminar");
+  // === SECCION ADMIN - USUARIOS (COMPLETA Y CORREGIDA) ===
+  const filasAgregar = document.querySelectorAll('.fila-agregar[data-action="añadir-usuario"]');
+  const formUsuarioAdmin = document.getElementById('form-usuario-admin');
+  const tablaAdmin = document.querySelector('.tabla-admin tbody');
 
-  let seccionRegreso = "reportes"; // a donde se regresa después de éxito
-
-  //MOSTRAR ALERTA DE EXPORTAR PDF
-
-  function mostrarAlertaExportarPDF() {
-    mostrarSeccion("eliminarTarjeta");
-
-    tituloAlerta.textContent = "Exportar PDF";
-    textoAlerta.innerHTML = `Por favor confirme la acción de exportar PDF.`;
-    iconoAlerta.src = "/assets/img/alerta.png";
-
-    // mostrar botones correctos
-    btnCancelar.style.display = "inline-block";
-    btnConfirmar.textContent = "Confirmar";
-
-    // Quitar cualquier onclick previo del botón Confirmar
-    btnConfirmar.onclick = () => {
-      mostrarAlertaExitoPDF();
-    };
-  }
-
-  //MOSTRAR ALERTA DE ÉXITO DESPUÉS DE EXPORTAR
-
-  function mostrarAlertaExitoPDF() {
-    mostrarSeccion("eliminarTarjeta");
-
-    tituloAlerta.textContent = "Exportar PDF";
-    textoAlerta.textContent = "Reporte exportado a PDF correctamente";
-    iconoAlerta.src = "/assets/img/exito.png";
-
-    // Solo mostrar botón Aceptar
-    btnCancelar.style.display = "none";
-    btnConfirmar.textContent = "Aceptar";
-
-    btnConfirmar.onclick = () => {
-      mostrarSeccion("reportes");
-    };
-  }
-
-  //BOTÓN EXPORTAR PDF (PUNTO DE ENTRADA)
-
-  const btnExportarPDF = document.getElementById("btn-exportar-pdf");
-  btnExportarPDF?.addEventListener("click", () => {
-    mostrarAlertaExportarPDF();
-  });
-
-  //CANCELAR (CIERRA ALERTA)
-
-  btnCancelar.addEventListener("click", () => {
-    mostrarSeccion("tabla-tareas");
-  });
-
-  // === TABLA DE USUARIOS – DELEGACIÓN DE EVENTOS ===
-
-  const tablaUsuarios = document.querySelector(".tabla-usuarios");
-
-  // ÚNICO EVENTO QUE DEBE EXISTIR
-  tablaUsuarios?.addEventListener("click", (e) => {
-      const fila = e.target.closest("tr");
+  // === CORRECCIÓN PARA EDITAR USUARIO AL HACER CLIC EN LA FILA ===
+  function inicializarTablaUsuarios() {
+    const tablaUsuarios = document.querySelector(".tabla-usuarios");
+    
+    if (!tablaUsuarios) return;
+    
+    // Event delegation para toda la tabla de usuarios
+    tablaUsuarios.addEventListener('click', function(e) {
+      const fila = e.target.closest('tr');
       if (!fila) return;
+      
+      // Si es la fila de agregar, no hacer nada (ya tiene su propio evento)
+      if (fila.classList.contains('fila-agregar')) return;
+      
+      // Si se hizo clic en un botón de acción, dejar que ese evento se maneje
+      if (e.target.closest('.btn-editar-admin') || e.target.closest('.btn-eliminar-admin')) {
+        return;
+      }
+      
+      // Si se hizo clic en cualquier otra parte de la fila, editar el usuario
+      manejarEditarUsuarioDesdeFila(fila);
+    });
+  }
 
-      const datos = fila.querySelectorAll("td");
-      if (datos.length < 3) return;
+  function manejarEditarUsuarioDesdeFila(fila) {
+    const celdas = fila.querySelectorAll('td');
+    if (celdas.length < 4) return;
+    
+    const nombre = celdas[0].textContent;
+    const correo = celdas[1].textContent;
+    const tareasTexto = celdas[2].textContent;
+    const notas = celdas[3].textContent;
+    
+    // Guardar referencia a la fila que se está editando
+    filaEditando = fila;
+    
+    // Llenar el formulario de edición
+    document.getElementById('edit-nombre-completo').value = nombre;
+    document.getElementById('edit-correo-electronico').value = correo;
+    document.getElementById('edit-notas').value = notas;
+    
+    // Limpiar y cargar tareas en el select
+    const selectTareas = document.getElementById('select-tareas');
+    if (selectTareas) {
+      selectTareas.innerHTML = '';
+      
+      if (tareasTexto && tareasTexto !== 'Añadir' && tareasTexto !== 'Sin tareas') {
+        const tareasArray = tareasTexto.split(', ').filter(t => t.trim());
+        if (tareasArray.length > 0) {
+          tareasArray.forEach(tarea => {
+            agregarTareaAlSelect(tarea.trim());
+          });
+        } else {
+          agregarTareaAlSelect(tareasTexto);
+        }
+      }
+    }
+    
+    // Mostrar la sección de edición
+    mostrarSeccion('editar-usuario-admin');
+  }
 
-      // Insertar datos en detalle
-      document.getElementById("detNombre").textContent = datos[0].textContent;
-      document.getElementById("detCorreo").textContent = datos[1].textContent;
-      document.getElementById("detTareas").textContent = datos[2].textContent;
-
-      // Guardar nombre original para edición
-      document.getElementById("detNombre").dataset.original = datos[0].textContent;
-
-      mostrarSeccion("detalleUsuario");
+  // Event delegation para toda la tabla admin (botones editar/eliminar)
+  tablaAdmin?.addEventListener('click', function(e) {
+    const btnEditar = e.target.closest('.btn-editar-admin');
+    const btnEliminar = e.target.closest('.btn-eliminar-admin');
+    
+    if (btnEditar) {
+      e.preventDefault();
+      e.stopPropagation();
+      const fila = btnEditar.closest('tr');
+      manejarEditarUsuarioDesdeFila(fila);
+    }
+    
+    if (btnEliminar) {
+      e.preventDefault();
+      e.stopPropagation();
+      const fila = btnEliminar.closest('tr');
+      mostrarAlertaEliminarUsuarioAdmin(fila);
+    }
   });
 
-  //     EDITAR USUARIO
-
-  document.getElementById("btnEditarUsuario").addEventListener("click", () => {
-
-      // Pasar valores al formulario
-      document.getElementById("editNombre").value = document.getElementById("detNombre").textContent;
-      document.getElementById("editCorreo").value = document.getElementById("detCorreo").textContent;
-      document.getElementById("editTareas").value = document.getElementById("detTareas").textContent;
-
-      // Mostrar edición
-      document.getElementById("detalleUsuario").style.display = "none";
-      document.getElementById("editarUsuario").style.display = "block";
-  });
-
-  //     ACEPTAR EDICIÓN
-
-  // Reemplaza tu handler actual por este
-document.getElementById("btnAceptarEditar").addEventListener("click", () => {
-  // Ocultar el formulario de edición (si estaba visible)
-  const editarUsuarioSec = document.getElementById("editarUsuario");
-  if (editarUsuarioSec) editarUsuarioSec.style.display = "none";
-
-  // Asegurarnos que los botones de alerta son tipo button (evita submit)
-  if (btnCancelar) btnCancelar.type = "button";
-  if (btnConfirmar) btnConfirmar.type = "button";
-
-  // Mostrar confirmación usando tu sección de alertas
-  mostrarSeccion("eliminarTarjeta");
-  tituloAlerta.textContent = "Confirmar cambios";
-  textoAlerta.innerHTML = "¿Deseas guardar los cambios realizados?";
-  iconoAlerta.src = "/assets/img/alerta.png";
-
-  // Mostrar ambos botones correctamente
-  btnCancelar.style.display = "inline-block";
-  btnConfirmar.style.display = "inline-block";
-  btnConfirmar.textContent = "Confirmar";
-
-  // CANCELAR -> volver al formulario de edición (oculta la alerta)
-  btnCancelar.onclick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // quitar clase activa de la alerta para ocultarla
-    const alertaSec = document.getElementById("eliminarTarjeta");
-    if (alertaSec) alertaSec.classList.remove("activa");
-    // mostrar sección editarUsuario
-    mostrarSeccion("editarUsuario");
-  };
-
-  // CONFIRMAR -> aplicar cambios y mostrar alerta de éxito
-  btnConfirmar.onclick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Tomar valores del formulario de edición
-    const nuevoNombre = document.getElementById("editNombre").value;
-    const nuevoCorreo = document.getElementById("editCorreo").value;
-    const nuevasTareas = document.getElementById("editTareas").value;
-    const nombreOriginal = document.getElementById("detNombre").dataset.original;
-
-    // Actualizar fila en la tabla
-    const filas = document.querySelectorAll(".tabla-usuarios tr");
-    filas.forEach(fila => {
-      const celdas = fila.querySelectorAll("td");
-      if (celdas.length && celdas[0].textContent === nombreOriginal) {
-        celdas[0].textContent = nuevoNombre;
-        celdas[1].textContent = nuevoCorreo;
-        celdas[2].textContent = nuevasTareas;
+  filasAgregar.forEach(fila => {
+    fila.addEventListener('click', function(e) {
+      if (!e.target.closest('.btn-editar-admin') && !e.target.closest('.btn-eliminar-admin')) {
+        mostrarSeccion('formulario-admin');
       }
     });
-
-    // Mostrar alerta de éxito (reutilizando la misma sección)
-    mostrarSeccion("eliminarTarjeta");
-    tituloAlerta.textContent = "Cambios guardados";
-    textoAlerta.textContent = "Los cambios fueron aplicados correctamente.";
-    iconoAlerta.src = "/assets/img/exito.png";
-
-    // Solo botón Aceptar visible
-    btnCancelar.style.display = "none";
-    btnConfirmar.style.display = "inline-block";
-    btnConfirmar.textContent = "Aceptar";
-
-    // Al Aceptar, cerrar alerta y mostrar tabla de usuarios
-    btnConfirmar.onclick = (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      // quitar clase activa de la alerta
-      const alertaSec = document.getElementById("eliminarTarjeta");
-      if (alertaSec) alertaSec.classList.remove("activa");
-      // mostrar tabla usuarios
-      mostrarSeccion("usuarios");
-    };
-  };
-});
-
-
-
-  //     CANCELAR EDICIÓN
-
-  document.getElementById("btnCancelarEditar").addEventListener("click", () => {
-      document.getElementById("editarUsuario").style.display = "none";
-      document.getElementById("detalleUsuario").style.display = "block";
   });
 
-  //     VOLVER DESDE DETALLE
+  if (formUsuarioAdmin) {
+    const btnCancelarAdmin = formUsuarioAdmin.querySelector('.cancelar');
+    if (btnCancelarAdmin) {
+      btnCancelarAdmin.addEventListener('click', function() {
+        mostrarSeccion('admin');
+      });
+    }
 
-  document.getElementById("btnVolverUsuario").addEventListener("click", () => {
-      mostrarSeccion("usuarios");
-  });
+    formUsuarioAdmin.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const inputs = this.querySelectorAll('input');
+      const nombre = inputs[0].value.trim();
+      const correo = inputs[1].value.trim();
+      const tareas = inputs[2].value.trim();
+      const notas = this.querySelector('textarea').value.trim();
+      
+      if (!nombre || !correo || !tareas || !notas) {
+        alert('Por favor completa todos los campos.');
+        return;
+      }
+      
+      seccionAntesDeEliminar = "formulario-admin";
+      configurarAlerta(
+        "Añadir Usuario",
+        `¿Estás seguro de que deseas añadir a <strong>${nombre}</strong>?`,
+        "alerta",
+        {
+          textoConfirmar: "Añadir",
+          onConfirmar: () => {
+            añadirUsuarioATabla(nombre, correo, tareas, notas);
+            formUsuarioAdmin.reset();
+            mostrarAlertaExito("Usuario añadido correctamente", "admin");
+          },
+          onCancelar: () => {
+            mostrarSeccion("formulario-admin");
+          }
+        }
+      );
+    });
+  }
 
+  function añadirUsuarioATabla(nombre, correo, tareas, notas) {
+    const nuevaFila = document.createElement('tr');
+    nuevaFila.innerHTML = `
+      <td>${nombre}</td>
+      <td>${correo}</td>
+      <td>${tareas}</td>
+      <td>${notas}</td>
+      <td class="acciones-celda">
+        <button class="btn-editar-admin">
+          <img src="/assets/img/editar.png" alt="Editar">
+        </button>
+        <button class="btn-eliminar-admin">
+          <img src="/assets/img/eliminar.png" alt="Eliminar">
+        </button>
+      </td>
+    `;
+    
+    const filaAgregar = document.querySelector('.fila-agregar');
+    if (filaAgregar) {
+      tablaAdmin.insertBefore(nuevaFila, filaAgregar);
+    } else {
+      tablaAdmin.appendChild(nuevaFila);
+    }
+  }
 
+  function mostrarAlertaEliminarUsuarioAdmin(fila) {
+    const nombreUsuario = fila.querySelector('td').textContent;
+    seccionAntesDeEliminar = "admin";
+    
+    configurarAlerta(
+      "Eliminar Usuario",
+      `¿Eliminar a <strong>${nombreUsuario}</strong>?<br>Esta acción no se puede deshacer.`,
+      "alerta",
+      {
+        textoConfirmar: "Eliminar",
+        onConfirmar: () => {
+          fila.remove();
+          mostrarAlertaExito("Usuario eliminado correctamente", "admin");
+        }
+      }
+    );
+  }
 
+  // === SISTEMA DE TAREAS PARA EDITAR USUARIO ===
+  function inicializarSistemaTareas() {
+    const btnAgregar = document.getElementById('btn-añadir-tarea');
+    const inputTarea = document.getElementById('nueva-tarea-input');
+    const selectTareas = document.getElementById('select-tareas');
+    
+    if (!btnAgregar || !inputTarea || !selectTareas) return;
 
-  
+    btnAgregar.addEventListener('click', function() {
+      agregarTareaAlSelect();
+    });
+    
+    inputTarea.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        agregarTareaAlSelect();
+      }
+    });
+    
+    selectTareas.addEventListener('keydown', function(e) {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectTareas.selectedIndex !== -1) {
+        e.preventDefault();
+        selectTareas.options[selectTareas.selectedIndex].remove();
+        actualizarTamañoSelect();
+      }
+    });
+  }
 
+  function agregarTareaAlSelect(textoTarea = null) {
+    const inputTarea = document.getElementById('nueva-tarea-input');
+    const selectTareas = document.getElementById('select-tareas');
+    
+    const texto = textoTarea || inputTarea.value.trim();
+    
+    if (texto !== '') {
+      const nuevaOpcion = document.createElement('option');
+      nuevaOpcion.value = texto;
+      nuevaOpcion.textContent = texto;
+      selectTareas.appendChild(nuevaOpcion);
+      
+      if (!textoTarea) {
+        inputTarea.value = '';
+      }
+      
+      actualizarTamañoSelect();
+      
+      if (!textoTarea) {
+        inputTarea.focus();
+      }
+    }
+  }
 
+  function actualizarTamañoSelect() {
+    const selectTareas = document.getElementById('select-tareas');
+    if (!selectTareas) return;
+    
+    const cantidadTareas = selectTareas.options.length;
+    selectTareas.size = Math.min(Math.max(3, cantidadTareas), 6);
+  }
+
+  function obtenerTextoDeTareas() {
+    const selectTareas = document.getElementById('select-tareas');
+    if (!selectTareas) return 'Sin tareas';
+    
+    const tareas = [];
+    for (let option of selectTareas.options) {
+      tareas.push(option.value);
+    }
+    
+    return tareas.length > 0 ? tareas.join(', ') : 'Sin tareas';
+  }
+
+  // === FORMULARIO EDITAR USUARIO ===
+  const formEditarUsuario = document.getElementById('form-editar-usuario-admin');
+  if (formEditarUsuario) {
+    inicializarSistemaTareas();
+    
+    const btnCancelarEditar = formEditarUsuario.querySelector('.cancelar');
+    if (btnCancelarEditar) {
+      btnCancelarEditar.addEventListener('click', function() {
+        mostrarSeccion('admin');
+      });
+    }
+
+    formEditarUsuario.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const nombre = document.getElementById('edit-nombre-completo').value.trim();
+      const correo = document.getElementById('edit-correo-electronico').value.trim();
+      const notas = document.getElementById('edit-notas').value.trim();
+      const tareasTexto = obtenerTextoDeTareas();
+      
+      if (!nombre || !correo || !notas) {
+        alert('Completa todos los campos.');
+        return;
+      }
+      
+      if (filaEditando) {
+        const celdas = filaEditando.querySelectorAll('td');
+        celdas[0].textContent = nombre;
+        celdas[1].textContent = correo;
+        celdas[2].textContent = tareasTexto;
+        celdas[3].textContent = notas;
+      }
+      
+      mostrarAlertaExito("Los cambios se guardaron correctamente", "admin");
+    });
+  }
+
+  // === INICIALIZACIÓN FINAL ===
+  function inicializarTodo() {
+    inicializarSistemaTareas();
+    inicializarTablaUsuarios();
+    inicializarExportarPDF();
+  }
+
+  // Inicializar cuando se carga la página
+  inicializarTodo();
 });
-

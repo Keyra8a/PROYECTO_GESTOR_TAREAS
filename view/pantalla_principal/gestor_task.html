@@ -39,7 +39,9 @@
     <a href="#" data-section="reportes">Reportes <img src="/assets/img/flecha.png"></a>
     <a href="#" data-section="usuarios">Usuarios <img src="/assets/img/flecha.png"></a>
     <a href="#" data-section="perfil">Perfil <img src="/assets/img/flecha.png"></a>
-    <a href="#" data-section="index"><img src="/assets/img/casita.png" width="30px" height="30px"><img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="inicio" style="display: none !important;"><img src="/assets/img/casita.png" width="30px" height="30px"><img src="/assets/img/flecha.png"></a>
+    <a href="#" data-section="admin" style="display: none !important;">Admin<img src="/assets/img/flecha.png"></a>
+
   </nav>
 
 
@@ -511,9 +513,148 @@
       <p>Configuración de usuario.</p>
     </section>
 
-    <!-- REGRESAR A INDEX -->
-    <section id="regresar" class="seccion">
 
+
+    <!-- ADMIN - USUARIOS ADMINISTRADORES -->
+    <section id="admin" class="seccion">
+      <h2 class="titulo-seccion">Usuarios - Admin</h2>
+
+      <div class="tabla-contenedor">
+        <table class="tabla-tareas tabla-admin">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo electrónico</th>
+              <th>Tareas asignadas</th>
+              <th>Notas</th>
+              <th class="acciones-header">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Usuarios existentes -->
+            <tr>
+              <td>Zahir Fernando</td>
+              <td>zd@z.23@alu.uabcs.mx</td>
+              <td>8</td>
+              <td>No trabaja</td>
+              <td class="acciones-celda">
+                <button class="btn-editar-admin">
+                  <img src="/assets/img/editar.png" alt="Editar">
+                </button>
+                <button class="btn-eliminar-admin">
+                  <img src="/assets/img/eliminar.png" alt="Eliminar">
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Renéry Lucero</td>
+              <td>renl_23@alu.uabcs.mx</td>
+              <td>2</td>
+              <td>Tareas bien hechas</td>
+              <td class="acciones-celda">
+                <button class="btn-editar-admin">
+                  <img src="/assets/img/editar.png" alt="Editar">
+                </button>
+                <button class="btn-eliminar-admin">
+                  <img src="/assets/img/eliminar.png" alt="Eliminar">
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Keyra Yarleky</td>
+              <td>keyra_23@alu.uabcs.mx</td>
+              <td>'D'</td>
+              <td>Picha un agnachile</td>
+              <td class="acciones-celda">
+                <button class="btn-editar-admin">
+                  <img src="/assets/img/editar.png" alt="Editar">
+                </button>
+                <button class="btn-eliminar-admin">
+                  <img src="/assets/img/eliminar.png" alt="Eliminar">
+                </button>
+              </td>
+            </tr>
+            
+            <!-- SOLO UNA fila para agregar usuario -->
+            <tr class="fila-agregar" data-action="añadir-usuario">
+              <td>Añadir</td>
+              <td>Ejemplo@correo.com</td>
+              <td>Añadir</td>
+              <td>Añadir</td>
+              <td class="acciones-celda">
+                <!-- Sin botones para esta fila -->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FORMULARIO AÑADIR USUARIO ADMIN -->
+    <section id="formulario-admin" class="seccion">
+      <h2 class="titulo-seccion">Usuarios - Admin</h2>
+
+      <div class="form-tarjeta form-admin">
+        <h3>Añadir usuario</h3>
+
+        <form id="form-usuario-admin">
+          <label>Nombre completo</label>
+          <input type="text" placeholder="Jonathan Giovanni Soto Muñoz" required>
+
+          <label>Correo electrónico</label>
+          <input type="email" placeholder="jsoto@uabcs.mx" required>
+
+          <label>Tareas asignadas</label>
+          <input type="text" placeholder="Calificar la revisión del diseño" required>
+
+          <label>Notas</label>
+          <textarea placeholder="Se la rifaron con el diseño" required></textarea>
+
+          <div class="botones">
+            <button type="button" class="cancelar">Cancelar</button>
+            <button type="submit" class="crear">Añadir usuario</button>
+          </div>
+        </form>
+      </div>
+    </section>
+    <!-- FORMULARIO EDITAR USUARIO ADMIN -->
+    <section id="editar-usuario-admin" class="seccion">
+      <h2 class="titulo-seccion">Usuarios - Admin</h2>
+
+      <div class="form-tarjeta form-admin">
+        <h3>Editar usuario</h3>
+
+        <form id="form-editar-usuario-admin">
+          <label>Nombre completo</label>
+          <input type="text" id="edit-nombre-completo" placeholder="Nombre completo" required>
+
+          <label>Correo electrónico</label>
+          <input type="email" id="edit-correo-electronico" placeholder="correo@ejemplo.com" required>
+
+          <div class="tareas-asignadas-editar">
+            <label><strong>Tareas asignadas</strong></label>
+            
+            <div class="select-tareas-container">
+              <select id="select-tareas" multiple size="3" class="form-control">
+                <!-- Las tareas se agregarán aquí dinámicamente -->
+              </select>
+              
+              <div class="agregar-tarea-input">
+                <input type="text" id="nueva-tarea-input" placeholder="Añadir nueva tarea" class="form-control">
+                <button type="button" id="btn-añadir-tarea" class="btn-añadir-tarea">+</button>
+              </div>
+            </div>
+          </div>
+
+          <label>Notas</label>
+          <textarea id="edit-notas" placeholder="Notas del usuario" required></textarea>
+
+          <div class="botones">
+            <button type="button" class="cancelar">Cancelar</button>
+            <button type="submit" class="crear">Editar usuario</button>
+          </div>
+        </form>
+      </div>
     </section>
 
     <section id="cerrarSesion" class="seccion">
@@ -528,8 +669,7 @@
       </div>
     </section>
 
-
-
+    
   </main>
 
   
