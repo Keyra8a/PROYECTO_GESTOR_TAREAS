@@ -11,52 +11,45 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 10);
 
-  // --- VARIABLES GLOBALES MEJORADAS ---
+  // --- VARIABLES GLOBALES ---
   let seccionAntesDeEliminar = null;
   let ultimaSeccionActiva = null;
   let filaEditando = null;
+  let imagenSeleccionada = null;
 
-  // --- FUNCIONES GENERALES ---
-  const mostrarSeccion = (id) => {
-    // Primero ocultar TODAS las secciones
+ const mostrarSeccion = (id) => {
+    console.log("Mostrando sección:", id);
+    
+    // 1. Ocultar TODAS las secciones
     document.querySelectorAll(".seccion").forEach((s) => {
-      s.classList.remove("activa");
-      // NO aplicar display: none a las alertas
-      if (!s.id.includes("eliminarTarjeta") && !s.id.includes("cerrarSesion")) {
+        s.classList.remove("activa");
         s.style.display = "none";
-      }
     });
     
-    // Luego mostrar solo la sección activa
+    // 2. Mostrar solo la sección solicitada
     const seccion = document.getElementById(id);
     if (seccion) {
-      seccion.classList.add("activa");
-      // NO forzar display block para las alertas - mantener su CSS original
-      if (!seccion.id.includes("eliminarTarjeta") && !seccion.id.includes("cerrarSesion") && seccion.id !== "inicio") {
-        seccion.style.display = "block";
-      } else if (seccion.id === "inicio") {
-        seccion.style.display = "flex";
-      }
+        seccion.classList.add("activa");
+        
+        if (id === "inicio") {
+            seccion.style.display = "flex";
+        } else if (id === "eliminarTarjeta" || id === "cerrarSesion" || id === "alerta-cambiar-foto") {
+            seccion.style.display = "flex";
+        } else {
+            seccion.style.display = "block";
+        }
     }
-    
+
     // LÓGICA PARA LA CASITA
     const linkCasita = document.querySelector('.sidebar a[data-section="inicio"]');
     if (linkCasita) {
-      if (id === "inicio") {
-        linkCasita.style.display = "none";
-      } else {
-        linkCasita.style.display = "flex";
-      }
+        linkCasita.style.display = (id === "inicio") ? "none" : "flex";
     }
     
     // Mostrar el botón admin SOLO cuando se clickee "usuarios"
     const botonAdmin = document.querySelector('.sidebar a[data-section="admin"]');
     if (botonAdmin) {
-      if (id === "usuarios") {
-        botonAdmin.style.display = "flex";
-      } else {
-        botonAdmin.style.display = "none";
-      }
+        botonAdmin.style.display = (id === "usuarios") ? "flex" : "none";
     }
   };
 
@@ -164,6 +157,52 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // --- FUNCIONALIDAD PARA CONFIRMACIÓN DE FOTO ---
+  function mostrarConfirmacion(imagenSrc) {
+    console.log("🖼️ Mostrando confirmación con imagen:", imagenSrc);
+    
+    imagenSeleccionada = imagenSrc;
+    
+    const modal = document.getElementById('confirmationModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Mostrar la imagen en el modal
+        const imgModal = modal.querySelector('img');
+        if (imgModal) {
+            imgModal.src = imagenSrc;
+        }
+    }
+  }
+
+  function ocultarConfirmacion() {
+    console.log("Ocultando confirmación");
+    const modal = document.getElementById('confirmationModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    imagenSeleccionada = null;
+    
+    // Volver a la sección de perfil
+    mostrarSeccion("perfil");
+  }
+
+  function confirmarFoto() {
+    if (imagenSeleccionada) {
+        // Actualizar la imagen en el perfil - cambiar el "Z" por la imagen
+        const fotoPerfil = document.querySelector('.foto-perfil');
+        if (fotoPerfil) {
+            // Cambiar el div con texto "Z" por una imagen
+            fotoPerfil.innerHTML = `<img src="${imagenSeleccionada}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        }
+        
+        console.log('✅ Foto confirmada y actualizada en el perfil');
+    }
+    
+    ocultarConfirmacion();
+    mostrarSeccion("perfil");
+  }
+
   // --- FUNCIONALIDAD PARA EXPORTAR PDF EN REPORTES ---
   function inicializarExportarPDF() {
     const btnExportarPDF = document.getElementById("btn-exportar-pdf");
@@ -174,7 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function mostrarAlertaExportarPDF() {
-    // GUARDAR LA SECCIÓN ACTUAL ANTES DE MOSTRAR LA ALERTA
     const activa = document.querySelector(".seccion.activa");
     seccionAntesDeEliminar = activa ? activa.id : null;
     
@@ -185,7 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         textoConfirmar: "Exportar",
         onConfirmar: () => {
-          // Aquí va la lógica para exportar a PDF
           exportarAPDF();
           mostrarAlertaExitoPDF();
         },
@@ -201,17 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function exportarAPDF() {
-    // Esta es una función simulada - necesitarías una librería como jsPDF
     console.log("Exportando a PDF...");
-    // Ejemplo con jsPDF:
-    /*
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text("Reporte de Tareas", 20, 20);
-    doc.save("reporte.pdf");
-    */
-    
-    // Por ahora mostramos un alert
     alert("Funcionalidad de exportar PDF - Aquí se implementaría con una librería como jsPDF");
   }
 
@@ -432,7 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // === SECCION ADMIN - USUARIOS (COMPLETA Y CORREGIDA) ===
+  // === SECCION ADMIN - USUARIOS ===
   const filasAgregar = document.querySelectorAll('.fila-agregar[data-action="añadir-usuario"]');
   const formUsuarioAdmin = document.getElementById('form-usuario-admin');
   const tablaAdmin = document.querySelector('.tabla-admin tbody');
@@ -443,20 +470,16 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (!tablaUsuarios) return;
     
-    // Event delegation para toda la tabla de usuarios
     tablaUsuarios.addEventListener('click', function(e) {
       const fila = e.target.closest('tr');
       if (!fila) return;
       
-      // Si es la fila de agregar, no hacer nada (ya tiene su propio evento)
       if (fila.classList.contains('fila-agregar')) return;
       
-      // Si se hizo clic en un botón de acción, dejar que ese evento se maneje
       if (e.target.closest('.btn-editar-admin') || e.target.closest('.btn-eliminar-admin')) {
         return;
       }
       
-      // Si se hizo clic en cualquier otra parte de la fila, editar el usuario
       manejarEditarUsuarioDesdeFila(fila);
     });
   }
@@ -470,15 +493,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const tareasTexto = celdas[2].textContent;
     const notas = celdas[3].textContent;
     
-    // Guardar referencia a la fila que se está editando
     filaEditando = fila;
     
-    // Llenar el formulario de edición
     document.getElementById('edit-nombre-completo').value = nombre;
     document.getElementById('edit-correo-electronico').value = correo;
     document.getElementById('edit-notas').value = notas;
     
-    // Limpiar y cargar tareas en el select
     const selectTareas = document.getElementById('select-tareas');
     if (selectTareas) {
       selectTareas.innerHTML = '';
@@ -495,11 +515,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    // Mostrar la sección de edición
     mostrarSeccion('editar-usuario-admin');
   }
 
-  // Event delegation para toda la tabla admin (botones editar/eliminar)
   tablaAdmin?.addEventListener('click', function(e) {
     const btnEditar = e.target.closest('.btn-editar-admin');
     const btnEliminar = e.target.closest('.btn-eliminar-admin');
@@ -692,7 +710,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCancelarEditar = formEditarUsuario.querySelector('.cancelar');
     if (btnCancelarEditar) {
       btnCancelarEditar.addEventListener('click', function() {
-        mostrarSeccion('admin');
+        mostrarSeccion('usuarios');
       });
     }
 
@@ -717,8 +735,335 @@ document.addEventListener("DOMContentLoaded", () => {
         celdas[3].textContent = notas;
       }
       
-      mostrarAlertaExito("Los cambios se guardaron correctamente", "admin");
+      mostrarAlertaExito("Los cambios se guardaron correctamente", "usuarios");
     });
+  }
+
+ function inicializarPerfil() {
+    console.log("🔄 Inicializando perfil...");
+    
+    // EVENT DELEGATION PARA TODOS LOS BOTONES DEL PERFIL
+    document.addEventListener('click', function(e) {
+        const target = e.target;
+        console.log("🎯 Click detectado en:", target);
+        
+        // 1. BOTONES CAMBIAR (nombre, correo, contraseña)
+        if (target.classList.contains('btn-cambiar') || target.closest('.btn-cambiar')) {
+            e.preventDefault();
+            const boton = target.classList.contains('btn-cambiar') ? target : target.closest('.btn-cambiar');
+            const campo = boton.getAttribute('data-campo');
+            
+            console.log("✅ Botón cambiar clickeado:", campo);
+            
+            // Ocultar perfil principal
+            document.getElementById('perfil').classList.remove('activa');
+            document.getElementById('perfil').style.display = 'none';
+            
+            // Mostrar sección de edición correspondiente
+            const seccionEditar = document.getElementById(`editar-${campo}`);
+            if (seccionEditar) {
+                // Ocultar todas las secciones de edición primero
+                document.querySelectorAll('#editar-nombre, #editar-correo, #editar-contrasena').forEach(sec => {
+                    sec.classList.remove('activa');
+                    sec.style.display = 'none';
+                });
+                
+                // Mostrar la sección seleccionada
+                seccionEditar.classList.add('activa');
+                seccionEditar.style.display = 'block';
+                
+                // Cargar valores actuales si es nombre
+                if (campo === 'nombre') {
+                    const valorActual = boton.closest('.input-y-boton').querySelector('.input-perfil').value;
+                    const inputEdicion = seccionEditar.querySelector('.input-edicion');
+                    if (inputEdicion) {
+                        inputEdicion.value = valorActual;
+                    }
+                }
+            }
+        }
+        
+        // 2. BOTONES CANCELAR EDICIÓN
+        if (target.classList.contains('btn-cancelar-edicion') || target.closest('.btn-cancelar-edicion')) {
+            e.preventDefault();
+            console.log("✅ Botón cancelar clickeado");
+            
+            // Ocultar todas las secciones de edición
+            document.querySelectorAll('#editar-nombre, #editar-correo, #editar-contrasena').forEach(seccion => {
+                seccion.classList.remove('activa');
+                seccion.style.display = 'none';
+            });
+            
+            // Mostrar perfil principal
+            document.getElementById('perfil').classList.add('activa');
+            document.getElementById('perfil').style.display = 'block';
+        }
+    });
+    
+    // ENVÍO DE FORMULARIOS DE EDICIÓN
+    document.querySelectorAll('.form-edicion-perfil').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("✅ Formulario enviado");
+            
+            const seccionId = this.closest('.seccion').id;
+            const campo = seccionId.replace('editar-', '');
+            
+            if (campo === 'correo') {
+                const nuevoCorreo = document.getElementById('nuevo-correo')?.value;
+                const confirmarCorreo = document.getElementById('confirmar-correo')?.value;
+                
+                if (!nuevoCorreo || !confirmarCorreo) {
+                    alert('Por favor completa ambos campos de correo.');
+                    return;
+                }
+                
+                if (nuevoCorreo !== confirmarCorreo) {
+                    alert('Los correos electrónicos no coinciden.');
+                    return;
+                }
+                
+                // Actualizar el correo en el perfil principal
+                const inputCorreoNormal = document.querySelector('#perfil .btn-cambiar[data-campo="correo"]')
+                    ?.closest('.input-y-boton')
+                    ?.querySelector('.input-perfil');
+                
+                if (inputCorreoNormal) {
+                    inputCorreoNormal.value = nuevoCorreo;
+                }
+            }
+            else if (campo === 'contrasena') {
+                const nuevaContrasena = document.getElementById('nueva-contrasena')?.value;
+                const confirmarContrasena = document.getElementById('confirmar-contrasena')?.value;
+                
+                if (!nuevaContrasena || !confirmarContrasena) {
+                    alert('Por favor completa ambos campos de contraseña.');
+                    return;
+                }
+                
+                if (nuevaContrasena !== confirmarContrasena) {
+                    alert('Las contraseñas no coinciden.');
+                    return;
+                }
+                
+                console.log('Contraseña actualizada');
+            }
+            else if (campo === 'nombre') {
+                const inputEdicion = this.querySelector('.input-edicion');
+                const nuevoValor = inputEdicion?.value;
+                
+                if (!nuevoValor) {
+                    alert('Por favor ingresa un nombre.');
+                    return;
+                }
+                
+                const inputNormal = document.querySelector(`#perfil .btn-cambiar[data-campo="${campo}"]`)
+                    ?.closest('.input-y-boton')
+                    ?.querySelector('.input-perfil');
+                
+                if (inputNormal) {
+                    inputNormal.value = nuevoValor;
+                }
+            }
+            
+            // Regresar al perfil principal
+            document.querySelectorAll('#editar-nombre, #editar-correo, #editar-contrasena').forEach(seccion => {
+                seccion.classList.remove('activa');
+                seccion.style.display = 'none';
+            });
+            document.getElementById('perfil').classList.add('activa');
+            document.getElementById('perfil').style.display = 'block';
+            
+            alert('Cambios guardados correctamente');
+        });
+    });
+
+    // Inicializar subida de foto
+    inicializarSubidaFoto();
+    
+    console.log("✅ Perfil inicializado correctamente");
+  }
+
+  // === FUNCIONALIDAD PARA SUBIR FOTO ===
+  function inicializarSubidaFoto() {
+    const btnImportarFoto = document.getElementById('btnImportarFoto');
+    const linkImportarFoto = document.querySelector('.link-importar-foto');
+    
+    // Botones de la primera alerta
+    const cancelarCambiarFoto = document.getElementById('cancelarCambiarFoto');
+    const subirCambiarFoto = document.getElementById('subirCambiarFoto');
+    
+    // Botones de la segunda alerta
+    const cancelBtn = document.getElementById('cancelBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+
+    // ===== PRIMERA ALERTA =====
+    // Configurar botón "Importar foto" - muestra primera alerta
+    if (btnImportarFoto) {
+        btnImportarFoto.addEventListener('click', function(e) {
+            e.preventDefault();
+            mostrarSeccion("alerta-cambiar-foto");
+        });
+    }
+
+    // Configurar enlace "Importar foto" también
+    if (linkImportarFoto) {
+        linkImportarFoto.addEventListener('click', function(e) {
+            e.preventDefault();
+            mostrarSeccion("alerta-cambiar-foto");
+        });
+    }
+
+    // Botón "Cancelar" de la primera alerta
+    if (cancelarCambiarFoto) {
+        cancelarCambiarFoto.addEventListener('click', function() {
+            mostrarSeccion("perfil");
+        });
+    }
+
+    // Botón "Subir" de la primera alerta - muestra segunda alerta
+    if (subirCambiarFoto) {
+        subirCambiarFoto.addEventListener('click', function() {
+            mostrarConfirmacion('/assets/img/perfil.png');
+        });
+    }
+
+    // ===== SEGUNDA ALERTA =====
+    // Botón "Cancelar" de la segunda alerta
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function() {
+            ocultarConfirmacion();
+            mostrarSeccion("perfil");
+        });
+    }
+
+    // Botón "Confirmar" de la segunda alerta - actualiza foto y regresa
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            confirmarFoto();
+        });
+    }
+
+  }
+
+// Función para mostrar la segunda alerta (confirmación)
+function mostrarConfirmacion(imagenSrc) {
+    
+    imagenSeleccionada = imagenSrc;
+    
+    const modal = document.getElementById('confirmationModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Mostrar la imagen en el modal
+        const imgModal = modal.querySelector('img');
+        if (imgModal) {
+            imgModal.src = imagenSrc;
+        }
+    }
+}
+
+// Función para ocultar la segunda alerta
+function ocultarConfirmacion() {
+    const modal = document.getElementById('confirmationModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    imagenSeleccionada = null;
+}
+
+// Función cuando confirman la foto
+function confirmarFoto() {
+    if (imagenSeleccionada) {
+        // Actualizar la imagen en el perfil - cambiar el "Z" por la imagen
+        const fotoPerfil = document.querySelector('.foto-perfil');
+        if (fotoPerfil) {
+            // Cambiar el div con texto "Z" por una imagen
+            fotoPerfil.style.backgroundImage = `url(${imagenSeleccionada})`;
+            fotoPerfil.style.backgroundSize = 'cover';
+            fotoPerfil.style.backgroundPosition = 'center';
+            fotoPerfil.innerHTML = ''; // Quitar el texto "Z"
+        }
+      }
+    
+    ocultarConfirmacion();
+    mostrarSeccion("perfil");
+ }
+  // === ALERTA PARA ELIMINAR CUENTA DE USUARIO ===
+  function inicializarEliminarCuenta() {
+      
+      const linkEliminarCuenta = document.querySelector('.link-eliminar-cuenta');
+      console.log("Link encontrado:", linkEliminarCuenta);
+      
+      if (linkEliminarCuenta) {
+          linkEliminarCuenta.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              mostrarAlertaConfirmarEliminarCuenta();
+          });
+          
+          // Buscar alternativas
+          const links = document.querySelectorAll('a');
+          links.forEach(link => {
+              if (link.textContent.includes('Eliminar mi cuenta')) {
+                  console.log("🔍 Encontrado por texto:", link);
+                  link.addEventListener('click', function(e) {
+                      e.preventDefault();
+                      mostrarAlertaConfirmarEliminarCuenta();
+                  });
+              }
+          });
+      }
+  }
+
+  function mostrarAlertaConfirmarEliminarCuenta() {
+      seccionAntesDeEliminar = "perfil";
+      
+      configurarAlerta(
+          "Eliminar Cuenta",
+          "¿Estás seguro que deseas eliminar tu perfil?<br><strong>Esta acción eliminará todos sus datos y no podrá recuperarlos.</strong>",
+          "alerta",
+          {
+              textoConfirmar: "Eliminar",
+              onConfirmar: () => {
+                  // Aquí iría la lógica para eliminar el usuario de la base de datos
+                  eliminarUsuarioDeSistema();
+              },
+              onCancelar: () => {
+                  mostrarSeccion("perfil");
+              }
+          }
+      );
+  }
+
+  function eliminarUsuarioDeSistema() {
+      
+      // Aquí iría tu código para eliminar el usuario:
+      // - Llamada a API
+      // - Eliminar de base de datos  
+      // - Limpiar localStorage/sessionStorage
+      // - etc.
+      
+      // Por ahora simulamos la eliminación
+      setTimeout(() => {
+          mostrarAlertaCuentaEliminada();
+      }, 500);
+  }
+
+  function mostrarAlertaCuentaEliminada() {
+      
+      configurarAlerta(
+          "Cuenta Eliminada",
+          "Tu cuenta ha sido eliminada exitosamente.<br>Serás redirigido a la página de inicio.",
+          "exito", 
+          {
+              soloAceptar: true,
+              onConfirmar: () => {
+                  // Redirigir al inicio después de eliminar la cuenta
+                  window.location.href = "/index.html";
+              }
+          }
+      );
   }
 
   // === INICIALIZACIÓN FINAL ===
@@ -726,8 +1071,11 @@ document.addEventListener("DOMContentLoaded", () => {
     inicializarSistemaTareas();
     inicializarTablaUsuarios();
     inicializarExportarPDF();
+    inicializarPerfil();
+    inicializarEliminarCuenta();
   }
 
   // Inicializar cuando se carga la página
   inicializarTodo();
+
 });

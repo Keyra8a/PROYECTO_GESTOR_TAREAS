@@ -54,7 +54,7 @@
     </section>
 
     <!-- Sección de tableros -->
-    <section id="tableros" class="seccion activa">
+    <section id="tableros" class="seccion">
       <h2 class="titulo-tableros">Mis tableros</h2>
       <div class="contenedor-tableros">
         <div class="columna">
@@ -223,11 +223,11 @@
         <form>
           <!-- TÍTULO -->
           <label for="titulo-tarea">Título de la tarea</label>
-          <input type="text" id="titulo-tarea" placeholder="Ejemplo: Diseñar pantalla de inicio">
+          <input type="text" id="titulo-tarea" placeholder="Añade una tarea">
 
           <!-- DESCRIPCIÓN -->
           <label for="descripcion-tarea">Descripción detallada</label>
-          <textarea id="descripcion-tarea" placeholder="Describe los detalles y objetivos de la tarea..."></textarea>
+          <textarea id="descripcion-tarea" placeholder="Cree una descripcion de la tarea"></textarea>
 
           <!-- ASIGNAR A -->
           <div class="fila">
@@ -507,11 +507,198 @@
 
 
 
-    <!-- PERFIL -->
+    <!-- PERFIL - VISTA NORMAL -->
     <section id="perfil" class="seccion">
-      <h2>Perfil</h2>
-      <p>Configuración de usuario.</p>
+      <h2 class="titulo-seccion">Perfil</h2>
+
+      <div class="contenedor-perfil-unico">
+        <div class="titulo-seccion-perfil">Datos del usuario</div>
+
+        <!-- Línea separadora -->
+          <div class="linea-separadora"></div>
+        
+        <div class="contenido-perfil-unico">
+          <!-- Foto de perfil -->
+          <div class="foto-perfil-container">
+            <div class="foto-perfil">Z</div>
+            <a href="#" class="link-importar-foto">Importar foto</a>
+          </div>
+
+          <!-- Información del usuario -->
+          <div class="info-usuario">
+            <div class="campo-contenedor">
+              <label class="campo-perfil-label">Nombre completo</label>
+              <div class="input-y-boton">
+                <input class="input-perfil" type="text" value="Zahir Fernando Díaz Barrera" readonly>
+                <button class="btn-cambiar" data-campo="nombre">Cambiar nombre</button>
+              </div>
+            </div>
+
+            <div class="campo-contenedor">
+              <label class="campo-perfil-label">Correo electrónico</label>
+              <div class="input-y-boton">
+                <input class="input-perfil" type="email" value="zdiaz_23@alu.uabcs.mx" readonly>
+                <button class="btn-cambiar" data-campo="correo">Cambiar correo</button>
+              </div>
+            </div>
+
+            <div class="campo-contenedor">
+              <label class="campo-perfil-label">Contraseña</label>
+              <div class="input-y-boton">
+                <input class="input-perfil" type="password" value="************" readonly>
+                <button class="btn-cambiar" data-campo="contrasena">Cambiar contraseña</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Línea separadora -->
+          <div class="linea-separadora"></div>
+
+          <!-- Actividad del usuario -->
+          <div class="seccion-actividad">
+            <h3 class="subtitulo-perfil">Actividad del usuario</h3>
+            <table class="tabla-actividad">
+              <thead>
+                <tr>
+                  <th>Tarea</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Diseño del módulo de reportes.</td>
+                  <td><span>En progreso</span></td>
+                  <td>03/11/2025</td>
+                </tr>
+                <tr>
+                  <td>Revisión de tareas del equipo.</td>
+                  <td><span>Pendiente</span></td>
+                  <td>06/11/2025</td>
+                </tr>
+                <tr>
+                  <td>Presentación del diseño en programación web.</td>
+                  <td><span>Completado</span></td>
+                  <td>03/11/2025</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Línea separadora -->
+          <div class="linea-separadora"></div>
+
+          <!-- Eliminación de perfil -->
+          <div class="seccion-eliminar">
+            <h3 class="subtitulo-perfil">Eliminación de perfil</h3>
+            <p class="advertencia-eliminar">
+              Elimina permanentemente la cuenta y quita el acceso a todos los espacios de trabajo.
+            </p>
+            <a href="#" class="link-eliminar-cuenta">Eliminar mi cuenta</a>
+          </div>
+        </div>
+      </div>
     </section>
+
+   <!-- EDITAR NOMBRE - SECCIÓN SEPARADA -->
+    <section id="editar-nombre" class="seccion">
+      <h2 class="titulo-seccion">Perfil</h2>
+
+      <div class="contenedor-perfil-unico">
+        <div class="titulo-seccion-perfil">Editar nombre</div>
+        
+        <div class="contenido-perfil-unico">
+          <form class="form-edicion-perfil">
+            <label class="label-edicion">Nuevo nombre completo</label>
+            <input type="text" class="input-edicion" placeholder="Escribe tu nuevo nombre..." required>
+            
+            <p class="confirmacion-edicion">¿Confirmas los cambios realizados?</p>
+            
+            <div class="botones-edicion">
+              <button type="button" class="btn-cancelar-edicion">Cancelar</button>
+              <button type="submit" class="btn-confirmar-edicion">Confirmar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITAR CORREO - SECCIÓN SEPARADA -->
+    <section id="editar-correo" class="seccion">
+      <h2 class="titulo-seccion">Perfil</h2>
+
+      <div class="contenedor-perfil-unico">
+        <div class="titulo-seccion-perfil">Editar correo</div>
+        
+        <div class="contenido-perfil-unico">
+          <form class="form-edicion-perfil">
+            <label class="label-edicion">Nuevo correo electrónico</label>
+            <input type="email" id="nuevo-correo" class="input-edicion" placeholder="Escribe tu nuevo correo..." required>
+            
+            <label class="label-edicion">Confirmar correo electrónico</label>
+            <input type="email" id="confirmar-correo" class="input-edicion" placeholder="Confirma tu nuevo correo..." required>
+            
+            <p class="confirmacion-edicion">¿Confirmas los cambios realizados?</p>
+            
+            <div class="botones-edicion">
+              <button type="button" class="btn-cancelar-edicion">Cancelar</button>
+              <button type="submit" class="btn-confirmar-edicion">Confirmar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITAR CONTRASEÑA - SECCIÓN SEPARADA -->
+    <section id="editar-contrasena" class="seccion">
+      <h2 class="titulo-seccion">Perfil</h2>
+
+      <div class="contenedor-perfil-unico">
+        <div class="titulo-seccion-perfil">Editar contraseña</div>
+        
+        <div class="contenido-perfil-unico">
+          <form class="form-edicion-perfil">
+            <label class="label-edicion">Nueva contraseña</label>
+            <input type="password" id="nueva-contrasena" class="input-edicion" placeholder="Escribe tu nueva contraseña..." required>
+            
+            <label class="label-edicion">Confirmar contraseña</label>
+            <input type="password" id="confirmar-contrasena" class="input-edicion" placeholder="Confirma tu nueva contraseña..." required>
+            
+            <p class="confirmacion-edicion">¿Confirmas los cambios realizados?</p>
+            
+            <div class="botones-edicion">
+              <button type="button" class="btn-cancelar-edicion">Cancelar</button>
+              <button type="submit" class="btn-confirmar-edicion">Confirmar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- ALERTA 1: Cambiar foto de perfil -->
+    <section id="alerta-cambiar-foto" class="seccion">
+      <div class="alerta-eliminar">
+        <h3>Cambiar foto de perfil</h3>
+        <img src="/assets/img/descarga-icono.png" alt="Icono imagen" class="icono-imagen-alerta">
+        <p>Selecciona una imagen para cambiar su foto de perfil</p>
+        <div class="botones-alerta">
+          <button id="cancelarCambiarFoto" class="btn-cancelar-foto">Cancelar</button>
+          <button id="subirCambiarFoto" class="btn-subir-foto">Subir</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALERTA 2: Confirmar importación -->
+    <div class="confirmation-modal" id="confirmationModal" style="display: none;">
+      <div class="modal-content">
+        <h3>Importando foto</h3>
+        <p>¿Confirma actualizar su foto de perfil?</p>
+        <img src="/assets/img/perfil.png">
+        <div class="modal-actions">
+          <button class="btn-cancel" id="cancelBtn">Cancelar</button>
+          <button class="btn-confirm" id="confirmBtn">Confirmar</button>
+        </div>
+      </div>
+    </div>
 
 
 
@@ -672,7 +859,6 @@
     
   </main>
 
-  
 
 
   <!-- FOOTER -->
