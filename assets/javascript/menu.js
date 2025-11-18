@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Configurar contenido básico
     tituloAlerta.textContent = titulo;
     textoAlerta.innerHTML = mensaje;
-    iconoAlerta.src = tipo === "exito" ? "/assets/img/exito.png" : "/assets/img/alerta.png";
+    iconoAlerta.src = tipo === "exito" ? "../../assets/img/exito.png" : "../../assets/img/alerta.png";
 
     // Configurar botones según el tipo de alerta
     if (config?.soloAceptar) {
@@ -319,11 +319,11 @@ document.addEventListener("DOMContentLoaded", () => {
     columnaDestino.insertAdjacentHTML("beforeend", `
       <div class="tarjeta">
         <h4>${titulo}</h4>
-        <p><img src="/assets/img/icono-calendario.png" class="icono"> ${fecha}</p>
-        <p><img src="/assets/img/icono-usuario.png" class="icono"> ${asignado}</p>
-        <p><img src="/assets/img/icono-prioridad.png" class="icono"> ${prioridad}</p>
+        <p><img src="../../assets/img/icono-calendario.png" class="icono"> ${fecha}</p>
+        <p><img src="../../assets/img/icono-usuario.png" class="icono"> ${asignado}</p>
+        <p><img src="../../assets/img/icono-prioridad.png" class="icono"> ${prioridad}</p>
         <div class="botones-tarjeta">
-          <button class="eliminar"><img src="/assets/img/basura.png" class="delete-card" alt="Eliminar"></button>
+          <button class="eliminar"><img src="../../assets/img/basura.png" class="delete-card" alt="Eliminar"></button>
           <div class="botones-derecha">
             <button class="mover-izq"><</button>
             <button class="mover-der">></button>
@@ -423,7 +423,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   confirmarCerrar?.addEventListener("click", () => {
-    window.location.href = "/index.html";
+    window.location.href = "../../index.html";
   });
 
   // --- ACCIONES EN TARJETAS (eliminar / mover) ---
@@ -771,10 +771,10 @@ document.addEventListener("DOMContentLoaded", () => {
       <td>${notas}</td>
       <td class="acciones-celda">
         <button class="btn-editar-admin">
-          <img src="/assets/img/editar.png" alt="Editar">
+          <img src="../../assets/img/editar.png" alt="Editar">
         </button>
         <button class="btn-eliminar-admin">
-          <img src="/assets/img/eliminar.png" alt="Eliminar">
+          <img src="../../assets/img/eliminar.png" alt="Eliminar">
         </button>
       </td>
     `;
@@ -920,7 +920,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // EVENT DELEGATION PARA TODOS LOS BOTONES DEL PERFIL
     document.addEventListener('click', function(e) {
         const target = e.target;
-        console.log("🎯 Click detectado en:", target);
+        console.log("Click detectado en:", target);
         
         // 1. BOTONES CAMBIAR (nombre, correo, contraseña)
         if (target.classList.contains('btn-cambiar') || target.closest('.btn-cambiar')) {
@@ -1099,7 +1099,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Botón "Subir" de la primera alerta - muestra segunda alerta
     if (subirCambiarFoto) {
         subirCambiarFoto.addEventListener('click', function() {
-            mostrarConfirmacion('/assets/img/perfil.png');
+            mostrarConfirmacion('../../assets/img/perfil.png');
         });
     }
 
@@ -1231,7 +1231,7 @@ document.addEventListener("DOMContentLoaded", () => {
               soloAceptar: true,
               onConfirmar: () => {
                   // Redirigir al inicio después de eliminar la cuenta
-                  window.location.href = "/index.html";
+                  window.location.href = "../../index.html";
               }
           }
       );
@@ -1239,7 +1239,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === FUNCIÓN PARA NAVEGACIÓN DESDE REPORTES ===
   function inicializarNavegacionReportes() {
-    console.log("🔗 Inicializando navegación desde reportes...");
+    console.log("Inicializando navegación desde reportes...");
     
     // 1. Tarjetas de métricas (Total tareas, Pendiente, etc.)
     const tarjetasMetricas = document.querySelectorAll('.tarjeta-metrica');
@@ -1251,10 +1251,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const tipoTarea = this.querySelector('h3').textContent.trim().toLowerCase();
             
             if (tipoTarea === 'total de tareas') {
-                console.log("📋 Navegando a TAREAS desde Total de tareas");
+                console.log("Navegando a TAREAS desde Total de tareas");
                 mostrarSeccion('tareas');
             } else {
-                console.log("📊 Navegando a TABLEROS desde:", tipoTarea);
+                console.log("Navegando a TABLEROS desde:", tipoTarea);
                 mostrarSeccion('tableros');
             }
         });
@@ -1268,19 +1268,80 @@ document.addEventListener("DOMContentLoaded", () => {
         
         recuadro.addEventListener('click', function() {
             const titulo = this.querySelector('h3').textContent.trim();
-            console.log("🎯 Click en recuadro:", titulo);
+            console.log("Click en recuadro:", titulo);
             
             // Determinar destino según el título
             if (titulo === 'Usuarios activos') {
-                console.log("👥 Navegando a USUARIOS desde Usuarios activos");
+                console.log("Navegando a USUARIOS desde Usuarios activos");
                 mostrarSeccion('usuarios');
             } else {
-                console.log("📊 Navegando a TABLEROS desde:", titulo);
+                console.log("Navegando a TABLEROS desde:", titulo);
                 mostrarSeccion('tableros');
             }
         });
     });
   }
+
+  // Toggle dropdown
+  document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+      toggle.addEventListener('click', e => {
+          e.preventDefault();
+
+          const menu = toggle.nextElementSibling;
+
+          // Cerrar otros dropdowns abiertos
+          document.querySelectorAll('.dropdown-menu').forEach(m => {
+              if (m !== menu) m.style.display = 'none';
+          });
+
+          // Abrir/cerrar el dropdown
+          menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+      });
+  });
+
+  // Cerrar dropdown al hacer click fuera
+  document.addEventListener('click', e => {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+          if (!menu.contains(e.target) && !menu.previousElementSibling.contains(e.target)) {
+              menu.style.display = 'none';
+          }
+      });
+  });
+
+  document.querySelectorAll('.toggle-password').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+    const input = toggle.previousElementSibling;
+    const svg = toggle.querySelector('svg');
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      // Cambiar SVG a ojo abierto
+      svg.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    } else {
+      input.type = 'password';
+      // Cambiar SVG a ojo cerrado
+      svg.innerHTML = `<path d="M17.94 17.94A10.97 10.97 0 0 1 12 20c-5 0-9.27-3-11-7 1.01-2.21 2.65-4.13 4.66-5.39"/><line x1="1" y1="1" x2="23" y2="23" />`;
+    }
+    });
+  });
+
+  document.querySelectorAll('.login-toggle-password').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+    const input = toggle.previousElementSibling;
+    const svg = toggle.querySelector('svg');
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      // Cambiar SVG a ojo abierto
+      svg.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    } else {
+      input.type = 'password';
+      // Cambiar SVG a ojo cerrado
+      svg.innerHTML = `<path d="M17.94 17.94A10.97 10.97 0 0 1 12 20c-5 0-9.27-3-11-7 1.01-2.21 2.65-4.13 4.66-5.39"/><line x1="1" y1="1" x2="23" y2="23" />`;
+    }
+    });
+  });
+  
 
   // === INICIALIZACIÓN COMPLETA ===
   function inicializarTodo() {
