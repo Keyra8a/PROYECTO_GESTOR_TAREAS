@@ -567,6 +567,21 @@ select {
 .tabla-tareas td{
   font-size: 20px;
 }
+/* Agrega esto a tu CSS existente */
+.tabla-tareas th:nth-child(5),
+.tabla-tareas td:nth-child(5) {
+    min-width: 120px;  /* Ancho mínimo para la columna de fecha */
+    width: 15%;        /* Porcentaje del ancho total */
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+}
+
+/* O si prefieres por clase */
+.columna-fecha {
+    min-width: 120px;
+    width: 15%;
+    white-space: nowrap;
+}
+
 
 .tabla-tareas th {
   background-color: #ffffff;
@@ -875,7 +890,8 @@ select {
   background-color: #007bff;
   color: #fff;
   border: none;
-  padding: 8px 18px;
+  font-size: 18px;
+  padding: 15px 30px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
@@ -900,16 +916,30 @@ select {
   width: 250px;
   padding: 10px;
   background: #fff;
+  transition: all 0.3s ease; /* Suaviza la transición */
+  cursor: pointer;
 }
+
+.tarjeta-metrica:hover {
+  border-color: #007bff;
+}
+
 .tarjeta-metrica h3 {
   margin-bottom: 8px;
   font-size: 25px;
+  transition: color 0.3s ease;
 }
+
 .tarjeta-metrica p {
   font-size: 25px;
   font-weight: bold;
+  transition: color 0.3s ease;
 }
 
+.tarjeta-metrica:hover h3,
+.tarjeta-metrica:hover p {
+  color: #007bff;
+}
 .contenedor-barras {
   display: flex;
   justify-content: center;
@@ -924,6 +954,20 @@ select {
   width: 535px;
   background: #fff;
   text-align: left;
+  transition: all 0.3s ease; /* Suaviza la transición */
+  cursor: pointer;
+}
+
+.recuadro:hover {
+  border-color: #007bff;
+}
+
+.recuadro h3 {
+  transition: color 0.3s ease;
+}
+
+.recuadro:hover h3 {
+  color: #007bff;
 }
 
 .barra {
@@ -931,10 +975,17 @@ select {
   align-items: center;
   margin-bottom: 10px;
 }
+
 .barra span {
   flex: 1;
   font-size: 15px;
+  transition: color 0.3s ease;
 }
+
+.recuadro:hover .barra span:not(.porcentaje) {
+  color: #007bff;
+}
+
 .barra-contenido {
   flex: 3;
   height: 10px;
@@ -943,15 +994,23 @@ select {
   margin: 0 10px;
   overflow: hidden;
 }
+
 .barra-progreso {
   height: 100%;
   background: #007bff;
   transition: width 0.8s ease;
 }
+
 .porcentaje {
   width: 40px;
   text-align: right;
   font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.recuadro:hover .porcentaje {
+  color: #007bff;
+  font-weight: bold;
 }
 
 .tareas-atrasadas {
@@ -1143,7 +1202,18 @@ select {
   min-height: 80vh;
   text-align: center;
 }
-
+.input-editar {
+    background-color: #0047ff;
+    width: 100%;
+    max-width: 400px; 
+    min-width: 300px; 
+    border-radius: 10px;
+    border:  2px solid #007bff;
+    color:white;
+    font-size: 15px;
+    flex: 10;
+    padding: 12px 16px;
+}
 #inicio h2 {
   font-size: 90px;
   margin-left: 120px;
@@ -1188,13 +1258,14 @@ select {
   padding: 8px 15px;
 }
 
-/* Botones de acciones */
+
+/* Botones de acciones - Versión minimalista */
 .btn-editar-admin,
 .btn-eliminar-admin {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 15px;
+  padding: 5px;
   border-radius: 4px;
   transition: all 0.3s ease;
   display: flex;
@@ -1203,29 +1274,59 @@ select {
 }
 
 .btn-editar-admin:hover {
-  background-color: #e3f2fd;
   transform: scale(1.1);
+  background-color: transparent; /* Sin fondo */
 }
 
 .btn-eliminar-admin:hover {
-  background-color: #ffebee;
   transform: scale(1.1);
+  background-color: transparent; /* Sin fondo */
 }
 
 .btn-editar-admin img,
 .btn-eliminar-admin img {
-  width: 50px;
-  height: 50px;
-  transition: filter 0.3s ease;
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
 }
 
 .btn-editar-admin:hover img {
-  filter: brightness(0.8);
+  filter: drop-shadow(0 0 3px rgba(33, 150, 243, 0.7));
 }
 
 .btn-eliminar-admin:hover img {
-  filter: brightness(0.8);
+  filter: drop-shadow(0 0 3px rgba(244, 67, 54, 0.7));
 }
+/* Celda de acciones - Compacta */
+.acciones-celda {
+    display: flex;
+    justify-content: center ;
+    align-items: center;
+    gap: 0px;
+    padding: 0px ;
+    border: -6px solid #ddd;
+    background-color: #fff;
+}
+
+.btn-editar-admin,
+.btn-eliminar-admin {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-editar-admin img,
+.btn-eliminar-admin img {
+    width: 50px;
+    height: 50px;
+}
+
 
 /* Filas para agregar usuarios */
 .fila-agregar {
@@ -1503,7 +1604,7 @@ select {
   font-size: 20px;
   text-align: left;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .input-y-boton {
@@ -1520,6 +1621,14 @@ select {
   border-radius: 5px;
   padding: 12px 15px;
   font-size: 16px;
+  height: 45px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+/* Fuerza el mismo ancho para todos los inputs */
+.input-perfil {
+  width: 100%;
+  max-width: 400px; /* Mismo ancho máximo para todos */
 }
 
 .input-perfil::placeholder {
@@ -1537,11 +1646,34 @@ select {
   font-weight: bold;
   white-space: nowrap;
   transition: background-color 0.3s;
-  height: 44px; /* Misma altura que el input */
+  height: 45px;
+  width: 210px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* Evita que el botón se reduzca */
 }
 
 .btn-cambiar:hover {
   background-color: #0056b3;
+}
+/* SOLUCIÓN: Contenedor con ancho fijo para los inputs */
+.campo-contenedor {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-y-boton {
+  display: grid;
+  grid-template-columns: 1fr auto; /* Input ocupa espacio disponible, botón tamaño automático */
+  gap: 15px;
+  align-items: center;
+}
+
+.input-perfil {
+  width: 100%;
+  min-width: 700px; /* Ancho mínimo igual para todos */
 }
 
 /* Línea separadora */
@@ -1864,6 +1996,9 @@ select {
 .confirmation-modal.activa {
     display: flex !important;
 }
+
+
+
 
 
 /* === FOOTER === */

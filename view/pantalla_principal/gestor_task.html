@@ -182,7 +182,7 @@
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
-              <td>2025-11-12</td>
+              <td class="fecha">2025-11-12</td>
               <td>Keyra Yariely Grijalva Ochoa</td>
             </tr>
             <tr>
@@ -190,7 +190,7 @@
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
-              <td>2025-11-12</td>
+              <td class="fecha">2025-11-12</td>
               <td>Keyra Yariely Grijalva Ochoa</td>
             </tr>
             <tr>
@@ -198,7 +198,7 @@
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
-              <td>2025-11-12</td>
+              <td class="fecha">2025-11-12</td>
               <td>Keyra Yariely Grijalva Ochoa</td>
             </tr>
             <tr>
@@ -206,7 +206,7 @@
               <td>Diseñar pantalla de login</td>
               <td>UI Principal</td>
               <td>Pendiente</td>
-              <td>2025-11-12</td>
+              <td class="fecha">2025-11-12</td>
               <td>Keyra Yariely Grijalva Ochoa</td>
             </tr>
           </tbody>
@@ -232,7 +232,10 @@
           <!-- ASIGNAR A -->
           <div class="fila">
             <label for="asignar-a">Asignar a:</label>
-            <input type="text" id="asignar-a" placeholder="Nombre del responsable">
+            <select id="asignar-a">
+              <option value="">Seleccionar usuario</option>
+              <!-- Los usuarios se agregarán dinámicamente con JavaScript -->
+            </select>
           </div>
 
           <!-- ESTADO -->
@@ -383,28 +386,28 @@
                 </thead>
 
                 <tbody class="tabla-usuarios">
-                    <tr data-id="1">
-                        <td>Juan Pérez</td>
-                        <td>juan.perez@example.com</td>
+                    <tr data-id="0">
+                        <td>Zahir Fernando</td>
+                        <td>zdiaz_23@alu.uabcs.mx</td>
                         <td>5</td>
                         <td>Responsable de tareas urgentes</td>
                     </tr>
 
-                    <tr data-id="2">
+                    <tr data-id="1">
                         <td>María López</td>
                         <td>maria.lopez@example.com</td>
                         <td>3</td>
                         <td>Apoya en tareas de diseño</td>
                     </tr>
 
-                    <tr data-id="3">
+                    <tr data-id="2">
                         <td>Carlos Martínez</td>
                         <td>carlos.martinez@example.com</td>
                         <td>7</td>
                         <td>Encargado del seguimiento semanal</td>
                     </tr>
 
-                    <tr data-id="4">
+                    <tr data-id="3">
                         <td>Ana Torres</td>
                         <td>ana.torres@example.com</td>
                         <td>2</td>

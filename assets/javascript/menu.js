@@ -16,8 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let ultimaSeccionActiva = null;
   let filaEditando = null;
   let imagenSeleccionada = null;
+  let usuarioActualDetalles = null;
 
- const mostrarSeccion = (id) => {
+  const mostrarSeccion = (id) => {
     console.log("Mostrando sección:", id);
     
     // 1. Ocultar TODAS las secciones
@@ -318,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
     columnaDestino.insertAdjacentHTML("beforeend", `
       <div class="tarjeta">
         <h4>${titulo}</h4>
-        <p>${descripcion}</p>
         <p><img src="/assets/img/icono-calendario.png" class="icono"> ${fecha}</p>
         <p><img src="/assets/img/icono-usuario.png" class="icono"> ${asignado}</p>
         <p><img src="/assets/img/icono-prioridad.png" class="icono"> ${prioridad}</p>
@@ -459,30 +459,205 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // === SECCION ADMIN - USUARIOS ===
-  const filasAgregar = document.querySelectorAll('.fila-agregar[data-action="añadir-usuario"]');
-  const formUsuarioAdmin = document.getElementById('form-usuario-admin');
-  const tablaAdmin = document.querySelector('.tabla-admin tbody');
+  // === FUNCIÓN PARA DETALLES DE USUARIO ===
+  function mostrarDetallesUsuarioDesdeFila(fila) {
+    if (!fila) {
+        console.log("❌ Error: fila es null");
+        return;
+    }
+    
+    const celdas = fila.querySelectorAll('td');
+    if (celdas.length < 4) {
+        console.log("❌ Error: no hay suficientes celdas", celdas.length);
+        return;
+    }
+    
+    const nombre = celdas[0].textContent;
+    const correo = celdas[1].textContent;
+    const tareas = celdas[2].textContent;
+    
+    console.log("👤 Cargando detalles para:", nombre);
+    
+    // Mostrar en la sección de detalles
+    document.getElementById('detNombre').textContent = nombre;
+    document.getElementById('detCorreo').textContent = correo;
+    document.getElementById('detTareas').textContent = `${calcularTareas(tareas)} tareas`;
+    document.getElementById('detEstado').textContent = 'Activo';
+    document.getElementById('detFecha').textContent = new Date().toLocaleDateString();
+    
+    // Guardar referencia
+    usuarioActualDetalles = { nombre, correo, tareas, fila };
+    
+    // VERIFICACIÓN POR ID DEL USUARIO (data-id)
+    const userId = fila.getAttribute('data-id');
+    console.log("📊 ID de usuario:", userId);
+    
+    // Control de botones - SOLO mostrar para el usuario con ID 0 (Zahir Fernando)
+    const btnEditar = document.getElementById('btnEditarUsuario');
+    const btnEliminar = document.getElementById('btnEliminarUsuario');
+    
+    if (userId === "0") {
+        // Usuario Zahir Fernando - MOSTRAR botones
+        btnEditar.style.display = 'inline-block';
+        btnEliminar.style.display = 'inline-block';
+        console.log("✅ Mostrando botones para USUARIO ACTUAL (Zahir)");
+    } else {
+        // Otros usuarios - OCULTAR botones
+        btnEditar.style.display = 'none';
+        btnEliminar.style.display = 'none';
+        console.log("❌ Ocultando botones para OTROS USUARIOS");
+    }
+    
+    mostrarSeccion('detalleUsuario');
+  }
 
-  // === CORRECCIÓN PARA EDITAR USUARIO AL HACER CLIC EN LA FILA ===
+  function calcularTareas(tareasTexto) {
+    if (!tareasTexto || tareasTexto === 'Añadir' || tareasTexto === 'Sin tareas') return 0;
+    
+    // Si es un número, devolver ese número
+    const numero = parseInt(tareasTexto);
+    if (!isNaN(numero)) return numero;
+    
+    // Si es texto con tareas separadas por comas
+    const tareasArray = tareasTexto.split(', ').filter(t => t.trim());
+    return tareasArray.length > 0 ? tareasArray.length : 1;
+  }
+
+  // === FUNCIÓN PARA EDITAR DESDE DETALLES ===
+  function editarUsuarioDesdeDetalles() {
+    if (usuarioActualDetalles) {
+        console.log("✏️ Editando usuario desde detalles:", usuarioActualDetalles.nombre);
+        
+        // Llenar el formulario de edición con los datos actuales
+        document.getElementById('editNombre').value = usuarioActualDetalles.nombre;
+        document.getElementById('editCorreo').value = usuarioActualDetalles.correo;
+        document.getElementById('editTareas').value = calcularTareas(usuarioActualDetalles.tareas);
+        document.getElementById('editEstado').value = 'Activo';
+        document.getElementById('editFecha').value = new Date().toLocaleDateString();
+        
+        // Guardar referencia de qué fila estamos editando
+        filaEditando = usuarioActualDetalles.fila;
+        
+        mostrarSeccion('editarUsuario');
+    }
+  }
+
+  // === FUNCIÓN PARA ELIMINAR DESDE DETALLES ===
+  function eliminarUsuarioDesdeDetalles() {
+    if (usuarioActualDetalles) {
+        const nombre = usuarioActualDetalles.nombre;
+        console.log("🗑️ Eliminando usuario desde detalles:", nombre);
+        
+        seccionAntesDeEliminar = "detalleUsuario";
+        
+        configurarAlerta(
+            "Eliminar Usuario",
+            `¿Eliminar a <strong>${nombre}</strong>?<br>Esta acción no se puede deshacer.`,
+            "alerta",
+            {
+                textoConfirmar: "Eliminar",
+                onConfirmar: () => {
+                    usuarioActualDetalles.fila.remove();
+                    mostrarAlertaExito("Usuario eliminado correctamente", "usuarios");
+                },
+                onCancelar: () => {
+                    mostrarSeccion("detalleUsuario");
+                }
+            }
+        );
+    }
+  }
+
+  // === INICIALIZAR BOTONES DE DETALLES ===
+  function inicializarBotonesDetalles() {
+    // Botón Volver desde detalles
+    const btnVolver = document.getElementById('btnVolverUsuario');
+    if (btnVolver) {
+        btnVolver.addEventListener('click', function() {
+            console.log("↩ Volviendo a usuarios desde detalles");
+            mostrarSeccion('usuarios');
+        });
+    }
+    
+    // Botón Editar desde detalles
+    const btnEditar = document.getElementById('btnEditarUsuario');
+    if (btnEditar) {
+        btnEditar.addEventListener('click', editarUsuarioDesdeDetalles);
+    }
+    
+    // Botón Eliminar desde detalles
+    const btnEliminar = document.getElementById('btnEliminarUsuario');
+    if (btnEliminar) {
+        btnEliminar.addEventListener('click', eliminarUsuarioDesdeDetalles);
+    }
+    
+    // Botón Cancelar desde edición
+    const btnCancelarEditar = document.getElementById('btnCancelarEditar');
+    if (btnCancelarEditar) {
+        btnCancelarEditar.addEventListener('click', function() {
+            console.log("↩ Cancelando edición, volviendo a detalles");
+            mostrarSeccion('detalleUsuario');
+        });
+    }
+    
+    // Botón Aceptar en edición
+    const btnAceptarEditar = document.getElementById('btnAceptarEditar');
+    if (btnAceptarEditar) {
+        btnAceptarEditar.addEventListener('click', function() {
+            if (filaEditando) {
+                // Actualizar los datos en la fila
+                const celdas = filaEditando.querySelectorAll('td');
+                celdas[0].textContent = document.getElementById('editNombre').value;
+                celdas[1].textContent = document.getElementById('editCorreo').value;
+                celdas[2].textContent = document.getElementById('editTareas').value + ' tareas';
+                
+                // Actualizar también en usuarioActualDetalles
+                if (usuarioActualDetalles) {
+                    usuarioActualDetalles.nombre = document.getElementById('editNombre').value;
+                    usuarioActualDetalles.correo = document.getElementById('editCorreo').value;
+                    usuarioActualDetalles.tareas = document.getElementById('editTareas').value + ' tareas';
+                }
+                
+                mostrarAlertaExito("Usuario actualizado correctamente", "detalleUsuario");
+            }
+        });
+    }
+    
+    // Botón Eliminar desde edición
+    const btnEliminarEdit = document.getElementById('btnEliminarUsuarioEdit');
+    if (btnEliminarEdit) {
+        btnEliminarEdit.addEventListener('click', function() {
+            eliminarUsuarioDesdeDetalles();
+        });
+    }
+    
+    console.log("✅ Botones de detalles inicializados");
+  }
+
+  // === INICIALIZAR TABLA DE USUARIOS ===
   function inicializarTablaUsuarios() {
     const tablaUsuarios = document.querySelector(".tabla-usuarios");
     
     if (!tablaUsuarios) return;
     
     tablaUsuarios.addEventListener('click', function(e) {
-      const fila = e.target.closest('tr');
-      if (!fila) return;
-      
-      if (fila.classList.contains('fila-agregar')) return;
-      
-      if (e.target.closest('.btn-editar-admin') || e.target.closest('.btn-eliminar-admin')) {
-        return;
-      }
-      
-      manejarEditarUsuarioDesdeFila(fila);
+        const fila = e.target.closest('tr');
+        if (!fila) return;
+        
+        // No hacer nada si clickean en los botones de acción de admin (si los hay)
+        if (e.target.closest('.btn-editar-admin') || e.target.closest('.btn-eliminar-admin')) {
+            return;
+        }
+        
+        // MOSTRAR DETALLES al hacer click en cualquier parte de la fila
+        mostrarDetallesUsuarioDesdeFila(fila);
     });
   }
+
+  // === SECCION ADMIN - USUARIOS ===
+  const filasAgregar = document.querySelectorAll('.fila-agregar[data-action="añadir-usuario"]');
+  const formUsuarioAdmin = document.getElementById('form-usuario-admin');
+  const tablaAdmin = document.querySelector('.tabla-admin tbody');
 
   function manejarEditarUsuarioDesdeFila(fila) {
     const celdas = fila.querySelectorAll('td');
@@ -710,7 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCancelarEditar = formEditarUsuario.querySelector('.cancelar');
     if (btnCancelarEditar) {
       btnCancelarEditar.addEventListener('click', function() {
-        mostrarSeccion('usuarios');
+        mostrarSeccion('admin');
       });
     }
 
@@ -739,7 +914,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
- function inicializarPerfil() {
+  function inicializarPerfil() {
     console.log("🔄 Inicializando perfil...");
     
     // EVENT DELEGATION PARA TODOS LOS BOTONES DEL PERFIL
@@ -943,55 +1118,53 @@ document.addEventListener("DOMContentLoaded", () => {
             confirmarFoto();
         });
     }
-
   }
 
-// Función para mostrar la segunda alerta (confirmación)
-function mostrarConfirmacion(imagenSrc) {
-    
-    imagenSeleccionada = imagenSrc;
-    
-    const modal = document.getElementById('confirmationModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        
-        // Mostrar la imagen en el modal
-        const imgModal = modal.querySelector('img');
-        if (imgModal) {
-            imgModal.src = imagenSrc;
-        }
-    }
-}
-
-// Función para ocultar la segunda alerta
-function ocultarConfirmacion() {
-    const modal = document.getElementById('confirmationModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-    imagenSeleccionada = null;
-}
-
-// Función cuando confirman la foto
-function confirmarFoto() {
-    if (imagenSeleccionada) {
-        // Actualizar la imagen en el perfil - cambiar el "Z" por la imagen
-        const fotoPerfil = document.querySelector('.foto-perfil');
-        if (fotoPerfil) {
-            // Cambiar el div con texto "Z" por una imagen
-            fotoPerfil.style.backgroundImage = `url(${imagenSeleccionada})`;
-            fotoPerfil.style.backgroundSize = 'cover';
-            fotoPerfil.style.backgroundPosition = 'center';
-            fotoPerfil.innerHTML = ''; // Quitar el texto "Z"
-        }
+  // Función para mostrar la segunda alerta (confirmación)
+  function mostrarConfirmacion(imagenSrc) {
+      imagenSeleccionada = imagenSrc;
+      
+      const modal = document.getElementById('confirmationModal');
+      if (modal) {
+          modal.style.display = 'flex';
+          
+          // Mostrar la imagen en el modal
+          const imgModal = modal.querySelector('img');
+          if (imgModal) {
+              imgModal.src = imagenSrc;
+          }
       }
-    
-    ocultarConfirmacion();
-    mostrarSeccion("perfil");
- }
+  }
+
+  // Función para ocultar la segunda alerta
+  function ocultarConfirmacion() {
+      const modal = document.getElementById('confirmationModal');
+      if (modal) {
+          modal.style.display = 'none';
+      }
+      imagenSeleccionada = null;
+  }
+
+  // Función cuando confirman la foto
+  function confirmarFoto() {
+      if (imagenSeleccionada) {
+          // Actualizar la imagen en el perfil - cambiar el "Z" por la imagen
+          const fotoPerfil = document.querySelector('.foto-perfil');
+          if (fotoPerfil) {
+              // Cambiar el div con texto "Z" por una imagen
+              fotoPerfil.style.backgroundImage = `url(${imagenSeleccionada})`;
+              fotoPerfil.style.backgroundSize = 'cover';
+              fotoPerfil.style.backgroundPosition = 'center';
+              fotoPerfil.innerHTML = ''; // Quitar el texto "Z"
+          }
+        }
+      
+      ocultarConfirmacion();
+      mostrarSeccion("perfil");
+  }
+
   // === ALERTA PARA ELIMINAR CUENTA DE USUARIO ===
   function inicializarEliminarCuenta() {
-      
       const linkEliminarCuenta = document.querySelector('.link-eliminar-cuenta');
       console.log("Link encontrado:", linkEliminarCuenta);
       
@@ -1037,7 +1210,6 @@ function confirmarFoto() {
   }
 
   function eliminarUsuarioDeSistema() {
-      
       // Aquí iría tu código para eliminar el usuario:
       // - Llamada a API
       // - Eliminar de base de datos  
@@ -1051,7 +1223,6 @@ function confirmarFoto() {
   }
 
   function mostrarAlertaCuentaEliminada() {
-      
       configurarAlerta(
           "Cuenta Eliminada",
           "Tu cuenta ha sido eliminada exitosamente.<br>Serás redirigido a la página de inicio.",
@@ -1066,16 +1237,62 @@ function confirmarFoto() {
       );
   }
 
-  // === INICIALIZACIÓN FINAL ===
+  // === FUNCIÓN PARA NAVEGACIÓN DESDE REPORTES ===
+  function inicializarNavegacionReportes() {
+    console.log("🔗 Inicializando navegación desde reportes...");
+    
+    // 1. Tarjetas de métricas (Total tareas, Pendiente, etc.)
+    const tarjetasMetricas = document.querySelectorAll('.tarjeta-metrica');
+    
+    tarjetasMetricas.forEach(tarjeta => {
+        tarjeta.style.cursor = 'pointer';
+        
+        tarjeta.addEventListener('click', function() {
+            const tipoTarea = this.querySelector('h3').textContent.trim().toLowerCase();
+            
+            if (tipoTarea === 'total de tareas') {
+                console.log("📋 Navegando a TAREAS desde Total de tareas");
+                mostrarSeccion('tareas');
+            } else {
+                console.log("📊 Navegando a TABLEROS desde:", tipoTarea);
+                mostrarSeccion('tableros');
+            }
+        });
+    });
+    
+    // 2. Recuadros de progreso (Progreso por tablero, Usuarios activos)
+    const recuadrosProgreso = document.querySelectorAll('.recuadro');
+    
+    recuadrosProgreso.forEach(recuadro => {
+        recuadro.style.cursor = 'pointer';
+        
+        recuadro.addEventListener('click', function() {
+            const titulo = this.querySelector('h3').textContent.trim();
+            console.log("🎯 Click en recuadro:", titulo);
+            
+            // Determinar destino según el título
+            if (titulo === 'Usuarios activos') {
+                console.log("👥 Navegando a USUARIOS desde Usuarios activos");
+                mostrarSeccion('usuarios');
+            } else {
+                console.log("📊 Navegando a TABLEROS desde:", titulo);
+                mostrarSeccion('tableros');
+            }
+        });
+    });
+  }
+
+  // === INICIALIZACIÓN COMPLETA ===
   function inicializarTodo() {
-    inicializarSistemaTareas();
-    inicializarTablaUsuarios();
-    inicializarExportarPDF();
-    inicializarPerfil();
-    inicializarEliminarCuenta();
+      inicializarSistemaTareas();
+      inicializarTablaUsuarios();
+      inicializarExportarPDF();
+      inicializarPerfil();
+      inicializarEliminarCuenta();
+      inicializarNavegacionReportes();
+      inicializarBotonesDetalles();
   }
 
   // Inicializar cuando se carga la página
   inicializarTodo();
-
 });
