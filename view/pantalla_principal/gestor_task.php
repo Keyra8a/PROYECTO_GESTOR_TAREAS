@@ -1,3 +1,4 @@
+<?php include __DIR__ . '/../../assets/app/header.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,50 +8,15 @@
   <link rel="stylesheet" href="../../assets/styles/pantallas.css">
 </head>
 <body>
-  <!-- NAVBAR SUPERIOR -->
-  <header class="header">
-    <div class="left-section">
-      <div class="logo-box-todo">
-        <a href="../../index.html">
-          <img src="../../assets/img/logo.png" width="30" alt="logo_tareas" class="logo">
-        </a>
-      </div>
-
-      <div class="tab-container">
-        <h2 class="tab">Pestaña 1</h2>
-        <button class="add-tab">+</button>
-      </div>
-    </div>
-
-    <div class="user-info">
-      <h3>Zahir Fernando</h3>
-      <div class="profile-circle">Z</div>
-      <a href="../../index.html">
-        <img src="../../assets/img/cerrarsesion.png" alt="cerrar sesión">
-      </a>
-    </div>
-  </header>
-
-
-  <!-- MENÚ LATERAL -->
-  <nav class="sidebar">
-    <a href="#" data-section="tableros">Tableros <img src="../../assets/img/flecha.png"></a>
-    <a href="#" data-section="tareas">Tareas <img src="../../assets/img/flecha.png"></a>
-    <a href="#" data-section="reportes">Reportes <img src="../../assets/img/flecha.png"></a>
-    <a href="#" data-section="usuarios">Usuarios <img src="../../assets/img/flecha.png"></a>
-    <a href="#" data-section="perfil">Perfil <img src="../../assets/img/flecha.png"></a>
-    <a href="#" data-section="inicio" style="display: none !important;"><img src="../../assets/img/casita.png" width="30px" height="30px"><img src="../../assets/img/flecha.png"></a>
-    <a href="#" data-section="admin" style="display: none !important;">Admin<img src="../../assets/img/flecha.png"></a>
-
-  </nav>
-
-
   <!-- CONTENIDO PRINCIPAL -->
   <main class="main-content">
     <!-- INICIO -->
     <section id="inicio" class="seccion activa">
       <h2>Bienvenido a <span class="task-blue">Task</span>Colab</h2>
-      <p>¡Bienvenido a tu espacio de trabajo, Zahir Fernando!</p>
+      <?php
+      $userName = $_SESSION['user']['name'] ?? 'Invitado';
+      ?>
+      <p>¡Bienvenido a tu espacio de trabajo, <?php echo htmlspecialchars($userName, ENT_QUOTES); ?>!</p>
     </section>
 
     <!-- Sección de tableros -->

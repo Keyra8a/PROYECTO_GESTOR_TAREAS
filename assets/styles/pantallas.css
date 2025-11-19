@@ -1997,10 +1997,6 @@ select {
     display: flex !important;
 }
 
-
-
-
-
 /* === FOOTER === */
 .footer {
   grid-area: footer;
@@ -2011,3 +2007,47 @@ select {
   align-items: center;
   font-size: 20px;
 }
+
+/* Avatar circular en header */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* círculo con inicial o imagen */
+.profile-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #1B5CFF;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  user-select: none;
+  overflow: hidden;
+}
+
+.profile-circle.img {
+  background-size: cover;
+  background-position: center;
+  color: transparent;
+}
+
+/* version más pequeña o mover: */
+.user-info .profile-circle.small {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+
+

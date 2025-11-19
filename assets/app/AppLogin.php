@@ -17,15 +17,20 @@ $result = $controller->login($email, $password);
 
 if ($result['ok']) {
     $user = $result['user'];
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['user_name'] = $user['name'];
-    $_SESSION['is_admin'] = $user['is_admin'];
+
+    $_SESSION['user'] = [
+        'id' => $user['id'],
+        'name' => $user['name'],
+        'is_admin' => !empty($user['is_admin']) ? 1 : 0
+    ];
 
     require_once __DIR__ . '/../../config/db.php';
-    $stmt = $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = ?');
-    $stmt->execute([$user['id']]);
+    if (isset($pdo)) {
+        $stmt = $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = ?');
+        $stmt->execute([$user['id']]);
+    }
 
-    header('Location: ../../view/pantalla_principal/gestor_task.html');
+    header('Location: ../../view/pantalla_principal/gestor_task.php');
     exit;
 } else {
     $msg = urlencode($result['message'] ?? 'Credenciales inválidas.');
