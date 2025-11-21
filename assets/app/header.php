@@ -9,6 +9,8 @@ $initial = mb_strtoupper(mb_substr($userName, 0, 1, 'UTF-8'));
 
 $imgBase = '../../assets/img';
 $homeLink = '../../index.html';
+
+
 ?>
 <header class="header">
   <div class="left-section">
@@ -26,6 +28,15 @@ $homeLink = '../../index.html';
     <div class="profile-circle"><?php echo htmlspecialchars($initial, ENT_QUOTES); ?></div>
     <a href="<?php echo $homeLink; ?>"><img src="<?php echo $imgBase; ?>/cerrarsesion.png" alt="cerrar sesión"></a>
   </div>
+
+  <?php
+  $jsCurrentUser = json_encode($user ?? null, JSON_UNESCAPED_UNICODE);
+  $apiBase = '/PROYECTO_GESTOR_TAREAS/assets/app/endpoints'; 
+  ?>
+  <script>
+    window.CURRENT_USER = <?php echo $jsCurrentUser; ?>;
+    window.API_BASE = "<?php echo $apiBase; ?>";
+  </script>
 </header>
 
 <nav class="sidebar">
@@ -41,3 +52,4 @@ $homeLink = '../../index.html';
   <?php endif; ?>
   
 </nav>
+

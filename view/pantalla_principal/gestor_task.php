@@ -1,4 +1,6 @@
 <?php include __DIR__ . '/../../assets/app/header.php'; ?>
+<script>window.CURRENT_USER = <?php echo json_encode($_SESSION['user'] ?? null); ?>;</script>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -421,15 +423,13 @@
             <div class="detalle-botones">
                 <button id="btnVolverUsuario" class="btn-volver">↩</button>
                 <button id="btnEditarUsuario" class="btn-editar">Editar</button>
-                <button id="btnEliminarUsuario" class="btn-eliminar-usuario">
-                    <img src="../../assets/img/basura.png" class="icono-bote">
-                </button>
+                <!-- Botón de eliminar REMOVIDO - usar perfil para eliminar cuenta -->
             </div>
         </div>
     </section>
 
     <!-- SECCIÓN EDITAR USUARIO -->
-    <section id="editarUsuario" class="seccion" >
+    <section id="editarUsuario" class="seccion">
         <h2 class="titulo-seccion">Editar</h2>
 
         <div class="detalle-caja">
@@ -438,36 +438,40 @@
             <div class="detalle-contenido">
                 <div class="fila-detalle">
                     <span class="campo">Nombre completo:</span>
-                    <input id="editNombre" class="input-editar" type="text">
+                    <input id="editNombre" class="input-editar" type="text" required>
                 </div>
 
                 <div class="fila-detalle">
                     <span class="campo">Correo electrónico:</span>
-                    <input id="editCorreo" class="input-editar" type="email">
+                    <input id="editCorreo" class="input-editar" type="email" required>
                 </div>
 
+                <!-- TAREAS ASIGNADAS: READONLY (no editable) -->
                 <div class="fila-detalle">
                     <span class="campo">Tareas asignadas:</span>
-                    <input id="editTareas" class="input-editar" type="number">
+                    <input id="editTareas" class="input-editar" type="number" readonly 
+                          style="background-color: #f0f0f0; cursor: not-allowed; color: black;">
                 </div>
 
+                <!-- ESTADO: SELECT CON OPCIONES ACTIVO/INACTIVO -->
                 <div class="fila-detalle">
                     <span class="campo">Estado:</span>
-                    <input id="editEstado" class="input-editar" type="text">
+                    <select id="editEstado" class="input-editar" required>
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                    </select>
                 </div>
 
                 <div class="fila-detalle">
                     <span class="campo">Última actualización:</span>
-                    <input id="editFecha" class="input-editar" type="text">
+                    <input id="editFecha" class="input-editar" type="date">
                 </div>
             </div>
 
             <div class="detalle-botones">
                 <button id="btnCancelarEditar" class="btn-volver">↩</button>
                 <button id="btnAceptarEditar" class="btn-editar">Aceptar</button>
-                <button id="btnEliminarUsuarioEdit" class="btn-eliminar-usuario">
-                    <img src="../../assets/img/basura.png" class="icono-bote">
-                </button>
+                <!-- Botón de eliminar REMOVIDO - usar perfil para eliminar cuenta -->
             </div>
         </div>
     </section>
@@ -836,5 +840,6 @@
   </footer>
 
   <script src="../../assets/javascript/menu.js"></script>
+  <script src="../../assets/javascript/users.js" defer></script>
 </body>
 </html>
