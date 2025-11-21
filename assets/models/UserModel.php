@@ -26,10 +26,7 @@ class UserModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Devuelve usuarios con la cantidad de tareas asignadas (LEFT JOIN con task_assignments/tasks),
-     * útil para mostrar la columna 'Tareas asignadas'.
-     */
+    // Devuelve usuarios con la cantidad de tareas asignadas (LEFT JOIN con task_assignments/tasks)
     public function getAllWithTaskCount() {
         $sql = "
             SELECT u.id, u.name, u.email, u.notes, u.is_admin, u.avatar_url, u.is_active, u.last_login,
@@ -76,7 +73,6 @@ class UserModel {
     }
 
     public function delete($id) {
-        // opcional: soft-delete cambiando is_active=0; aquí hacemos delete físico
         $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = ?");
         return $stmt->execute([$id]);
     }
