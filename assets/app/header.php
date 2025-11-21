@@ -10,7 +10,21 @@ $initial = mb_strtoupper(mb_substr($userName, 0, 1, 'UTF-8'));
 $imgBase = '../../assets/img';
 $homeLink = '../../index.html';
 
+// DETECTAR SI ESTAMOS EN LOCAL O EN PRODUCCIÓN
+$isLocal = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false || 
+            strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false);
 
+// CONFIGURAR RUTA BASE SEGÚN EL ENTORNO
+if ($isLocal) {
+    // Localhost - ruta relativa CON carpeta del proyecto
+    $apiBase = '/PROYECTO_GESTOR_TAREAS/assets/app/endpoints';
+} else {
+    // InfinityFree (producción) - URL ABSOLUTA SIN carpeta del proyecto
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+    $host = $_SERVER['HTTP_HOST'];
+    // SIN /PROYECTO_GESTOR_TAREAS porque los archivos están en la raíz
+    $apiBase = $protocol . $host . '/assets/app/endpoints';
+}
 ?>
 <header class="header">
   <div class="left-section">
@@ -31,11 +45,12 @@ $homeLink = '../../index.html';
 
   <?php
   $jsCurrentUser = json_encode($user ?? null, JSON_UNESCAPED_UNICODE);
-  $apiBase = '/PROYECTO_GESTOR_TAREAS/assets/app/endpoints'; 
   ?>
   <script>
     window.CURRENT_USER = <?php echo $jsCurrentUser; ?>;
     window.API_BASE = "<?php echo $apiBase; ?>";
+    console.log("🔍 API_BASE configurado:", "<?php echo $apiBase; ?>");
+    console.log("🔍 Entorno:", "<?php echo $isLocal ? 'LOCAL' : 'PRODUCCIÓN'; ?>");
   </script>
 </header>
 
@@ -50,6 +65,4 @@ $homeLink = '../../index.html';
   <?php if ($isAdmin): ?>
     <a href="#" data-section="admin">Admin <img src="<?php echo $imgBase; ?>/flecha.png"></a>
   <?php endif; ?>
-  
 </nav>
-
