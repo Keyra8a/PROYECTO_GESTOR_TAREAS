@@ -1,5 +1,4 @@
 <?php include __DIR__ . '/../../assets/app/header.php'; ?>
-<script>window.CURRENT_USER = <?php echo json_encode($_SESSION['user'] ?? null); ?>;</script>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -90,14 +89,11 @@
       </div>
     </section>
 
-
-
     <!-- Sección de confirmación de eliminación -->
     <section id="eliminarTarjeta" class="seccion">
       <div class="alerta-eliminar">
         <h3 id="tituloAlerta">Eliminar Tarjeta</h3>
 
-        <!-- AQUÍ AGREGUÉ EL ID NECESARIO PARA CAMBIAR LA IMAGEN -->
         <img id="iconoAlerta" src="../../assets/img/alerta.png" alt="Alerta">
 
         <p id="textoAlerta">
@@ -114,12 +110,6 @@
       
     </section>
 
-  
-
-
-
-
-
     <!-- TAREAS -->
     <section id="tareas" class="seccion">
       <h2 class="titulo-tareas">Tareas</h2>
@@ -130,7 +120,6 @@
 
         <button class="btn-azul">Añadir tarea</button>
       </div>
-
 
       <div class="tabla-contenedor">
         <table class="tabla-tareas">
@@ -181,6 +170,7 @@
         </table>
       </div>
     </section>
+
     <!-- FORMULARIO AÑADIR TAREA -->
     <section id="formulario-tarea" class="seccion">
       <h2 class="titulo">Tareas</h2>
@@ -240,9 +230,6 @@
         </form>
       </div>
     </section>
-
-
-
 
     <!-- REPORTES -->
     <div id="reportes" class="seccion">
@@ -336,7 +323,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- SECCIÓN USUARIOS -->
     <section id="usuarios" class="seccion">
@@ -476,25 +462,23 @@
         </div>
     </section>
 
-
-
-
-
     <!-- PERFIL - VISTA NORMAL -->
     <section id="perfil" class="seccion">
       <h2 class="titulo-seccion">Perfil</h2>
 
       <div class="contenedor-perfil-unico">
         <div class="titulo-seccion-perfil">Datos del usuario</div>
-
-        <!-- Línea separadora -->
-          <div class="linea-separadora"></div>
+        <div class="linea-separadora"></div>
         
         <div class="contenido-perfil-unico">
           <!-- Foto de perfil -->
           <div class="foto-perfil-container">
-            <div class="foto-perfil">Z</div>
-            <a href="#" class="link-importar-foto">Importar foto</a>
+            <div class="foto-perfil" id="avatarPerfil">
+              <!-- La inicial o imagen se cargará aquí dinámicamente -->
+              <?php echo htmlspecialchars($initial, ENT_QUOTES); ?>
+            </div>
+            <button id="btnSubirAvatar" class="link-importar-foto">Importar foto</button>
+            <input type="file" id="inputAvatar" accept="image/*" style="display: none;">
           </div>
 
           <!-- Información del usuario -->
@@ -502,7 +486,7 @@
             <div class="campo-contenedor">
               <label class="campo-perfil-label">Nombre completo</label>
               <div class="input-y-boton">
-                <input class="input-perfil" type="text" value="Zahir Fernando Díaz Barrera" readonly>
+                <input class="input-perfil nombre-usuario" type="text" value="<?php echo htmlspecialchars($userName, ENT_QUOTES); ?>" readonly>
                 <button class="btn-cambiar" data-campo="nombre">Cambiar nombre</button>
               </div>
             </div>
@@ -510,7 +494,7 @@
             <div class="campo-contenedor">
               <label class="campo-perfil-label">Correo electrónico</label>
               <div class="input-y-boton">
-                <input class="input-perfil" type="email" value="zdiaz_23@alu.uabcs.mx" readonly>
+                <input class="input-perfil correo-usuario" type="email" value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? '', ENT_QUOTES); ?>" readonly>
                 <button class="btn-cambiar" data-campo="correo">Cambiar correo</button>
               </div>
             </div>
@@ -518,19 +502,18 @@
             <div class="campo-contenedor">
               <label class="campo-perfil-label">Contraseña</label>
               <div class="input-y-boton">
-                <input class="input-perfil" type="password" value="" readonly>
+                <input class="input-perfil" type="password" value="••••••••" readonly>
                 <button class="btn-cambiar" data-campo="contrasena">Cambiar contraseña</button>
               </div>
             </div>
           </div>
 
-          <!-- Línea separadora -->
           <div class="linea-separadora"></div>
 
           <!-- Actividad del usuario -->
           <div class="seccion-actividad">
             <h3 class="subtitulo-perfil">Actividad del usuario</h3>
-            <table class="tabla-actividad">
+            <table id="tablaActividad" class="tabla-actividad">
               <thead>
                 <tr>
                   <th>Tarea</th>
@@ -540,25 +523,12 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>Diseño del módulo de reportes.</td>
-                  <td><span>En progreso</span></td>
-                  <td>03/11/2025</td>
-                </tr>
-                <tr>
-                  <td>Revisión de tareas del equipo.</td>
-                  <td><span>Pendiente</span></td>
-                  <td>06/11/2025</td>
-                </tr>
-                <tr>
-                  <td>Presentación del diseño en programación web.</td>
-                  <td><span>Completado</span></td>
-                  <td>03/11/2025</td>
+                  <td colspan="3" style="text-align: center;">Cargando actividades...</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- Línea separadora -->
           <div class="linea-separadora"></div>
 
           <!-- Eliminación de perfil -->
@@ -567,23 +537,21 @@
             <p class="advertencia-eliminar">
               Elimina permanentemente la cuenta y quita el acceso a todos los espacios de trabajo.
             </p>
-            <a href="#" class="link-eliminar-cuenta">Eliminar mi cuenta</a>
+            <button id="btnEliminarCuenta" class="link-eliminar-cuenta">Eliminar mi cuenta</button>
           </div>
         </div>
       </div>
     </section>
 
-   <!-- EDITAR NOMBRE - SECCIÓN SEPARADA -->
+    <!-- EDITAR NOMBRE -->
     <section id="editar-nombre" class="seccion">
       <h2 class="titulo-seccion">Perfil</h2>
-
       <div class="contenedor-perfil-unico">
         <div class="titulo-seccion-perfil">Editar nombre</div>
-        
         <div class="contenido-perfil-unico">
           <form class="form-edicion-perfil">
             <label class="label-edicion">Nuevo nombre completo</label>
-            <input type="text" class="input-edicion" placeholder="Escribe tu nuevo nombre..." required>
+            <input type="text" class="input-edicion" placeholder="Tu nombre actual" required>
             
             <p class="confirmacion-edicion">¿Confirmas los cambios realizados?</p>
             
@@ -596,20 +564,18 @@
       </div>
     </section>
 
-    <!-- EDITAR CORREO - SECCIÓN SEPARADA -->
+    <!-- EDITAR CORREO -->
     <section id="editar-correo" class="seccion">
       <h2 class="titulo-seccion">Perfil</h2>
-
       <div class="contenedor-perfil-unico">
         <div class="titulo-seccion-perfil">Editar correo</div>
-        
         <div class="contenido-perfil-unico">
           <form class="form-edicion-perfil">
             <label class="label-edicion">Nuevo correo electrónico</label>
-            <input type="email" id="nuevo-correo" class="input-edicion" placeholder="Escribe tu nuevo correo..." required>
+            <input type="email" id="nuevo-correo" class="input-edicion" placeholder="Tu correo actual" required>
             
             <label class="label-edicion">Confirmar correo electrónico</label>
-            <input type="email" id="confirmar-correo" class="input-edicion" placeholder="Confirma tu nuevo correo..." required>
+            <input type="email" id="confirmar-correo" class="input-edicion" placeholder="Confirma tu correo" required>
             
             <p class="confirmacion-edicion">¿Confirmas los cambios realizados?</p>
             
@@ -622,20 +588,22 @@
       </div>
     </section>
 
-    <!-- EDITAR CONTRASEÑA - SECCIÓN SEPARADA -->
+    <!-- EDITAR CONTRASEÑA -->
     <section id="editar-contrasena" class="seccion">
       <h2 class="titulo-seccion">Perfil</h2>
-
       <div class="contenedor-perfil-unico">
         <div class="titulo-seccion-perfil">Editar contraseña</div>
-        
         <div class="contenido-perfil-unico">
           <form class="form-edicion-perfil">
+            <!-- AGREGAR ESTE CAMPO -->
+            <label class="label-edicion">Contraseña actual</label>
+            <input type="password" id="currentPassword" class="input-edicion" placeholder="Ingresa tu contraseña actual" required>
+            
             <label class="label-edicion">Nueva contraseña</label>
-            <input type="password" id="nueva-contrasena" class="input-edicion" placeholder="Escribe tu nueva contraseña..." required>
+            <input type="password" id="newPassword" class="input-edicion" placeholder="Escribe tu nueva contraseña..." required>
             
             <label class="label-edicion">Confirmar contraseña</label>
-            <input type="password" id="confirmar-contrasena" class="input-edicion" placeholder="Confirma tu nueva contraseña..." required>
+            <input type="password" id="confirmPassword" class="input-edicion" placeholder="Confirma tu nueva contraseña..." required>
             
             <p class="confirmacion-edicion">¿Confirmas los cambios realizados?</p>
             
@@ -647,7 +615,8 @@
         </div>
       </div>
     </section>
-    <!-- ALERTA 1: Cambiar foto de perfil -->
+
+    <!-- ALERTA CAMBIAR FOTO -->
     <section id="alerta-cambiar-foto" class="seccion">
       <div class="alerta-eliminar">
         <h3>Cambiar foto de perfil</h3>
@@ -660,7 +629,7 @@
       </div>
     </section>
 
-    <!-- ALERTA 2: Confirmar importación -->
+    <!-- ALERTA CONFIRMACIÓN (modal) -->
     <div class="confirmation-modal" id="confirmationModal" style="display: none;">
       <div class="modal-content">
         <h3>Importando foto</h3>
@@ -672,8 +641,6 @@
         </div>
       </div>
     </div>
-
-
 
     <!-- ADMIN - USUARIOS ADMINISTRADORES -->
     <section id="admin" class="seccion">
@@ -828,18 +795,15 @@
         </div>
       </div>
     </section>
-
-    
   </main>
-
-
 
   <!-- FOOTER -->
   <footer class="footer">
     <p>© 2025 Task<span class="task-black">Colab</span> - Todos los derechos reservados.</p>
   </footer>
 
-  <script src="../../assets/javascript/menu.js"></script>
+  <script src="../../assets/javascript/menu.js" defer></script>
   <script src="../../assets/javascript/users.js" defer></script>
+  <script src="../../assets/javascript/profile.js" defer></script>
 </body>
 </html>

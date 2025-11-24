@@ -1737,7 +1737,7 @@ select {
 /* === ESTILOS PARA EL ENLACE ELIMINAR CUENTA === */
 /* Sección de eliminación */
 .seccion-eliminar {
-  text-align: left; /* Esto alinea todo el contenido a la izquierda */
+  text-align: left; 
 }
 
 .link-eliminar-cuenta {
@@ -2049,5 +2049,394 @@ select {
   height: 30px;
   font-size: 14px;
 }
+
+/* === MODALES PERFIL === */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal.activo {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-contenido {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+  border: 3px solid #007bff;
+}
+
+.modal.activo .modal-contenido {
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #007bff;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #007bff;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.btn-cerrar-modal {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cerrar-modal:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label-edicion {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+  text-align: left;
+}
+
+.input-edicion {
+  padding: 0.75rem;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #1b5cff;
+  color: white;
+  transition: border-color 0.3s ease;
+}
+
+.input-edicion:focus {
+  outline: none;
+  border-color: #0056b3;
+  background-color: #1b5cff;
+}
+
+.input-edicion::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.advertencia-texto {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  padding: 0.75rem;
+  background-color: #ffebee;
+  border-radius: 6px;
+  border-left: 4px solid #d32f2f;
+  text-align: left;
+}
+
+.modal-botones {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.btn-cancelar {
+  padding: 0.75rem 1.5rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cancelar:hover {
+  background: #5a6268;
+}
+
+.btn-confirmar {
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-confirmar:hover {
+  background: #0056b3;
+}
+
+.btn-eliminar {
+  padding: 0.75rem 1.5rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-eliminar:hover {
+  background: #c82333;
+}
+
+/* === ESTADOS PARA LAS TAREAS EN ACTIVIDAD === */
+.estado-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+  text-align: center;
+  min-width: 100px;
+}
+
+.estado-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.estado-en-progreso {
+  background-color: #cce7ff;
+  color: #004085;
+  border: 1px solid #b3d7ff;
+}
+
+.estado-completado {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.estado-completada {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.text-center {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 1rem;
+}
+
+/* Mejoras para la tabla de actividad */
+#tablaActividad {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  border: 2px solid #007bff;
+}
+
+#tablaActividad th {
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  font-size: 1rem;
+}
+
+#tablaActividad td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+#tablaActividad tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* === MEJORAS PARA LA SECCIÓN PERFIL === */
+.nombre-usuario,
+.correo-usuario {
+  background-color: #1b5cff !important;
+  color: white !important;
+  border: none !important;
+}
+
+/* Botón eliminar cuenta en perfil */
+#btnEliminarCuenta {
+  background: none;
+  border: none;
+  color: #dc3545;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-block;
+  padding: 5px 0;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  text-align: left;
+  margin: 0;
+}
+
+#btnEliminarCuenta:hover {
+  color: #c82333;
+  border-bottom: 2px solid #c82333;
+}
+
+/* Botón importar foto */
+#btnSubirAvatar {
+  background: none;
+  border: none;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+  padding: 5px 0;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  text-align: left;
+  margin: 0;
+}
+
+#btnSubirAvatar:hover {
+  color: #0056b3;
+  border-bottom: 2px solid #0056b3;
+}
+
+/* === ESTILOS PARA TOGGLE PASSWORD EN PERFIL === */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper .input-perfil,
+.password-wrapper .input-edicion {
+  padding-right: 50px !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.3s ease;
+  z-index: 2;
+}
+
+.toggle-password:hover {
+  color: white;
+}
+
+.toggle-password svg {
+  width: 20px;
+  height: 20px;
+}
+
+#perfil .password-wrapper .input-perfil {
+  background-color: #1b5cff !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 5px;
+  padding: 12px 50px 12px 15px !important;
+  height: 45px;
+}
+
+/* Para los inputs de edición de contraseña */
+#editar-contrasena .password-wrapper .input-edicion {
+  padding-right: 50px !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-contenido {
+    width: 95%;
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .modal-botones {
+    flex-direction: column;
+  }
+  
+  .modal-botones button {
+    width: 100%;
+  }
+  
+  .modal-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .btn-cerrar-modal {
+    align-self: flex-end;
+  }
+}
+
+
 
 

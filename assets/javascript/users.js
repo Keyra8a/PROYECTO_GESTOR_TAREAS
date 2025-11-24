@@ -28,14 +28,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Load users ---
   async function loadUsers() {
     try {
-      const res = await fetch(`${apiBase}/list_users.php`, { cache: 'no-store' });
+      const url = `${apiBase}/list_users.php`;
+      console.log('Intentando cargar usuarios desde:', url);
+      console.log('apiBase:', apiBase);
+      
+      const res = await fetch(url, { 
+        cache: 'no-store',
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log('Respuesta recibida:', res.status, res.statusText);
+      
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
+      
+      console.log('Datos recibidos:', json);
+      
       if (!json.ok) throw new Error(json.message || 'Error al obtener usuarios');
       usersCache = Array.isArray(json.users) ? json.users : [];
       renderTable(usersCache);
+      
+      console.log('Usuarios cargados correctamente:', usersCache.length);
     } catch (err) {
-      console.error('loadUsers:', err);
+      console.error('loadUsers ERROR:', err);
+      console.error('Error completo:', err.message, err.stack);
       tbody.innerHTML = `<tr><td colspan="4">No se pudieron cargar los usuarios.</td></tr>`;
     }
   }
@@ -63,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
     tbody.appendChild(frag);
   }
 
-  // --- Delegated click on rows ---
   tbody?.addEventListener('click', (e) => {
     const tr = e.target.closest('tr');
     if (!tr) return;
@@ -206,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- Función para guardar los cambios (separada) ---
+  // --- Función para guardar los cambios ---
   async function guardarCambiosUsuario(id) {
     const payload = {
       id,
@@ -252,6 +270,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await loadUsers();
         
+        // DISPARAR EVENTO PARA ACTUALIZAR EL PERFIL
+        console.log("Disparando evento 'usuarioActualizado'...");
+        const eventoActualizacion = new CustomEvent('usuarioActualizado', {
+          detail: {
+            nombre: payload.name,
+            email: payload.email
+          }
+        });
+        window.dispatchEvent(eventoActualizacion);
+        console.log("Evento 'usuarioActualizado' disparado con datos:", {
+          nombre: payload.name,
+          email: payload.email
+        });
+        
         // SEGUNDO: Mostrar alerta de éxito "Cambios realizados"
         if (typeof configurarAlerta === 'function') {
           configurarAlerta(
@@ -269,7 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
           abrirDetalle(usuarioSeleccionado);
         }
       } else {
-        // Error del servidor
         if (typeof configurarAlerta === 'function') {
           configurarAlerta(
             "Error",
@@ -302,94 +333,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- Eliminar ---
+  // --- Eliminar (BOTÓN ELIMINADO - Ya no se usa) ---
+  // La funcionalidad de eliminar usuario se maneja desde el perfil
   btnEliminarDesdeDetalle?.addEventListener('click', async () => {
-    if (!usuarioSeleccionado) return;
-    
-    // Usar alerta personalizada para confirmar eliminación
-    if (typeof configurarAlerta === 'function') {
-      configurarAlerta(
-        "Eliminar Usuario",
-        `¿Eliminar a <strong>${usuarioSeleccionado.name}</strong>?<br>Esta acción cerrará tu sesión y no se puede deshacer.`,
-        "alerta",
-        {
-          textoConfirmar: "Eliminar",
-          onConfirmar: async () => {
-            await eliminarUsuario(usuarioSeleccionado.id);
-          },
-          onCancelar: () => {
-            if (typeof mostrarSeccion === 'function') mostrarSeccion('detalleUsuario');
-          }
-        }
-      );
-    }
+    // Botón deshabilitado - usar perfil para eliminar cuenta
+    return;
   });
-
-  async function eliminarUsuario(id) {
-    try {
-      const res = await fetch(`${apiBase}/delete_user.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
-      
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      
-      const json = await res.json();
-      
-      if (json.ok) {
-        // Mostrar alerta de éxito y redirigir
-        if (typeof configurarAlerta === 'function') {
-          configurarAlerta(
-            "Usuario Eliminado",
-            "Usuario eliminado correctamente.<br>Serás redirigido al login.",
-            "exito",
-            {
-              soloAceptar: true,
-              onConfirmar: () => {
-                window.location.href = '../../view/login.html';
-              }
-            }
-          );
-        } else {
-          // Fallback si no existe configurarAlerta
-          window.location.href = '../../view/login.html';
-        }
-      } else {
-        // Error del servidor
-        if (typeof configurarAlerta === 'function') {
-          configurarAlerta(
-            "Error",
-            json.message || 'No se pudo eliminar el usuario',
-            "alerta",
-            {
-              soloAceptar: true,
-              onConfirmar: () => {
-                if (typeof mostrarSeccion === 'function') mostrarSeccion('detalleUsuario');
-              }
-            }
-          );
-        }
-      }
-    } catch (err) {
-      console.error('delete user:', err);
-      if (typeof configurarAlerta === 'function') {
-        configurarAlerta(
-          "Error",
-          "Ocurrió un error al eliminar el usuario. Por favor intenta nuevamente.",
-          "alerta",
-          {
-            soloAceptar: true,
-            onConfirmar: () => {
-              if (typeof mostrarSeccion === 'function') mostrarSeccion('detalleUsuario');
-            }
-          }
-        );
-      }
-    }
-  }
 
   // Helpers
   function escapeHtml(str = '') {
@@ -412,6 +361,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Init
+  // ESCUCHAR EVENTO DE ACTUALIZACIÓN DESDE profile.js
+  window.addEventListener('perfilActualizado', async (event) => {
+      console.log("====== EVENTO RECIBIDO EN USERS.JS ======");
+      console.log("Perfil actualizado detectado");
+      console.log("Datos del evento:", event.detail);
+      
+      if (event.detail.nombre) {
+          console.log("Actualizando nombre en users.js:", event.detail.nombre);
+          window.CURRENT_USER.name = event.detail.nombre;
+      }
+      if (event.detail.email) {
+          console.log("Actualizando email en users.js:", event.detail.email);
+          window.CURRENT_USER.email = event.detail.email;
+      }
+      
+      console.log("Recargando tabla de usuarios...");
+      await loadUsers();
+      console.log("====== FIN EVENTO ======");
+  });
+
+  console.log("Listener 'perfilActualizado' registrado en users.js");
+
   loadUsers();
 });

@@ -3,7 +3,37 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 $user = $_SESSION['user'] ?? null;
+
+// ACTUALIZAR: Cargar datos frescos de la BD incluyendo avatar_url
+if ($user && isset($user['id'])) {
+    try {
+        require_once __DIR__ . '/../../config/db.php';
+        $stmt = $pdo->prepare("SELECT name, email, avatar_url, is_admin, is_active FROM users WHERE id = ? AND is_active = 1");
+        $stmt->execute([$user['id']]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($userData) {
+            // Actualizar sesión con datos frescos
+            $_SESSION['user']['name'] = $userData['name'];
+            $_SESSION['user']['email'] = $userData['email'];
+            $_SESSION['user']['avatar_url'] = $userData['avatar_url'];
+            $_SESSION['user']['is_admin'] = $userData['is_admin'];
+            $_SESSION['user']['is_active'] = $userData['is_active'];
+            $user = $_SESSION['user']; 
+        } else {
+            // Usuario no encontrado o inactivo - cerrar sesión
+            session_destroy();
+            header('Location: ../../index.html');
+            exit;
+        }
+    } catch (Exception $e) {
+        error_log("Error cargando datos de usuario: " . $e->getMessage());
+    }
+}
+
 $userName = $user['name'] ?? 'Invitado';
+$userEmail = $user['email'] ?? 'No especificado';
+$avatarUrl = $user['avatar_url'] ?? null;
 $isAdmin = !empty($user['is_admin']);
 $initial = mb_strtoupper(mb_substr($userName, 0, 1, 'UTF-8'));
 
@@ -16,13 +46,10 @@ $isLocal = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
 
 // CONFIGURAR RUTA BASE SEGÚN EL ENTORNO
 if ($isLocal) {
-    // Localhost - ruta relativa CON carpeta del proyecto
     $apiBase = '/PROYECTO_GESTOR_TAREAS/assets/app/endpoints';
 } else {
-    // InfinityFree (producción) - URL ABSOLUTA SIN carpeta del proyecto
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
     $host = $_SERVER['HTTP_HOST'];
-    // SIN /PROYECTO_GESTOR_TAREAS porque los archivos están en la raíz
     $apiBase = $protocol . $host . '/assets/app/endpoints';
 }
 ?>
@@ -39,7 +66,17 @@ if ($isLocal) {
 
   <div class="user-info">
     <h3><?php echo htmlspecialchars($userName, ENT_QUOTES); ?></h3>
-    <div class="profile-circle"><?php echo htmlspecialchars($initial, ENT_QUOTES); ?></div>
+    <div class="profile-circle">
+        <?php if (!empty($avatarUrl)): ?>
+            <!-- Mostrar imagen del avatar con timestamp para evitar cache -->
+            <img src="<?php echo htmlspecialchars($avatarUrl, ENT_QUOTES); ?>?t=<?php echo time(); ?>" 
+                 alt="Avatar" 
+                 style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        <?php else: ?>
+            <!-- Mostrar inicial -->
+            <?php echo htmlspecialchars($initial, ENT_QUOTES); ?>
+        <?php endif; ?>
+    </div>
     <a href="<?php echo $homeLink; ?>"><img src="<?php echo $imgBase; ?>/cerrarsesion.png" alt="cerrar sesión"></a>
   </div>
 
@@ -50,7 +87,7 @@ if ($isLocal) {
     window.CURRENT_USER = <?php echo $jsCurrentUser; ?>;
     window.API_BASE = "<?php echo $apiBase; ?>";
     console.log("🔍 API_BASE configurado:", "<?php echo $apiBase; ?>");
-    console.log("🔍 Entorno:", "<?php echo $isLocal ? 'LOCAL' : 'PRODUCCIÓN'; ?>");
+    console.log("🔍 Avatar URL:", "<?php echo $avatarUrl ?? 'null'; ?>");
   </script>
 </header>
 
