@@ -1,5 +1,9 @@
 <?php
 // config/db.php - lector .env simple + PDO con puerto
+
+// ZONA HORARIA ESPECÍFICA PARA LA PAZ, BAJA CALIFORNIA SUR
+date_default_timezone_set('America/Mazatlan'); 
+
 function load_dotenv($path) {
     if (!file_exists($path)) return;
     $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

@@ -70,6 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
       }
 
+      // Guardar la sección anterior
+      seccionAntesDeEliminar = document.querySelector(".seccion.activa")?.id || "tareas";
+
       // Configurar contenido básico
       tituloAlerta.textContent = titulo;
       textoAlerta.innerHTML = mensaje;
@@ -81,37 +84,38 @@ document.addEventListener("DOMContentLoaded", () => {
       btnConfirmar.textContent = esSoloAceptar ? "Aceptar" : (config.textoConfirmar || "Confirmar");
 
       // Limpiar event listeners previos
-      const nuevoBtnCancelar = btnCancelar.cloneNode(true);
-      const nuevoBtnConfirmar = btnConfirmar.cloneNode(true);
-      
-      btnCancelar.parentNode.replaceChild(nuevoBtnCancelar, btnCancelar);
-      btnConfirmar.parentNode.replaceChild(nuevoBtnConfirmar, btnConfirmar);
+      btnCancelar.replaceWith(btnCancelar.cloneNode(true));
+      btnConfirmar.replaceWith(btnConfirmar.cloneNode(true));
+
+      // Obtener las nuevas referencias
+      const nuevoBtnCancelar = document.getElementById("cancelarEliminar");
+      const nuevoBtnConfirmar = document.getElementById("confirmarEliminar");
 
       // CONFIGURAR EVENTO PARA BOTÓN CONFIRMAR/ACEPTAR
       nuevoBtnConfirmar.addEventListener("click", function() {
-          console.log("Botón principal clickeado - Ejecutando onConfirmar");
+          console.log("Botón principal clickeado");
           
-          // Cerrar la alerta primero
-          window.mostrarSeccion(seccionAntesDeEliminar || "perfil");
+          // Cerrar la alerta
+          window.mostrarSeccion(seccionAntesDeEliminar);
           
-          // Ejecutar el callback después de un pequeño delay
-          setTimeout(() => {
-              if (config.onConfirmar && typeof config.onConfirmar === 'function') {
-                  console.log("Ejecutando callback onConfirmar");
-                  config.onConfirmar();
-              } else {
-                  console.log("No hay callback onConfirmar o no es función");
-              }
-          }, 100);
+          // Ejecutar callback si existe
+          if (config.onConfirmar && typeof config.onConfirmar === 'function') {
+              console.log("Ejecutando onConfirmar");
+              config.onConfirmar();
+          }
       });
 
       // Configurar botón cancelar solo si está visible
       if (!esSoloAceptar) {
           nuevoBtnCancelar.addEventListener("click", function() {
               console.log("Botón cancelar clickeado");
-              window.mostrarSeccion(seccionAntesDeEliminar || "perfil");
               
+              // Regresar a la sección anterior
+              window.mostrarSeccion(seccionAntesDeEliminar);
+              
+              // Ejecutar callback si existe
               if (config.onCancelar && typeof config.onCancelar === 'function') {
+                  console.log("Ejecutando onCancelar");
                   config.onCancelar();
               }
           });
@@ -119,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Mostrar la alerta
       window.mostrarSeccion("eliminarTarjeta");
-      console.log("Alerta mostrada correctamente");
+      console.log("Alerta mostrada correctamente. Sección anterior:", seccionAntesDeEliminar);
   };
 
   // --- ALERTAS ESPECÍFICAS ---
@@ -356,79 +360,79 @@ document.addEventListener("DOMContentLoaded", () => {
     window.mostrarSeccion("tableros");
   });
 
-  // --- TABLA DE TAREAS ---
-  const btnBasura = document.getElementById("btn-borrar-tareas");
-  const tabla = document.querySelector(".tabla-contenedor");
+  // // --- TABLA DE TAREAS ---
+  // const btnBasura = document.getElementById("btn-borrar-tareas");
+  // const tabla = document.querySelector(".tabla-contenedor");
 
-  const actualizarBotonBasura = () => {
-    const seleccionadas = document.querySelectorAll(".tabla-tareas .check-cuadro.checked").length;
-    if (btnBasura) {
-      btnBasura.style.display = seleccionadas > 0 ? "inline-block" : "none";
-    }
-  };
+  // const actualizarBotonBasura = () => {
+  //   const seleccionadas = document.querySelectorAll(".tabla-tareas .check-cuadro.checked").length;
+  //   if (btnBasura) {
+  //     btnBasura.style.display = seleccionadas > 0 ? "inline-block" : "none";
+  //   }
+  // };
 
-  tabla?.addEventListener("click", (e) => {
-    const cuadro = e.target.closest(".check-cuadro");
-    if (!cuadro) return;
-    cuadro.classList.toggle("checked");
-    actualizarBotonBasura();
-  });
+  // tabla?.addEventListener("click", (e) => {
+  //   const cuadro = e.target.closest(".check-cuadro");
+  //   if (!cuadro) return;
+  //   cuadro.classList.toggle("checked");
+  //   actualizarBotonBasura();
+  // });
 
-  btnBasura?.addEventListener("click", () => {
-    mostrarAlertaEliminarTareas();
-  });
+  // btnBasura?.addEventListener("click", () => {
+  //   mostrarAlertaEliminarTareas();
+  // });
 
-  // --- FORMULARIO AÑADIR TAREA ---
-  const btnAñadirTarea = document.querySelector(".btn-azul");
-  const formularioTarea = document.getElementById("formulario-tarea");
-  const formTarea = formularioTarea?.querySelector("form");
-  const btnCancelarTarea = formularioTarea?.querySelector(".cancelar");
-  const tablaBody = document.querySelector(".tabla-tareas tbody");
+  // // --- FORMULARIO AÑADIR TAREA ---
+  // const btnAñadirTarea = document.querySelector(".btn-azul");
+  // const formularioTarea = document.getElementById("formulario-tarea");
+  // const formTarea = formularioTarea?.querySelector("form");
+  // const btnCancelarTarea = formularioTarea?.querySelector(".cancelar");
+  // const tablaBody = document.querySelector(".tabla-tareas tbody");
 
-  btnAñadirTarea?.addEventListener("click", () => {
-    window.mostrarSeccion("formulario-tarea");
-  });
+  // btnAñadirTarea?.addEventListener("click", () => {
+  //   window.mostrarSeccion("formulario-tarea");
+  // });
 
-  btnCancelarTarea?.addEventListener("click", () => {
-    window.mostrarSeccion("tareas");
-  });
+  // btnCancelarTarea?.addEventListener("click", () => {
+  //   window.mostrarSeccion("tareas");
+  // });
 
-  formTarea?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const titulo = document.getElementById("titulo-tarea").value.trim();
-    const descripcion = document.getElementById("descripcion-tarea").value.trim();
-    const asignarA = document.getElementById("asignar-a").value.trim();
-    const estado = document.getElementById("estado").value;
-    const prioridad = document.getElementById("prioridad").value;
-    const fecha = document.getElementById("fecha").value;
+  // formTarea?.addEventListener("submit", (e) => {
+  //   e.preventDefault();
+  //   const titulo = document.getElementById("titulo-tarea").value.trim();
+  //   const descripcion = document.getElementById("descripcion-tarea").value.trim();
+  //   const asignarA = document.getElementById("asignar-a").value.trim();
+  //   const estado = document.getElementById("estado").value;
+  //   const prioridad = document.getElementById("prioridad").value;
+  //   const fecha = document.getElementById("fecha").value;
 
-    if (!titulo || !descripcion || !asignarA || !fecha) {
-      window.configurarAlerta(
-        "Error",
-        "Por favor completa todos los campos.",
-        "alerta",
-        {
-          soloAceptar: true,
-          onConfirmar: () => window.mostrarSeccion("formulario-tarea")
-        }
-      );
-      return;
-    }
+  //   if (!titulo || !descripcion || !asignarA || !fecha) {
+  //     window.configurarAlerta(
+  //       "Error",
+  //       "Por favor completa todos los campos.",
+  //       "alerta",
+  //       {
+  //         soloAceptar: true,
+  //         onConfirmar: () => window.mostrarSeccion("formulario-tarea")
+  //       }
+  //     );
+  //     return;
+  //   }
 
-    const nuevaFila = document.createElement("tr");
-    nuevaFila.innerHTML = `
-      <td><div class="check-cuadro"></div></td>
-      <td>${titulo}</td>
-      <td>${prioridad}</td>
-      <td>${estado.charAt(0).toUpperCase() + estado.slice(1)}</td>
-      <td>${fecha}</td>
-      <td>${asignarA}</td>
-    `;
+  //   const nuevaFila = document.createElement("tr");
+  //   nuevaFila.innerHTML = `
+  //     <td><div class="check-cuadro"></div></td>
+  //     <td>${titulo}</td>
+  //     <td>${prioridad}</td>
+  //     <td>${estado.charAt(0).toUpperCase() + estado.slice(1)}</td>
+  //     <td>${fecha}</td>
+  //     <td>${asignarA}</td>
+  //   `;
 
-    tablaBody.appendChild(nuevaFila);
-    formTarea.reset();
-    window.mostrarSeccion("tareas");
-  });
+  //   tablaBody.appendChild(nuevaFila);
+  //   formTarea.reset();
+  //   window.mostrarSeccion("tareas");
+  // });
 
   // --- CERRAR SESIÓN ---
   const iconCerrar = document.querySelector(".user-info a img");

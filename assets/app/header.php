@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 $user = $_SESSION['user'] ?? null;
 
-// ACTUALIZAR: Cargar datos frescos de la BD incluyendo avatar_url
+// ACTUALIZAR: Cargar datos de la BD incluyendo avatar_url
 if ($user && isset($user['id'])) {
     try {
         require_once __DIR__ . '/../../config/db.php';
@@ -13,7 +13,7 @@ if ($user && isset($user['id'])) {
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($userData) {
-            // Actualizar sesión con datos frescos
+            // Actualizar sesión 
             $_SESSION['user']['name'] = $userData['name'];
             $_SESSION['user']['email'] = $userData['email'];
             $_SESSION['user']['avatar_url'] = $userData['avatar_url'];
@@ -68,12 +68,10 @@ if ($isLocal) {
     <h3><?php echo htmlspecialchars($userName, ENT_QUOTES); ?></h3>
     <div class="profile-circle">
         <?php if (!empty($avatarUrl)): ?>
-            <!-- Mostrar imagen del avatar con timestamp para evitar cache -->
             <img src="<?php echo htmlspecialchars($avatarUrl, ENT_QUOTES); ?>?t=<?php echo time(); ?>" 
                  alt="Avatar" 
                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
         <?php else: ?>
-            <!-- Mostrar inicial -->
             <?php echo htmlspecialchars($initial, ENT_QUOTES); ?>
         <?php endif; ?>
     </div>
@@ -86,9 +84,23 @@ if ($isLocal) {
   <script>
     window.CURRENT_USER = <?php echo $jsCurrentUser; ?>;
     window.API_BASE = "<?php echo $apiBase; ?>";
-    console.log("🔍 API_BASE configurado:", "<?php echo $apiBase; ?>");
-    console.log("🔍 Avatar URL:", "<?php echo $avatarUrl ?? 'null'; ?>");
+    console.log("API_BASE configurado:", "<?php echo $apiBase; ?>");
+    console.log("Avatar URL:", "<?php echo $avatarUrl ?? 'null'; ?>");
   </script>
+
+  <script>
+  // APIs de usuarios
+  window.API_BASE = '<?php echo $API_BASE; ?>';
+  
+  // APIs de perfil
+  window.API_BASE_PERFIL = '<?php echo $API_BASE_PERFIL; ?>';
+  
+  // APIs de tareas (NUEVO)
+  window.API_BASE_TAREAS = '/PROYECTO_GESTOR_TAREAS/assets/app/endpointsTareas';
+  
+  // Usuario actual
+  window.CURRENT_USER = <?php echo json_encode($_SESSION['user'] ?? null); ?>;
+</script>
 </header>
 
 <nav class="sidebar">

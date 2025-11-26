@@ -134,37 +134,11 @@
             </tr>
           </thead>
           <tbody>
+            <!-- LAS FILAS SE CARGARÁN DINÁMICAMENTE CON JAVASCRIPT -->
             <tr>
-              <td><div class="check-cuadro"></div></td>
-              <td>Diseñar pantalla de login</td>
-              <td>UI Principal</td>
-              <td>Pendiente</td>
-              <td class="fecha">2025-11-12</td>
-              <td>Keyra Yariely Grijalva Ochoa</td>
-            </tr>
-            <tr>
-              <td><div class="check-cuadro"></div></td>
-              <td>Diseñar pantalla de login</td>
-              <td>UI Principal</td>
-              <td>Pendiente</td>
-              <td class="fecha">2025-11-12</td>
-              <td>Keyra Yariely Grijalva Ochoa</td>
-            </tr>
-            <tr>
-              <td><div class="check-cuadro"></div></td>
-              <td>Diseñar pantalla de login</td>
-              <td>UI Principal</td>
-              <td>Pendiente</td>
-              <td class="fecha">2025-11-12</td>
-              <td>Keyra Yariely Grijalva Ochoa</td>
-            </tr>
-            <tr>
-              <td><div class="check-cuadro"></div></td>
-              <td>Diseñar pantalla de login</td>
-              <td>UI Principal</td>
-              <td>Pendiente</td>
-              <td class="fecha">2025-11-12</td>
-              <td>Keyra Yariely Grijalva Ochoa</td>
+              <td colspan="6" style="text-align:center; color:#666;">
+                Cargando tareas...
+              </td>
             </tr>
           </tbody>
         </table>
@@ -181,45 +155,57 @@
         <form>
           <!-- TÍTULO -->
           <label for="titulo-tarea">Título de la tarea</label>
-          <input type="text" id="titulo-tarea" placeholder="Añade una tarea">
+          <input 
+            type="text" 
+            id="titulo-tarea"
+            name="titulo-tarea"
+            placeholder="Ej: Diseñar pantalla de login"
+            style="color: white;"
+            required
+          >
 
           <!-- DESCRIPCIÓN -->
           <label for="descripcion-tarea">Descripción detallada</label>
-          <textarea id="descripcion-tarea" placeholder="Cree una descripcion de la tarea"></textarea>
+          <textarea 
+            id="descripcion-tarea"
+            name="descripcion-tarea"
+            placeholder="Describe con detalle la tarea a realizar..."
+            style="color: white;"
+          ></textarea>
 
           <!-- ASIGNAR A -->
           <div class="fila">
             <label for="asignar-a">Asignar a:</label>
-            <select id="asignar-a">
+            <select id="asignar-a" name="asignar-a" style="color: white;">
               <option value="">Seleccionar usuario</option>
-              <!-- Los usuarios se agregarán dinámicamente con JavaScript -->
+              <!-- Los usuarios ACTIVOS se cargarán dinámicamente -->
             </select>
           </div>
 
-          <!-- ESTADO -->
+          <!-- ESTADO - VALORES EN INGLÉS -->
           <div class="fila">
-            <label for="estado">Estado:</label>
-            <select id="estado">
-              <option value="pendiente">Pendiente</option>
-              <option value="proceso">En proceso</option>
-              <option value="completada">Completada</option>
-            </select>
+              <label for="estado">Estado:</label>
+              <select id="estado" name="estado" style="color: white;">
+                  <option value="pending">Pendiente</option>
+                  <option value="in_progress">En proceso</option>
+                  <option value="completed">Completado</option>
+              </select>
           </div>
 
-          <!-- PRIORIDAD -->
+          <!-- PRIORIDAD - VALORES EN INGLÉS -->
           <div class="fila">
-            <label for="prioridad">Prioridad:</label>
-            <select id="prioridad">
-              <option value="baja">Baja prioridad</option>
-              <option value="media">Media prioridad</option>
-              <option value="alta">Alta prioridad</option>
-            </select>
+              <label for="prioridad">Prioridad:</label>
+              <select id="prioridad" name="prioridad" style="color: white;">
+                  <option value="low">Baja</option>
+                  <option value="medium" selected>Media</option>
+                  <option value="high">Alta</option>
+              </select>
           </div>
 
           <!-- FECHA -->
           <div class="fila">
             <label for="fecha">Fecha límite:</label>
-            <input type="date" id="fecha">
+            <input type="date" id="fecha" name="fecha" style="color: white;">
           </div>
 
           <!-- BOTONES -->
@@ -432,32 +418,34 @@
                     <input id="editCorreo" class="input-editar" type="email" required>
                 </div>
 
-                <!-- TAREAS ASIGNADAS: READONLY (no editable) -->
+                <!-- TAREAS ASIGNADAS: READONLY -->
                 <div class="fila-detalle">
                     <span class="campo">Tareas asignadas:</span>
                     <input id="editTareas" class="input-editar" type="number" readonly 
-                          style="background-color: #f0f0f0; cursor: not-allowed; color: black;">
+                          style="background-color: #f0f0f0; cursor: not-allowed; color: #666;">
                 </div>
 
-                <!-- ESTADO: SELECT CON OPCIONES ACTIVO/INACTIVO -->
+                <!-- ESTADO: SOLO LECTURA -->
                 <div class="fila-detalle">
                     <span class="campo">Estado:</span>
-                    <select id="editEstado" class="input-editar" required>
+                    <select id="editEstado" class="input-editar" disabled 
+                          style="background-color: #f0f0f0; cursor: not-allowed; color: #666;">
                         <option value="1">Activo</option>
                         <option value="0">Inactivo</option>
                     </select>
                 </div>
 
+                <!-- ÚLTIMA ACTUALIZACIÓN: SOLO LECTURA CON FECHA ACTUAL -->
                 <div class="fila-detalle">
                     <span class="campo">Última actualización:</span>
-                    <input id="editFecha" class="input-editar" type="date">
+                    <input id="editFecha" class="input-editar" type="text" readonly
+                          style="background-color: #f0f0f0; cursor: not-allowed; color: #666;">
                 </div>
             </div>
 
             <div class="detalle-botones">
                 <button id="btnCancelarEditar" class="btn-volver">↩</button>
                 <button id="btnAceptarEditar" class="btn-editar">Aceptar</button>
-                <!-- Botón de eliminar REMOVIDO - usar perfil para eliminar cuenta -->
             </div>
         </div>
     </section>
@@ -805,5 +793,6 @@
   <script src="../../assets/javascript/menu.js" defer></script>
   <script src="../../assets/javascript/users.js" defer></script>
   <script src="../../assets/javascript/profile.js" defer></script>
+  <script src="../../assets/javascript/tasks.js" defer></script>
 </body>
 </html>

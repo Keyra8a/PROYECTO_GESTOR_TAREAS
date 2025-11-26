@@ -9,18 +9,18 @@ require_once __DIR__ . '/../../../config/db.php';
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'message' => 'Payload inválido (se esperaba JSON).']);
+    echo json_encode(['ok' => false, 'message' => 'Payload inválido']);
     exit;
 }
 
 $id = intval($input['id'] ?? 0);
 if ($id <= 0) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'message' => 'Missing id']);
+    echo json_encode(['ok' => false, 'message' => 'ID inválido']);
     exit;
 }
 
-// Verificar que el usuario esté autenticado
+// Verificar autenticación
 $currentUser = $_SESSION['user'] ?? null;
 if (!$currentUser) {
     http_response_code(401);
@@ -28,19 +28,18 @@ if (!$currentUser) {
     exit;
 }
 
-// Solo permitir editar su propio perfil (o si es admin)
-if (intval($currentUser['id']) !== $id && empty($currentUser['is_admin'])) {
+// RESTRICCIÓN: SOLO PERMITIR EDITAR SU PROPIO PERFIL
+if (intval($currentUser['id']) !== $id) {
     http_response_code(403);
-    echo json_encode(['ok' => false, 'message' => 'No autorizado para editar este usuario']);
+    echo json_encode(['ok' => false, 'message' => 'Solo puedes editar tu propio perfil']);
     exit;
 }
 
-// Campos permitidos a actualizar
+// Campos permitidos
 $name = trim($input['name'] ?? '');
 $email = trim($input['email'] ?? '');
 $notes = isset($input['notes']) ? trim($input['notes']) : null; 
 $is_active = isset($input['is_active']) ? (int)$input['is_active'] : null;
-$last_login = $input['last_login'] ?? null;
 
 try {
     $fields = [];
@@ -50,7 +49,14 @@ try {
         $fields[] = 'name = ?'; 
         $params[] = $name; 
     }
+    
     if ($email !== '') { 
+        $stmtCheck = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+        $stmtCheck->execute([$email, $id]);
+        if ($stmtCheck->fetch()) {
+            echo json_encode(['ok' => false, 'message' => 'El correo ya está en uso']);
+            exit;
+        }
         $fields[] = 'email = ?'; 
         $params[] = $email; 
     }
@@ -59,17 +65,17 @@ try {
         $fields[] = 'notes = ?'; 
         $params[] = $notes; 
     }
+    
     if ($is_active !== null) { 
         $fields[] = 'is_active = ?'; 
         $params[] = $is_active; 
     }
-    if ($last_login !== null) { 
-        $fields[] = 'last_login = ?'; 
-        $params[] = $last_login; 
-    }
+
+    // ACTUALIZAR FECHA SIEMPRE AL EDITAR
+    $fields[] = 'last_login = NOW()';
 
     if (empty($fields)) {
-        echo json_encode(['ok' => false, 'message' => 'No hay campos para actualizar.']);
+        echo json_encode(['ok' => false, 'message' => 'No hay campos para actualizar']);
         exit;
     }
 
@@ -78,7 +84,7 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
-    // ACTUALIZAR LA SESIÓN si el usuario editó su propio perfil
+    // Actualizar sesión
     if (intval($currentUser['id']) === $id) {
         $_SESSION['user']['name'] = $name !== '' ? $name : $currentUser['name'];
         $_SESSION['user']['email'] = $email !== '' ? $email : $currentUser['email'];
@@ -87,7 +93,7 @@ try {
         }
     }
 
-    // Devolver el usuario actualizado con el conteo de tareas
+    // OBTENER USUARIO ACTUALIZADO
     $stmt2 = $pdo->prepare("
         SELECT 
             u.id, 
@@ -97,24 +103,27 @@ try {
             u.is_active, 
             u.last_login,
             u.is_admin,
-            COUNT(ta.task_id) as assigned_count
+            COUNT(DISTINCT CASE 
+                WHEN t.is_active = 1 THEN ta.task_id 
+                ELSE NULL 
+            END) as assigned_count
         FROM users u
         LEFT JOIN task_assignments ta ON u.id = ta.user_id
+        LEFT JOIN tasks t ON ta.task_id = t.id
         WHERE u.id = ?
         GROUP BY u.id
     ");
     $stmt2->execute([$id]);
     $user = $stmt2->fetch(PDO::FETCH_ASSOC);
 
-    echo json_encode(['ok' => true, 'user' => $user, 'message' => 'Usuario actualizado correctamente']);
-    exit;
+    echo json_encode([
+        'ok' => true, 
+        'user' => $user, 
+        'message' => 'Usuario actualizado correctamente'
+    ]);
 
 } catch (PDOException $ex) {
     http_response_code(500);
-    echo json_encode(['ok' => false, 'message' => 'Error en la base de datos: ' . $ex->getMessage()]);
-    exit;
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['ok' => false, 'message' => 'Error: ' . $e->getMessage()]);
-    exit;
+    echo json_encode(['ok' => false, 'message' => 'Error en BD: ' . $ex->getMessage()]);
 }
+?>

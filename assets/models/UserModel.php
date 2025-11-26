@@ -30,12 +30,12 @@ class UserModel {
     public function getAllWithTaskCount() {
         $sql = "
             SELECT u.id, u.name, u.email, u.notes, u.is_admin, u.avatar_url, u.is_active, u.last_login,
-                   COALESCE(t.cnt, 0) AS tasks_assigned
+                COALESCE(t.cnt, 0) AS tasks_assigned
             FROM users u
             LEFT JOIN (
                 SELECT ta.user_id, COUNT(*) AS cnt
                 FROM task_assignments ta
-                JOIN tasks t ON t.id = ta.task_id AND t.is_active = 1
+                JOIN tasks t ON t.id = ta.task_id AND t.is_active = 1  
                 GROUP BY ta.user_id
             ) t ON t.user_id = u.id
             ORDER BY u.name ASC

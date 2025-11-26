@@ -22,22 +22,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ESCUCHAR EVENTO DE ACTUALIZACIÓN DESDE users.js
     window.addEventListener('usuarioActualizado', (event) => {
-        console.log("====== EVENTO RECIBIDO ======");
-        console.log("'usuarioActualizado' detectado en profile.js");
-        console.log("Datos del evento:", event.detail);
+        console.log("EVENTO 'usuarioActualizado' RECIBIDO EN PROFILE.JS");
+        console.log("Datos:", event.detail);
         
-        if (event.detail.nombre) {
-            console.log("Actualizando nombre:", window.CURRENT_USER.name, "-", event.detail.nombre);
-            window.CURRENT_USER.name = event.detail.nombre;
-        }
-        if (event.detail.email) {
-            console.log("Actualizando email:", window.CURRENT_USER.email, "-", event.detail.email);
-            window.CURRENT_USER.email = event.detail.email;
+        if (event.detail.user) {
+            // ACTUALIZAR TODOS LOS DATOS, INCLUYENDO FECHA
+            window.CURRENT_USER.name = event.detail.user.name;
+            window.CURRENT_USER.email = event.detail.user.email;
+            window.CURRENT_USER.last_login = event.detail.user.last_login;
+            window.CURRENT_USER.assigned_count = event.detail.user.assigned_count;
+            
+            console.log("CURRENT_USER actualizado completamente:", window.CURRENT_USER);
+        } else {
+            if (event.detail.nombre) window.CURRENT_USER.name = event.detail.nombre;
+            if (event.detail.email) window.CURRENT_USER.email = event.detail.email;
         }
         
+        // RECARGAR DATOS DEL PERFIL PARA REFLEJAR CAMBIOS
         console.log("Recargando datos del perfil...");
         cargarDatosPerfil();
-        console.log("====== FIN EVENTO ======");
+        
+        console.log("Perfil actualizado con datos de users.js");
     });
 
     console.log("Listener 'usuarioActualizado' registrado en profile.js");
@@ -93,31 +98,58 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- CARGAR ACTIVIDAD DEL USUARIO ---
-    async function cargarActividadUsuario() {
+    async function cargarActividadUsuario(forceRefresh = false) {
         try {
-            const url = `${apiBase}/get_user_activity.php`;
+            // CORREGIR: Usar ? para el primer parámetro
+            const timestamp = new Date().getTime();
+            const url = `${apiBase}/get_user_activity.php?t=${timestamp}`;
+            
             console.log("Cargando actividad desde:", url);
             
-            const res = await fetch(url, { cache: 'no-store' });
+            const res = await fetch(url, { 
+                method: 'GET',
+                cache: 'no-cache',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            });
+            
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             
             const json = await res.json();
             console.log("Actividad recibida:", json);
-            
+
             if (json.ok && json.tareas) {
+                console.log(` ${json.tareas.length} tareas cargadas para usuario`);
                 renderizarActividad(json.tareas);
             } else {
+                console.warn("No hay tareas o respuesta inválida");
                 renderizarActividad([]);
             }
+            
+            return json.tareas || [];
         } catch (error) {
             console.error('Error cargando actividad:', error);
             renderizarActividad([]);
+            return [];
         }
     }
 
+    // Actualizar automáticamente cada 30 segundos
+    function iniciarActualizacionAutomatica() {
+        console.log("Iniciando actualización automática cada 30 segundos");
+        setInterval(() => {
+            console.log("Actualización automática de actividad...");
+            cargarActividadUsuario(true);
+        }, 30000); // 30 segundos
+    }
+
+    // Actualizar la función formatActivityDate
     function renderizarActividad(tareas) {
         const tbody = document.querySelector('#tablaActividad tbody') || 
-                     document.querySelector('.tabla-actividad tbody');
+                    document.querySelector('.tabla-actividad tbody');
         if (!tbody) {
             console.warn("No se encontró tabla de actividad");
             return;
@@ -132,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <tr>
                 <td>${escapeHtml(tarea.tarea)}</td>
                 <td><span>${escapeHtml(tarea.estado)}</span></td>
-                <td>${formatDate(tarea.fecha_limite)}</td>
+                <td>${formatActivityDate(tarea.fecha_limite)}</td> <!-- Usar la nueva función -->
             </tr>
         `).join('');
         
@@ -495,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- FUNCIONES API ---
     async function actualizarPerfil(datos) {
         try {
-            console.log("Actualizando perfil:", datos);
+            console.log("Actualizando perfil con datos:", datos);
             const url = `${apiBase}/update_profile.php`;
             
             const res = await fetch(url, {
@@ -505,28 +537,45 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const json = await res.json();
-            console.log("Respuesta:", json);
+            console.log("Respuesta del servidor:", json);
 
             if (json.ok) {
-                // ACTUALIZAR CACHE GLOBAL Y SESIÓN PHP
-                if (datos.name) {
-                    window.CURRENT_USER.name = datos.name;
-                    actualizarNombreEnUI(datos.name);
-                }
-                if (datos.email) {
-                    window.CURRENT_USER.email = datos.email;
-                    actualizarCorreoEnUI(datos.email);
+                // ACTUALIZAR CON DATOS COMPLETOS DEL SERVIDOR
+                if (json.user) {
+                    window.CURRENT_USER.name = json.user.name;
+                    window.CURRENT_USER.email = json.user.email;
+                    window.CURRENT_USER.last_login = json.user.last_login;
+                    window.CURRENT_USER.assigned_count = json.user.assigned_count;
+                    
+                    actualizarNombreEnUI(json.user.name);
+                    actualizarCorreoEnUI(json.user.email);
+                    console.log("Datos completos actualizados en CURRENT_USER");
+                } else {
+                    // Fallback por si no viene user completo
+                    if (datos.name) {
+                        window.CURRENT_USER.name = datos.name;
+                        actualizarNombreEnUI(datos.name);
+                    }
+                    if (datos.email) {
+                        window.CURRENT_USER.email = datos.email;
+                        actualizarCorreoEnUI(datos.email);
+                    }
                 }
                 
-                // Recargar datos del perfil
                 cargarDatosPerfil();
                 
-                // DISPARAR EVENTO para que users.js recargue la tabla
-                console.log("Disparando evento 'perfilActualizado' desde profile.js...");
+                // DISPARAR EVENTO con datos completos
+                console.log("🔥 ===== DISPARANDO EVENTO 'perfilActualizado' =====");
                 const eventoActualizacion = new CustomEvent('perfilActualizado', {
-                    detail: { nombre: datos.name, email: datos.email }
+                    detail: { 
+                        nombre: datos.name, 
+                        email: datos.email,
+                        timestamp: new Date().getTime(),
+                        user: json.user  
+                    }
                 });
                 window.dispatchEvent(eventoActualizacion);
+                console.log("Evento 'perfilActualizado' disparado con datos completos");
                 
                 mostrarExitoYRegresar(json.message || 'Perfil actualizado correctamente');
             } else {
@@ -783,7 +832,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // AGREGAR FUNCIÓN PARA MODAL DE CONTRASEÑA
     function mostrarModalContrasenaEliminar() {
-        // Crear modal con el mismo diseño
         const modalHTML = `
             <div id="modalContrasena" style="
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -915,27 +963,93 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 
+    function formatActivityDate(dateString) {
+        if (!dateString) return '-';
+        
+        try {
+            // Para La Paz, BCS (UTC-7/-6)
+            const date = new Date(dateString + 'T12:00:00-07:00');
+            
+            if (isNaN(date.getTime())) {
+                return dateString;
+            }
+            
+            return date.toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                timeZone: 'America/Mazatlan'
+            });
+        } catch (error) {
+            console.error('Error formateando fecha:', error, dateString);
+            return dateString;
+        }
+    }
+
     // --- INICIALIZACIÓN COMPLETA ---
     function inicializarProfileCompleto() {
         console.log("Inicializando profile.js completo...");
         
         cargarDatosPerfil();
-        cargarActividadUsuario();
+        
+        // Cargar actividad inicial
+        setTimeout(() => {
+            cargarActividadUsuario(true);
+        }, 500);
         
         inicializarFlujoAvatar();
+        inicializarBotonesCancelar();
         
+        // SOLO iniciar actualización automática (sin botón)
         setTimeout(() => {
-            inicializarBotonesCancelar();
-        }, 100);
+            iniciarActualizacionAutomatica();
+        }, 1000);
         
-        setTimeout(() => {
-            const botonesCancelar = document.querySelectorAll('.btn-cancelar-edicion');
-            
-            console.log(`Configuración completada:`);
-            console.log(`   - Botones cancelar: ${botonesCancelar.length}`);
-        }, 200);
+        console.log("Profile.js completamente inicializado con auto-actualización");
+    }
+
+    // ESCUCHAR EVENTO DE ACTUALIZACIÓN DESDE users.js
+    window.addEventListener('usuarioActualizado', (event) => {
+        console.log("====== EVENTO RECIBIDO ======");
+        console.log("'usuarioActualizado' detectado en profile.js");
+        console.log("Datos del evento:", event.detail);
         
-        console.log("Profile.js completamente inicializado");
+        if (event.detail.nombre) {
+            console.log("Actualizando nombre:", window.CURRENT_USER.name, "->", event.detail.nombre);
+            window.CURRENT_USER.name = event.detail.nombre;
+        }
+        if (event.detail.email) {
+            console.log("Actualizando email:", window.CURRENT_USER.email, "->", event.detail.email);
+            window.CURRENT_USER.email = event.detail.email;
+        }
+        
+        console.log("Recargando datos del perfil...");
+        cargarDatosPerfil();
+        console.log("====== FIN EVENTO ======");
+    });
+
+    // NUEVO: ESCUCHAR EVENTO DE TAREA CREADA
+    window.addEventListener('tareaCreada', (event) => {
+        console.log("====== EVENTO TAREA CREADA ======");
+        console.log("Nueva tarea creada, recargando actividad...");
+        console.log("Detalles:", event.detail);
+        
+        // Recargar actividad inmediatamente
+        cargarActividadUsuario(true);
+        
+        console.log("====== FIN EVENTO TAREA CREADA ======");
+    });
+
+    console.log("Listener 'usuarioActualizado' registrado en profile.js");
+    console.log("Listener 'tareaCreada' registrado en profile.js");
+
+    // Actualizar automáticamente cada 30 segundos
+    function iniciarActualizacionAutomatica() {
+        console.log("Iniciando actualización automática cada 30 segundos");
+        setInterval(() => {
+            console.log("Actualización automática de actividad...");
+            cargarActividadUsuario(true); 
+        }, 30000); 
     }
 
     // --- UTILIDADES ---

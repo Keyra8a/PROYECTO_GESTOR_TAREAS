@@ -1,10 +1,14 @@
 <?php
 // assets/app/endpointsPerfil/get_user_activity.php
-// HEADERS CORS
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json; charset=utf-8');
+
+// Headers anti-cache
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -13,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../models/TaskModel.php';
 
 $user_id = $_SESSION['user']['id'] ?? null;
 if (!$user_id) {
@@ -23,46 +27,41 @@ if (!$user_id) {
 }
 
 try {
-    // Consulta para obtener tareas del usuario
-    $stmt = $pdo->prepare("
-        SELECT 
-            t.id,
-            t.title as tarea,
-            t.status as estado,
-            t.due_date as fecha_limite,
-            t.created_at
-        FROM tasks t
-        WHERE t.assigned_to = ?
-        ORDER BY t.due_date ASC, t.created_at DESC
-        LIMIT 20
-    ");
+    $taskModel = new TaskModel();
     
-    $stmt->execute([$user_id]);
-    $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Obtener actividad SOLO del usuario actual
+    $tareas = $taskModel->getUserActivity($user_id, 10);
     
-    // Si no hay tabla tasks aún, devolver datos de ejemplo
-    if (empty($tareas)) {
-        $tareas = [
-            ['tarea' => 'Diseñar interfaz de usuario', 'estado' => 'En progreso', 'fecha_limite' => date('Y-m-d', strtotime('+3 days'))],
-            ['tarea' => 'Revisar documentación', 'estado' => 'Pendiente', 'fecha_limite' => date('Y-m-d', strtotime('+5 days'))],
-            ['tarea' => 'Testing de funcionalidades', 'estado' => 'Completado', 'fecha_limite' => date('Y-m-d', strtotime('-2 days'))]
+    // Log para debug
+    error_log("Actividad cargada para usuario $user_id: " . count($tareas) . " tareas");
+    
+    // Mapear campos para el frontend
+    $tareasMapeadas = array_map(function($tarea) {
+        return [
+            'tarea' => $tarea['description'] ?? ($tarea['title'] ?? 'Sin descripcion'),
+            'estado' => $tarea['status'] ?? '-',
+            'fecha_limite' => $tarea['due_date'] ?? null,
+            'prioridad' => $tarea['priority'] ?? '-',
+            'tablero' => $tarea['board_title'] ?? 'General'
         ];
-    }
+    }, $tareas);
     
     echo json_encode([
         'ok' => true,
-        'tareas' => $tareas
+        'tareas' => $tareasMapeadas,
+        'count' => count($tareas),
+        'debug_user_id' => $user_id,
+        'timestamp' => time()
     ]);
     
-} catch (PDOException $e) {
-    // Si hay error, devolver datos de ejemplo
+} catch (Exception $e) {
+    error_log("Error en get_user_activity: " . $e->getMessage());
+    
     echo json_encode([
-        'ok' => true,
-        'tareas' => [
-            ['tarea' => 'Diseñar interfaz de usuario', 'estado' => 'En progreso', 'fecha_limite' => date('Y-m-d', strtotime('+3 days'))],
-            ['tarea' => 'Revisar documentación', 'estado' => 'Pendiente', 'fecha_limite' => date('Y-m-d', strtotime('+5 days'))],
-            ['tarea' => 'Testing de funcionalidades', 'estado' => 'Completado', 'fecha_limite' => date('Y-m-d', strtotime('-2 days'))]
-        ]
+        'ok' => false,
+        'tareas' => [],
+        'count' => 0,
+        'message' => 'Error al cargar actividad',
+        'error' => $e->getMessage()
     ]);
 }
-?>

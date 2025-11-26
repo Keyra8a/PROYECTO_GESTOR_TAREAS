@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../../config/db.php';
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-// 🔥 DEBUGGING
+// DEBUGGING
 error_log("=== CHANGE_PASSWORD DEBUG ===");
 error_log("Datos recibidos: " . print_r($input, true));
 error_log("Usuario en sesión: " . ($_SESSION['user']['id'] ?? 'NO'));
@@ -70,7 +70,6 @@ try {
         exit;
     }
     
-    // Si no tiene contraseña establecida, permitir establecerla
     if (empty($user['password_hash'])) {
         error_log("Usuario sin contraseña - Estableciendo nueva");
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);

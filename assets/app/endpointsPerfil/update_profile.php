@@ -47,7 +47,6 @@ try {
     }
     
     if (!empty($email)) {
-        // Verificar si el email ya existe (excluyendo al usuario actual)
         $stmtCheck = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
         $stmtCheck->execute([$email, $user_id]);
         if ($stmtCheck->fetch()) {
@@ -58,22 +57,47 @@ try {
         $params[] = $email;
     }
     
+    // AGREGAR ACTUALIZACIÓN DE FECHA
+    $fields[] = 'last_login = NOW()';
+    
     $params[] = $user_id;
     $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     
+    // OBTENER EL USUARIO ACTUALIZADO CON TODOS LOS DATOS (INCLUYENDO TAREAS)
+    $stmtUser = $pdo->prepare("
+        SELECT 
+            u.id, 
+            u.name, 
+            u.email, 
+            u.notes, 
+            u.is_active, 
+            u.last_login,
+            u.is_admin,
+            u.avatar_url,
+            COUNT(ta.task_id) as assigned_count
+        FROM users u
+        LEFT JOIN task_assignments ta ON u.id = ta.user_id
+        LEFT JOIN tasks t ON ta.task_id = t.id AND t.is_active = 1
+        WHERE u.id = ?
+        GROUP BY u.id
+    ");
+    $stmtUser->execute([$user_id]);
+    $userUpdated = $stmtUser->fetch(PDO::FETCH_ASSOC);
+    
     // Actualizar datos en sesión
     if (!empty($name)) $_SESSION['user']['name'] = $name;
     if (!empty($email)) $_SESSION['user']['email'] = $email;
+    if ($userUpdated) {
+        $_SESSION['user']['last_login'] = $userUpdated['last_login'];
+        $_SESSION['user']['is_active'] = $userUpdated['is_active'];
+    }
     
     echo json_encode([
         'ok' => true, 
         'message' => 'Perfil actualizado correctamente',
-        'user' => [
-            'name' => $name ?: $_SESSION['user']['name'],
-            'email' => $email ?: $_SESSION['user']['email']
-        ]
+        'user' => $userUpdated 
     ]);
     
 } catch (PDOException $e) {

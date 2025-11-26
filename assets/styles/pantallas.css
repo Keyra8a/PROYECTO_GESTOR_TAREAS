@@ -2410,6 +2410,27 @@ select {
   padding-right: 50px !important;
 }
 
+/* Estilos para formulario de tareas */
+#formulario-tarea input,
+#formulario-tarea textarea,
+#formulario-tarea select {
+  color: white !important;
+  border: 1px solid #444;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+#formulario-tarea input::placeholder,
+#formulario-tarea textarea::placeholder {
+  color: rgba(255, 255, 255, 0.61);
+  opacity: 1;
+}
+
+#formulario-tarea select option {
+  background-color: #2c2c2c;
+  color: white;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .modal-contenido {

@@ -52,7 +52,6 @@ try {
     $result = $stmt->execute([$userId]);
 
     if ($result && $stmt->rowCount() > 0) {
-        // Destruir sesión
         session_destroy();
         
         $response = [
