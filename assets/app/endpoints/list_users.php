@@ -28,9 +28,8 @@ try {
         FROM users u
         LEFT JOIN task_assignments ta ON u.id = ta.user_id
         LEFT JOIN tasks t ON ta.task_id = t.id
-        WHERE u.is_active = 1
         GROUP BY u.id, u.name, u.email, u.notes, u.is_active, u.last_login
-        ORDER BY u.name ASC
+        ORDER BY u.is_active DESC, u.name ASC
     ";
     
     $stmt = $pdo->query($sql);

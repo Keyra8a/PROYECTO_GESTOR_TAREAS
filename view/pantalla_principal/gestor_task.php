@@ -789,6 +789,23 @@
   <footer class="footer">
     <p>© 2025 Task<span class="task-black">Colab</span> - Todos los derechos reservados.</p>
   </footer>
+  
+  <script>
+      // Configuración de API_BASE
+      const apiBase = '<?php echo '/PROYECTO_GESTOR_TAREAS/assets/app/endpoints'; ?>';
+      console.log('API_BASE configurado:', apiBase);
+      
+      // Avatar URL
+      <?php 
+      $avatarUrl = $_SESSION['user']['avatar_url'] ?? null;
+      if ($avatarUrl): 
+      ?>
+      const avatarUrl = '<?php echo $avatarUrl; ?>';
+      console.log('Avatar URL:', avatarUrl);
+      <?php endif; ?>
+      
+      window.API_BASE = apiBase;
+  </script>
 
   <script src="../../assets/javascript/menu.js" defer></script>
   <script src="../../assets/javascript/users.js" defer></script>

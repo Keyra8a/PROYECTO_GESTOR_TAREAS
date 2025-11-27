@@ -1,4 +1,4 @@
-// assets/javascript/tasks.js - VERSIÓN CORREGIDA
+// assets/javascript/tasks.js
 document.addEventListener('DOMContentLoaded', function() {
   console.log("Inicializando tasks.js...");
 
@@ -443,28 +443,70 @@ document.addEventListener('DOMContentLoaded', function() {
       }
   });
 
-  async function eliminarTareas(ids) {
-      try {
-          const res = await fetch(`${apiBase}/delete_tasks.php`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ task_ids: ids })
-          });
+    async function eliminarTareas(ids) {
+        try {
+            console.log("Eliminando tareas:", ids);
+            
+            const res = await fetch(`${apiBase}/delete_tasks.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task_ids: ids })
+            });
 
-          const json = await res.json();
+            console.log("Respuesta HTTP:", res.status);
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("Error del servidor:", errorText);
+                throw new Error(`HTTP ${res.status}`);
+            }
 
-          if (json.ok) {
-              mostrarExito(`${ids.length} Tarea(s) eliminada(s) correctamente(s)`);
-              await loadTasks();
-              actualizarBotonBasura();
-          } else {
-              mostrarError(json.message || 'Error al eliminar las tareas');
-          }
-      } catch (error) {
-          console.error('Error eliminando tareas:', error);
-          mostrarError('Error de conexión. Intenta nuevamente.');
-      }
-  }
+            const json = await res.json();
+            console.log("Respuesta del servidor:", json);
+
+            if (json.ok) {
+                console.log(`${json.deleted_count || ids.length} tarea(s) eliminada(s)`);
+                
+                // RECARGAR TAREAS
+                await loadTasks();
+                actualizarBotonBasura();
+                
+                // DISPARAR EVENTOS PARA ACTUALIZAR OTRAS SECCIONES
+                console.log("Disparando eventos de actualización...");
+                
+                // Evento para actualizar conteo en Usuarios
+                const eventoUsuarios = new CustomEvent('actualizarConteoTareas', {
+                    detail: {
+                        timestamp: new Date().getTime(),
+                        deleted_count: json.deleted_count || ids.length,
+                        task_ids: ids
+                    }
+                });
+                window.dispatchEvent(eventoUsuarios);
+                console.log("Evento 'actualizarConteoTareas' disparado para users.js");
+                
+                // Evento para actualizar actividad en Perfil
+                const eventoPerfil = new CustomEvent('tareasEliminadas', {
+                    detail: {
+                        timestamp: new Date().getTime(),
+                        deleted_count: json.deleted_count || ids.length,
+                        task_ids: ids
+                    }
+                });
+                window.dispatchEvent(eventoPerfil);
+                console.log("Evento 'tareasEliminadas' disparado para profile.js");
+                
+                // Mostrar alerta de éxito
+                mostrarExito(json.message || `${ids.length} Tarea(s) eliminada(s) correctamente`);
+                
+            } else {
+                throw new Error(json.message || 'Error al eliminar las tareas');
+            }
+        } catch (error) {
+            console.error('Error eliminando tareas:', error);
+            mostrarError(error.message || 'Error de conexión. Intenta nuevamente.');
+        }
+    }
 
   // ACTUALIZAR: Función mostrarExito corregida
   function mostrarExito(mensaje) {

@@ -1,58 +1,89 @@
 <?php
 // assets/app/endpointsTareas/delete_tasks.php
-session_start();
-header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Content-Type: application/json; charset=utf-8');
 
-// Verificar sesión
-if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
-    http_response_code(401);
-    echo json_encode([
-        'ok' => false, 
-        'message' => 'No autorizado: sesión no iniciada'
-    ]);
-    exit;
+// Deshabilitar display de errores
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
 }
+
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once __DIR__ . '/../../models/TaskModel.php';
 
-try {
-    $input = json_decode(file_get_contents('php://input'), true);
-    
-    if (!$input) {
-        throw new Exception('Datos JSON inválidos');
-    }
-    
-    // Validar que se proporcionaron IDs de tareas
-    if (empty($input['task_ids']) || !is_array($input['task_ids'])) {
-        throw new Exception('IDs de tareas requeridos');
-    }
+$user_id = $_SESSION['user']['id'] ?? null;
+$is_admin = $_SESSION['user']['is_admin'] ?? 0;
 
+if (!$user_id) {
+    http_response_code(401);
+    echo json_encode(['ok' => false, 'message' => 'No autenticado']);
+    exit;
+}
+
+$input = json_decode(file_get_contents('php://input'), true);
+$task_ids = $input['task_ids'] ?? [];
+
+if (empty($task_ids) || !is_array($task_ids)) {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'message' => 'IDs de tareas inválidos']);
+    exit;
+}
+
+try {
     $taskModel = new TaskModel();
-    $userId = $_SESSION['user']['id'];
     
-    $taskIds = array_map('intval', $input['task_ids']);
-    
-    error_log("Eliminando tareas: " . implode(', ', $taskIds));
-    
-    // Eliminar las tareas
-    $result = $taskModel->deleteTasks($taskIds, $userId);
-    
-    if ($result) {
-        echo json_encode([
-            'ok' => true,
-            'message' => count($taskIds) . ' tarea eliminada exitosamente',
-            'deleted_count' => $result
-        ]);
-    } else {
-        throw new Exception('Error al eliminar las tareas');
+    // VERIFICAR PERMISOS PARA CADA TAREA
+    foreach ($task_ids as $task_id) {
+        $task = $taskModel->getTaskById($task_id);
+        
+        if (!$task) {
+            http_response_code(404);
+            echo json_encode(['ok' => false, 'message' => "Tarea ID $task_id no encontrada"]);
+            exit;
+        }
+        
+        // PERMITIR SI:
+        // - Es admin (puede eliminar cualquier tarea)
+        // - Es el creador de la tarea
+        // - Está asignado a la tarea
+        $esCreador = $task['created_by'] == $user_id;
+        $estaAsignado = $taskModel->isUserAssignedToTask($task_id, $user_id);
+        
+        if (!$is_admin && !$esCreador && !$estaAsignado) {
+            http_response_code(403);
+            echo json_encode([
+                'ok' => false, 
+                'message' => "No tienes permisos para eliminar la tarea ID $task_id"
+            ]);
+            exit;
+        }
     }
+    
+    // TIENE PERMISOS PARA TODAS LAS TAREAS
+    $deleted_count = 0;
+    foreach ($task_ids as $task_id) {
+        if ($taskModel->deleteTask($task_id)) {
+            $deleted_count++;
+        }
+    }
+    
+    echo json_encode([
+        'ok' => true,
+        'message' => "$deleted_count tarea(s) eliminada(s) correctamente",
+        'deleted_count' => $deleted_count
+    ]);
     
 } catch (Exception $e) {
     error_log("Error en delete_tasks: " . $e->getMessage());
-    http_response_code(400);
-    echo json_encode([
-        'ok' => false,
-        'message' => $e->getMessage()
-    ]);
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 ?>

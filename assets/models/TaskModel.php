@@ -94,6 +94,7 @@ class TaskModel {
                 $task['status'] = $this->statusToFrontend($task['status']);
                 $task['priority'] = $this->priorityToFrontend($task['priority']);
                 
+                // Si no hay usuarios asignados, poner null
                 if (empty($task['assigned_users'])) {
                     $task['assigned_users'] = null;
                     $task['assigned_user_ids'] = null;
@@ -110,24 +111,43 @@ class TaskModel {
     }
 
     //  Obtener una tarea específica por ID
-    public function getTaskById($taskId, $userId) {
+    public function getTaskById($taskId, $userId = null) {
         try {
-            $sql = "SELECT t.*, b.title as board_title, 
-                        GROUP_CONCAT(DISTINCT u.name) as assigned_users,
-                        GROUP_CONCAT(DISTINCT u.id) as assigned_user_ids
-                    FROM tasks t
-                    LEFT JOIN boards b ON t.board_id = b.id
-                    LEFT JOIN task_assignments ta ON t.id = ta.task_id
-                    LEFT JOIN users u ON ta.user_id = u.id
-                    WHERE t.id = :task_id 
-                    AND (t.created_by = :user_id OR ta.user_id = :user_id)
-                    GROUP BY t.id";
-            
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute([
-                ':task_id' => $taskId,
-                ':user_id' => $userId
-            ]);
+            if ($userId) {
+                // Si se proporciona userId, verificar permisos
+                $sql = "SELECT t.*, b.title as board_title, 
+                            GROUP_CONCAT(DISTINCT u.name) as assigned_users,
+                            GROUP_CONCAT(DISTINCT u.id) as assigned_user_ids
+                        FROM tasks t
+                        LEFT JOIN boards b ON t.board_id = b.id
+                        LEFT JOIN task_assignments ta ON t.id = ta.task_id
+                        LEFT JOIN users u ON ta.user_id = u.id
+                        WHERE t.id = :task_id 
+                        AND t.is_active = 1
+                        AND (t.created_by = :user_id OR ta.user_id = :user_id)
+                        GROUP BY t.id";
+                
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([
+                    ':task_id' => $taskId,
+                    ':user_id' => $userId
+                ]);
+            } else {
+                // Si NO se proporciona userId, obtener sin verificar permisos
+                $sql = "SELECT t.*, b.title as board_title, 
+                            GROUP_CONCAT(DISTINCT u.name) as assigned_users,
+                            GROUP_CONCAT(DISTINCT u.id) as assigned_user_ids
+                        FROM tasks t
+                        LEFT JOIN boards b ON t.board_id = b.id
+                        LEFT JOIN task_assignments ta ON t.id = ta.task_id
+                        LEFT JOIN users u ON ta.user_id = u.id
+                        WHERE t.id = :task_id 
+                        AND t.is_active = 1
+                        GROUP BY t.id";
+                
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([':task_id' => $taskId]);
+            }
             
             $task = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -140,7 +160,7 @@ class TaskModel {
             
         } catch (PDOException $e) {
             error_log("Error en getTaskById: " . $e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -430,6 +450,42 @@ class TaskModel {
                 'in_progress_tasks' => 0,
                 'done_tasks' => 0
             ];
+        }
+    }
+
+    // Verificar si un usuario está asignado a una tarea
+    public function isUserAssignedToTask($taskId, $userId) {
+        try {
+            $query = "SELECT COUNT(*) as count 
+                    FROM {$this->assignmentsTable} 
+                    WHERE task_id = :task_id AND user_id = :user_id";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':task_id', $taskId, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'] > 0;
+            
+        } catch (PDOException $e) {
+            error_log("Error verificando asignación: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    //  Eliminar una tarea (marcar como inactiva)
+    public function deleteTask($taskId) {
+        try {
+            $query = "UPDATE {$this->table} SET is_active = 0 WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $taskId, PDO::PARAM_INT);
+            
+            return $stmt->execute();
+            
+        } catch (PDOException $e) {
+            error_log("Error eliminando tarea: " . $e->getMessage());
+            return false;
         }
     }
 }

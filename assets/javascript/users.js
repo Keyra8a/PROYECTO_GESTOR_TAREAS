@@ -1,3 +1,4 @@
+// assets/javascript/users.js
 document.addEventListener('DOMContentLoaded', () => {
   console.log("users.js cargado - Inicializando...");
 
@@ -120,123 +121,139 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   }
 
-  // === RENDERIZAR TABLA ===
-  function renderTable(users) {
-      if (!tbody) {
-          console.error("No se encontró tbody para la tabla de usuarios");
-          return;
-      }
+    // === RENDERIZAR TABLA MEJORADA CON USUARIOS INACTIVOS ===
+    function renderTable(users) {
+        if (!tbody) {
+            console.error("No se encontró tbody para la tabla de usuarios");
+            return;
+        }
 
-      if (!users || users.length === 0) {
-          tbody.innerHTML = `
-              <tr>
-                  <td colspan="4" style="text-align: center; color: #666; padding: 20px;">
-                      No hay usuarios registrados
-                  </td>
-              </tr>
-          `;
-          return;
-      }
+        if (!users || users.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #666; padding: 20px;">
+                        No hay usuarios registrados
+                    </td>
+                </tr>
+            `;
+            return;
+        }
 
-      console.log(`Renderizando ${users.length} usuarios en la tabla`);
-      
-      const current = window.CURRENT_USER || null;
-      
-      tbody.innerHTML = users.map(user => {
-          // MARCAR EL USUARIO ACTUAL CON UN ESTILO DIFERENTE
-          const esUsuarioActual = current && String(current.id) === String(user.id);
-          const estiloFila = esUsuarioActual ? 'background-color: #e3f2fd;' : '';
-          const marcadorActual = esUsuarioActual ? ' (Tú)' : '';
-          
-          return `
-              <tr data-id="${user.id}" style="${estiloFila}">
-                  <td>${escapeHtml(user.name)}${marcadorActual}</td>
-                  <td>${escapeHtml(user.email)}</td>
-                  <td>${user.assigned_count || 0}</td>
-                  <td>${escapeHtml(user.notes || '')}</td>
-              </tr>
-          `;
-      }).join('');
-      
-      console.log(`${users.length} usuarios renderizados`);
-  }
+        console.log(`Renderizando ${users.length} usuarios en la tabla`);
+        
+        const current = window.CURRENT_USER || null;
+        
+        tbody.innerHTML = users.map(user => {
+            // DETERMINAR ESTILOS SEGÚN ESTADO
+            const esUsuarioActual = current && String(current.id) === String(user.id);
+            const esActivo = user.is_active == 1;
+            
+            let estiloFila = '';
+            let marcadorEstado = '';
+            
+            if (esUsuarioActual) {
+                estiloFila = 'background-color: #e3f2fd;'; 
+                marcadorEstado = ' (Tú)';
+            } else if (!esActivo) {
+                estiloFila = 'background-color: #f5f5f5; color: #999;'; 
+                marcadorEstado = ' (Inactivo)';
+            }
+            
+            return `
+                <tr data-id="${user.id}" style="${estiloFila}">
+                    <td>${escapeHtml(user.name)}${marcadorEstado}</td>
+                    <td>${escapeHtml(user.email)}</td>
+                    <td>${user.assigned_count || 0}</td>
+                    <td>${escapeHtml(user.notes || '')}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        console.log(`${users.length} usuarios renderizados (incluyendo inactivos)`);
+    }
 
-  // === FUNCIÓN PARA ACTUALIZAR VISTA DE DETALLE ===
-  function actualizarVistaDetalle(user) {
-      console.log("Actualizando vista detalle:", user);
-      
-      if (!user) {
-          console.error("Usuario es null");
-          return;
-      }
-      
-      if (detalleNombre) detalleNombre.textContent = user.name || '';
-      if (detalleCorreo) detalleCorreo.textContent = user.email || '';
-      if (detalleTareas) detalleTareas.textContent = `${user.assigned_count || 0} tareas`;
-      if (detalleEstado) detalleEstado.textContent = user.is_active == 1 ? 'Activo' : 'Inactivo';
-      
-      // FECHA
-      if (detalleFecha) {
-          if (user.last_login && user.last_login !== '0000-00-00 00:00:00') {
-              try {
-                  const fecha = new Date(user.last_login);
-                  if (!isNaN(fecha.getTime())) {
-                      detalleFecha.textContent = fecha.toLocaleDateString('es-MX', {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                      });
-                  } else {
-                      detalleFecha.textContent = 'Fecha inválida';
-                  }
-              } catch (error) {
-                  detalleFecha.textContent = user.last_login;
-              }
-          } else {
-              detalleFecha.textContent = 'Sin actividad';
-          }
-      }
-      
-      console.log("Vista detalle actualizada");
-  }
+    // === FUNCIÓN PARA ACTUALIZAR VISTA DE DETALLE ===
+    function actualizarVistaDetalle(user) {
+        console.log("Actualizando vista detalle:", user);
+        
+        if (!user) {
+            console.error("Usuario es null");
+            return;
+        }
+        
+        if (detalleNombre) detalleNombre.textContent = user.name || '';
+        if (detalleCorreo) detalleCorreo.textContent = user.email || '';
+        if (detalleTareas) detalleTareas.textContent = `${user.assigned_count || 0} tareas`;
+        
+        // MOSTRAR ESTADO SIMPLE
+        if (detalleEstado) {
+            const esActivo = user.is_active == 1;
+            detalleEstado.textContent = esActivo ? 'Activo' : 'Inactivo';
+            // Quitamos colores y estilos
+        }
+        
+        // FECHA
+        if (detalleFecha) {
+            if (user.last_login && user.last_login !== '0000-00-00 00:00:00') {
+                try {
+                    const fecha = new Date(user.last_login);
+                    if (!isNaN(fecha.getTime())) {
+                        detalleFecha.textContent = fecha.toLocaleDateString('es-MX', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    } else {
+                        detalleFecha.textContent = 'Fecha inválida';
+                    }
+                } catch (error) {
+                    detalleFecha.textContent = user.last_login;
+                }
+            } else {
+                detalleFecha.textContent = 'Sin actividad';
+            }
+        }
+        
+        console.log("Vista detalle actualizada");
+    }
 
-  // === FUNCIÓN PARA ACTUALIZAR FORMULARIO DE EDICIÓN ===
-  function actualizarFormularioEdicion(user) {
-      console.log("Actualizando formulario de edición:", user);
-      
-      if (inputEditNombre) inputEditNombre.value = user.name || '';
-      if (inputEditCorreo) inputEditCorreo.value = user.email || '';
-      if (inputEditTareas) inputEditTareas.value = user.assigned_count || '0';
-      if (inputEditEstado) inputEditEstado.value = user.is_active == 1 ? '1' : '0';
-      
-      // MOSTRAR FECHA ACTUAL EN EL FORMULARIO
-      if (inputEditFecha) {
-          if (user.last_login && user.last_login !== '0000-00-00 00:00:00') {
-              try {
-                  const fecha = new Date(user.last_login);
-                  if (!isNaN(fecha.getTime())) {
-                      inputEditFecha.value = fecha.toLocaleDateString('es-MX', {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                      });
-                  } else {
-                      inputEditFecha.value = 'Fecha inválida';
-                  }
-              } catch (error) {
-                  inputEditFecha.value = user.last_login;
-              }
-          } else {
-              inputEditFecha.value = 'Sin actividad';
-          }
-      }
-      
-      console.log("Formulario de edición actualizado");
-  }
+    // === FUNCIÓN PARA ACTUALIZAR FORMULARIO DE EDICIÓN ===
+    function actualizarFormularioEdicion(user) {
+        console.log("Actualizando formulario de edición:", user);
+        
+        if (inputEditNombre) inputEditNombre.value = user.name || '';
+        if (inputEditCorreo) inputEditCorreo.value = user.email || '';
+        if (inputEditTareas) inputEditTareas.value = user.assigned_count || '0';
+        if (inputEditEstado) inputEditEstado.value = user.is_active == 1 ? '1' : '0';
+        
+        // MOSTRAR FECHA ACTUAL EN EL FORMULARIO
+        if (inputEditFecha) {
+            if (user.last_login && user.last_login !== '0000-00-00 00:00:00') {
+                try {
+                    const fecha = new Date(user.last_login);
+                    if (!isNaN(fecha.getTime())) {
+                        inputEditFecha.value = fecha.toLocaleDateString('es-MX', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    } else {
+                        inputEditFecha.value = 'Fecha inválida';
+                    }
+                } catch (error) {
+                    inputEditFecha.value = user.last_login;
+                }
+            } else {
+                inputEditFecha.value = 'Sin actividad';
+            }
+        }
+        
+        console.log("Formulario de edición actualizado");
+    }
 
   // === FUNCIÓN PARA ACTUALIZAR FILA EN TABLA ===
   function actualizarFilaEnTabla(user) {
@@ -276,9 +293,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Evento de actualización de tareas
-  window.addEventListener('actualizarConteoTareas', async (event) => {
-      console.log("EVENTO 'actualizarConteoTareas' recibido");
-      await loadUsers();
+  window.addEventListener('actualizarConteoTareas', async (event) => {     
+     console.log("===== EVENTO 'actualizarConteoTareas' CAPTURADO EN USERS.JS =====");
+     console.log("Detalles del evento:", event.detail);
+     console.log("Hora del evento:", new Date().toLocaleTimeString());
+
+     console.log("Recargando tabla de usuarios INMEDIATAMENTE...");
+     await loadUsers();
+        
+     console.log("Conteo de tareas actualizado en tiempo real");
+     console.log("===== FIN EVENTO =====\n");
   });
 
   // Evento de tarea creada
@@ -286,6 +310,22 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log("EVENTO 'tareaCreada' recibido");
       await loadUsers();
   });
+
+  // ESCUCHAR EVENTO DE TAREAS ELIMINADAS
+  window.addEventListener('tareasEliminadas', async (event) => {
+    console.log("===== EVENTO 'tareasEliminadas' RECIBIDO EN PROFILE.JS =====");
+    console.log("Detalles:", event.detail);
+    console.log(`${event.detail.deleted_count} tarea(s) eliminada(s)`);
+        
+    // RECARGAR ACTIVIDAD INMEDIATAMENTE
+    console.log("Recargando actividad del perfil...");
+    await cargarActividadUsuario(true);
+        
+    console.log("Actividad actualizada después de eliminar tareas");
+    console.log("===== FIN EVENTO =====\n");
+  });
+
+    console.log("Listener 'tareasEliminadas' registrado en profile.js");
 
   // Evento de perfil actualizado
   window.addEventListener('perfilActualizado', async (event) => {
@@ -554,6 +594,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // === INICIALIZACIÓN ===
 
   console.log("Inicializando tabla de usuarios...");
+  console.log("Listeners registrados en profile.js:");
+  console.log("   - usuarioActualizado");
+  console.log("   - tareaCreada");
+  console.log("   - tareasEliminadas");
   
   // Cargar usuarios
   setTimeout(() => {
