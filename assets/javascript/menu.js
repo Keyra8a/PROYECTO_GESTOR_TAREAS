@@ -1,3 +1,4 @@
+// assets/javascript/menu.js
 document.addEventListener("DOMContentLoaded", () => {
   // Ocultar la casita y el botón admin inmediatamente al cargar
   setTimeout(() => {
@@ -314,51 +315,51 @@ document.addEventListener("DOMContentLoaded", () => {
     window.mostrarSeccion("tableros");
   });
 
-  formTarjeta?.addEventListener("submit", (e) => {
-    e.preventDefault();
+  // formTarjeta?.addEventListener("submit", (e) => {
+  //   e.preventDefault();
 
-    const titulo = formTarjeta.querySelector('input[type="text"]').value.trim();
-    const descripcion = formTarjeta.querySelector("textarea").value.trim();
-    const asignado = formTarjeta.querySelectorAll("select")[0].value;
-    const prioridad = formTarjeta.querySelectorAll("select")[1].value;
-    const fecha = formTarjeta.querySelector('input[type="date"]').value;
+  //   const titulo = formTarjeta.querySelector('input[type="text"]').value.trim();
+  //   const descripcion = formTarjeta.querySelector("textarea").value.trim();
+  //   const asignado = formTarjeta.querySelectorAll("select")[0].value;
+  //   const prioridad = formTarjeta.querySelectorAll("select")[1].value;
+  //   const fecha = formTarjeta.querySelector('input[type="date"]').value;
 
-    if (!titulo) {
-      window.configurarAlerta(
-        "Error",
-        "Por favor, escribe un título para la tarea.",
-        "alerta",
-        {
-          soloAceptar: true,
-          onConfirmar: () => window.mostrarSeccion("formulario-tarjeta")
-        }
-      );
-      return;
-    }
+  //   if (!titulo) {
+  //     window.configurarAlerta(
+  //       "Error",
+  //       "Por favor, escribe un título para la tarea.",
+  //       "alerta",
+  //       {
+  //         soloAceptar: true,
+  //         onConfirmar: () => window.mostrarSeccion("formulario-tarjeta")
+  //       }
+  //     );
+  //     return;
+  //   }
 
-    if (!columnaDestino) {
-      columnaDestino = document.querySelector(".columna:first-child .tarjetas");
-    }
+  //   if (!columnaDestino) {
+  //     columnaDestino = document.querySelector(".columna:first-child .tarjetas");
+  //   }
 
-    columnaDestino.insertAdjacentHTML("beforeend", `
-      <div class="tarjeta">
-        <h4>${titulo}</h4>
-        <p><img src="../../assets/img/icono-calendario.png" class="icono"> ${fecha}</p>
-        <p><img src="../../assets/img/icono-usuario.png" class="icono"> ${asignado}</p>
-        <p><img src="../../assets/img/icono-prioridad.png" class="icono"> ${prioridad}</p>
-        <div class="botones-tarjeta">
-          <button class="eliminar"><img src="../../assets/img/basura.png" class="delete-card" alt="Eliminar"></button>
-          <div class="botones-derecha">
-            <button class="mover-izq"><</button>
-            <button class="mover-der">></button>
-          </div>
-        </div>
-      </div>
-    `);
+  //   columnaDestino.insertAdjacentHTML("beforeend", `
+  //     <div class="tarjeta">
+  //       <h4>${titulo}</h4>
+  //       <p><img src="../../assets/img/icono-calendario.png" class="icono"> ${fecha}</p>
+  //       <p><img src="../../assets/img/icono-usuario.png" class="icono"> ${asignado}</p>
+  //       <p><img src="../../assets/img/icono-prioridad.png" class="icono"> ${prioridad}</p>
+  //       <div class="botones-tarjeta">
+  //         <button class="eliminar"><img src="../../assets/img/basura.png" class="delete-card" alt="Eliminar"></button>
+  //         <div class="botones-derecha">
+  //           <button class="mover-izq"><</button>
+  //           <button class="mover-der">></button>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   `);
 
-    formTarjeta.reset();
-    window.mostrarSeccion("tableros");
-  });
+  //   formTarjeta.reset();
+  //   window.mostrarSeccion("tableros");
+  // });
 
   // // --- TABLA DE TAREAS ---
   // const btnBasura = document.getElementById("btn-borrar-tareas");

@@ -56,30 +56,37 @@
         <h3 id="titulo-form-tarjeta">Añadir Tarjeta - Pendiente</h3>
 
         <form id="form-tarjeta">
-          <label>Título de la tarea</label>
-          <input type="text" placeholder="Diseñar encabezado principal" required>
+          <label for="titulo-tarjeta">Título de la tarea</label>
+          <input type="text" 
+                id="titulo-tarjeta" 
+                name="titulo-tarjeta"
+                placeholder="Ej: Diseñar pantalla de login" 
+                required
+                autocomplete="off">
 
-          <label>Descripción detallada</label>
-          <textarea placeholder="Hacer la creación de elementos y estilos para el diseño." required></textarea>
+          <label for="descripcion-tarjeta">Descripción detallada</label>
+          <textarea id="descripcion-tarjeta" 
+                    name="descripcion-tarjeta"
+                    placeholder="Describe con detalle la tarea a realizar..."></textarea>
 
-          <label>Asignar a:</label>
-          <select required>
-            <option value="">Seleccionar usuario</option>
-            <option>Ana García</option>
-            <option>José Pérez</option>
-            <option>María López</option>
+          <label for="asignar-tarjeta">Asignar a:</label>
+          <select id="asignar-tarjeta" name="asignar-tarjeta">
+            <option value="">Sin asignar</option>
+            <!-- Se cargarán dinámicamente -->
           </select>
 
-          <label>Prioridad:</label>
-          <select required>
-            <option value="">Seleccionar prioridad</option>
-            <option>Alta prioridad</option>
-            <option>Media prioridad</option>
-            <option>Baja prioridad</option>
+          <label for="prioridad-tarjeta">Prioridad:</label>
+          <select id="prioridad-tarjeta" name="prioridad-tarjeta">
+            <option value="Media prioridad" selected>Media prioridad</option>
+            <option value="Alta prioridad">Alta prioridad</option>
+            <option value="Baja prioridad">Baja prioridad</option>
           </select>
 
-          <label>Fecha límite:</label>
-          <input class="date" type="date" required>
+          <label for="fecha-tarjeta">Fecha límite:</label>
+          <input class="date" 
+                type="date" 
+                id="fecha-tarjeta" 
+                name="fecha-tarjeta">
 
           <div class="botones">
             <button type="button" class="cancelar">Cancelar</button>
@@ -697,7 +704,6 @@
               <td>Añadir</td>
               <td>Añadir</td>
               <td class="acciones-celda">
-                <!-- Sin botones para esta fila -->
               </td>
             </tr>
           </tbody>
@@ -811,5 +817,6 @@
   <script src="../../assets/javascript/users.js" defer></script>
   <script src="../../assets/javascript/profile.js" defer></script>
   <script src="../../assets/javascript/tasks.js" defer></script>
+  <script src="../../assets/javascript/boards.js" defer></script>
 </body>
 </html>

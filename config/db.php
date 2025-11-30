@@ -1,5 +1,5 @@
 <?php
-// config/db.php - lector .env simple + PDO con puerto
+// config/db.php 
 
 // ZONA HORARIA ESPECÍFICA PARA LA PAZ, BAJA CALIFORNIA SUR
 date_default_timezone_set('America/Mazatlan'); 
@@ -37,7 +37,46 @@ $options = [
 ];
 
 try {
+    // CREAR $pdo EN ÁMBITO GLOBAL
     $pdo = new PDO($dsn, $DB_USER, $DB_PASS, $options);
+    
+    // HACERLA GLOBAL EXPLÍCITAMENTE
+    $GLOBALS['pdo'] = $pdo;
+    
 } catch (PDOException $e) {
-    die('Error de conexión a la base de datos: ' . $e->getMessage());
+    error_log('Error de conexión a la base de datos: ' . $e->getMessage());
+
+    if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+        die('Error de conexión a la base de datos: ' . $e->getMessage());
+    } else {
+        die('Error de conexión a la base de datos');
+    }
 }
+
+// FUNCIÓN PARA OBTENER LA CONEXIÓN DESDE CUALQUIER LUGAR
+function getDBConnection() {
+    if (isset($GLOBALS['pdo'])) {
+        return $GLOBALS['pdo'];
+    }
+    
+    global $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, $DB_CHARSET;
+    $dsn = "mysql:host={$DB_HOST};port={$DB_PORT};dbname={$DB_NAME};charset={$DB_CHARSET}";
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+    
+    try {
+        $GLOBALS['pdo'] = new PDO($dsn, $DB_USER, $DB_PASS, $options);
+        return $GLOBALS['pdo'];
+    } catch (PDOException $e) {
+        error_log('Error recreando conexión BD: ' . $e->getMessage());
+        return null;
+    }
+}
+
+if (!isset($pdo) && isset($GLOBALS['pdo'])) {
+    $pdo = $GLOBALS['pdo'];
+}
+?>

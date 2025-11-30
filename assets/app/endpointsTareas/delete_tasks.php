@@ -1,5 +1,5 @@
 <?php
-// assets/app/endpointsTareas/delete_tasks.php
+// assets/app/endpointsTareas/delete_tasks.php 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once __DIR__ . '/../../models/TaskModel.php';
+require_once __DIR__ . '/../../models/ActivityModel.php';
 
 $user_id = $_SESSION['user']['id'] ?? null;
 $is_admin = $_SESSION['user']['is_admin'] ?? 0;
@@ -39,6 +40,7 @@ if (empty($task_ids) || !is_array($task_ids)) {
 
 try {
     $taskModel = new TaskModel();
+    $activityModel = new ActivityModel();
     
     // VERIFICAR PERMISOS PARA CADA TAREA
     foreach ($task_ids as $task_id) {
@@ -69,16 +71,28 @@ try {
     
     // TIENE PERMISOS PARA TODAS LAS TAREAS
     $deleted_count = 0;
+    $total_activities_deleted = 0;
+    
     foreach ($task_ids as $task_id) {
+        // Eliminar actividades relacionadas con esta tarea
+        $activities_deleted = $activityModel->deleteTaskActivities($task_id);
+        if ($activities_deleted !== false) {
+            $total_activities_deleted += $activities_deleted;
+            error_log("Eliminadas $activities_deleted actividades de la tarea $task_id");
+        }
+        
+        // Eliminar la tarea
         if ($taskModel->deleteTask($task_id)) {
             $deleted_count++;
+            error_log("Tarea $task_id eliminada correctamente");
         }
     }
     
     echo json_encode([
         'ok' => true,
         'message' => "$deleted_count tarea(s) eliminada(s) correctamente",
-        'deleted_count' => $deleted_count
+        'deleted_count' => $deleted_count,
+        'activities_deleted' => $total_activities_deleted
     ]);
     
 } catch (Exception $e) {
@@ -86,4 +100,3 @@ try {
     http_response_code(500);
     echo json_encode(['ok' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
-?>

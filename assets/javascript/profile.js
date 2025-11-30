@@ -100,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- CARGAR ACTIVIDAD DEL USUARIO ---
     async function cargarActividadUsuario(forceRefresh = false) {
         try {
-            // CORREGIR: Usar ? para el primer parámetro
             const timestamp = new Date().getTime();
             const url = `${apiBase}/get_user_activity.php?t=${timestamp}`;
             
@@ -565,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cargarDatosPerfil();
                 
                 // DISPARAR EVENTO con datos completos
-                console.log("🔥 ===== DISPARANDO EVENTO 'perfilActualizado' =====");
+                console.log("===== DISPARANDO EVENTO 'perfilActualizado' =====");
                 const eventoActualizacion = new CustomEvent('perfilActualizado', {
                     detail: { 
                         nombre: datos.name, 
@@ -1073,4 +1072,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isNaN(date)) return dateString;
         return date.toLocaleDateString('es-MX');
     }
+
+    // === ESCUCHAR EVENTOS DE ACTUALIZACIÓN DESDE TABLEROS ===
+    window.addEventListener('actividadTareaActualizada', async (event) => {
+        console.log("EVENTO RECIBIDO: Actividad de tarea actualizada", event.detail);
+        
+        // Recargar actividad inmediatamente
+        await cargarActividadUsuario(true);
+        
+        console.log("Actividad actualizada después de movimiento en Tableros");
+    });
+
+    // === ESCUCHAR EVENTOS DE TAREAS ===
+    window.addEventListener('tareaCreada', async (event) => {
+        console.log("EVENTO RECIBIDO: Tarea creada", event.detail);
+        await cargarActividadUsuario(true);
+    });
+
+    window.addEventListener('tareasEliminadas', async (event) => {
+        console.log("EVENTO RECIBIDO: Tareas eliminadas", event.detail);
+        await cargarActividadUsuario(true);
+    });
+
+    console.log("Profile.js inicializado con listeners para eventos de actividad");
+
 });

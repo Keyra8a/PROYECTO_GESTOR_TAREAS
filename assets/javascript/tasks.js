@@ -314,50 +314,51 @@ document.addEventListener('DOMContentLoaded', function() {
           const json = await res.json();
           console.log("Respuesta del servidor:", json);
           
-          if (json.ok) {
-              console.log("Tarea creada exitosamente");
-              
-              // DISPARAR EVENTOS DE ACTUALIZACIÓN
-              const eventoActualizarTareas = new CustomEvent('actualizarConteoTareas', {
-                  detail: {
-                      taskId: json.task_id,
-                      assigned_to: usuarioId,
-                      action: 'create'
-                  }
-              });
-              window.dispatchEvent(eventoActualizarTareas);
-              
-              console.log("Evento para actualizar conteos disparado");
-              
-              // Limpiar formulario
-              formAnadirTarea?.reset();
-              if (inputTitulo) inputTitulo.value = '';
-              if (inputDescripcion) inputDescripcion.value = '';
-              if (selectUsuario) selectUsuario.value = '';
-              if (selectEstado) selectEstado.value = 'pending';
-              if (selectPrioridad) selectPrioridad.value = 'medium';
-              if (inputFecha) inputFecha.value = '';
-              
-              // Recargar tareas
-              await loadTasks();
-              
-              // Alerta de éxito
-              if (typeof configurarAlerta === 'function') {
-                  configurarAlerta(
-                      "Éxito",
-                      json.message || "Tarea creada exitosamente",
-                      "exito",
-                      {
-                          soloAceptar: true,
-                          onConfirmar: () => {
-                              if (typeof mostrarSeccion === 'function') {
-                                  mostrarSeccion('tareas');
-                              }
-                          }
-                      }
-                  );
-              }
-          } else {
+        if (json.ok) {
+            console.log('Tarea creada exitosamente');
+            
+            // Limpiar formulario
+            formAnadirTarea?.reset();
+            if (inputTitulo) inputTitulo.value = '';
+            if (inputDescripcion) inputDescripcion.value = '';
+            if (selectUsuario) selectUsuario.value = '';
+            if (selectEstado) selectEstado.value = 'pending';
+            if (selectPrioridad) selectPrioridad.value = 'medium';
+            if (inputFecha) inputFecha.value = '';
+            
+            // Recargar tareas
+            await loadTasks();
+            
+            // DISPARAR EVENTO PARA TABLEROS
+            console.log('Disparando evento para Tableros...');
+            const eventoTableros = new CustomEvent('tareaCreadaDesdeTareas', {
+                detail: {
+                    taskId: json.task_id,
+                    timestamp: new Date().getTime(),
+                    action: 'create',
+                    source: 'tasks'
+                }
+            });
+            window.dispatchEvent(eventoTableros);
+            console.log("Evento 'tareaCreadaDesdeTareas' disparado");
+            
+            // Alerta de éxito
+            if (typeof configurarAlerta === 'function') {
+                configurarAlerta(
+                    "Éxito",
+                    json.message || "Tarea creada exitosamente",
+                    "exito",
+                    {
+                        soloAceptar: true,
+                        onConfirmar: () => {
+                            if (typeof mostrarSeccion === 'function') {
+                                mostrarSeccion('tareas');
+                            }
+                        }
+                    }
+                );
+            }
+        } else {
               console.error("Error del servidor:", json.message);
               if (typeof configurarAlerta === 'function') {
                   configurarAlerta(
@@ -367,6 +368,12 @@ document.addEventListener('DOMContentLoaded', function() {
                       { soloAceptar: true }
                   );
               }
+
+              // Después de crear una tarea exitosamente
+                dispararEventoActualizacionTareas('creacion', {
+                    taskId: nuevaTareaId, 
+                    action: 'create'
+                });
           }
       } catch (error) {
           console.error('Error creando tarea:', error);
@@ -685,5 +692,73 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-  console.log("Tasks.js inicializado correctamente");
+    // === ESCUCHAR EVENTOS DE ACTUALIZACIÓN DESDE TABLEROS ===
+    window.addEventListener('tareaMovidaEnTableros', async (event) => {
+        console.log("EVENTO RECIBIDO: Tarea movida en Tableros", event.detail);
+        
+        // Recargar tareas inmediatamente
+        await loadTasks();
+        
+        console.log("Tareas actualizadas después de movimiento en Tableros");
+    });
+
+    // === ESCUCHAR EVENTOS DE CREACIÓN/ELIMINACIÓN ===
+    window.addEventListener('tareaCreadaEnTableros', async (event) => {
+        console.log("EVENTO RECIBIDO: Tarea creada en Tableros", event.detail);
+        await loadTasks();
+    });
+
+    // === ESCUCHAR EVENTOS DE ELIMINACIÓN DESDE TABLEROS ===
+    window.addEventListener('tareaEliminadaEnTableros', async (event) => {
+        console.log("EVENTO RECIBIDO: Tarea eliminada en Tableros", event.detail);
+        
+        // Recargar tareas inmediatamente
+        await loadTasks();
+        
+        console.log("Tareas actualizadas después de eliminación en Tableros");
+    });
+
+    // === DISPARAR EVENTOS DE ACTUALIZACIÓN ===
+    function dispararEventoActualizacionTareas(tipo, detalles = {}) {
+        console.log(`Disparando eventos de ${tipo} desde Tareas...`);
+        
+        const timestamp = new Date().getTime();
+        
+        // Evento para Tableros (actualizar vista)
+        const eventoTableros = new CustomEvent('tareaCreadaDesdeTareas', {
+            detail: {
+                ...detalles,
+                timestamp: timestamp,
+                action: 'create',
+                source: 'tasks'
+            }
+        });
+        window.dispatchEvent(eventoTableros);
+        console.log("Evento 'tareaCreadaDesdeTareas' disparado para boards.js");
+        
+        // Evento para Perfil (actualizar actividad)
+        const eventoPerfil = new CustomEvent('actividadTareaActualizada', {
+            detail: {
+                ...detalles,
+                timestamp: timestamp,
+                action: 'create',
+                source: 'tasks'
+            }
+        });
+        window.dispatchEvent(eventoPerfil);
+        console.log("Evento 'actividadTareaActualizada' disparado para profile.js");
+        
+        // Evento para Usuarios (actualizar conteos)
+        const eventoUsuarios = new CustomEvent('actualizarConteoTareas', {
+            detail: {
+                timestamp: timestamp,
+                action: 'create',
+                task_id: detalles.taskId
+            }
+        });
+        window.dispatchEvent(eventoUsuarios);
+        console.log("Evento 'actualizarConteoTareas' disparado para users.js");
+    }
+
+    console.log("Tasks.js inicializado correctamente");
 });

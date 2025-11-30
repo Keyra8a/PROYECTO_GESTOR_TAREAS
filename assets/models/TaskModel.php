@@ -1,6 +1,5 @@
 <?php
-// assets/models/TaskModel.php
-require_once __DIR__ . '/../../config/db.php';
+// assets/models/TaskModel.php 
 
 class TaskModel {
     private $conn;
@@ -27,8 +26,18 @@ class TaskModel {
     ];
 
     public function __construct() {
-        global $pdo;
-        $this->conn = $pdo;
+        // USAR LA NUEVA FUNCIÓN getDBConnection()
+        $dbPath = __DIR__ . '/../../config/db.php';
+        if (!file_exists($dbPath)) {
+            throw new Exception("Archivo db.php no encontrado en: $dbPath");
+        }
+        
+        require_once $dbPath;
+        $this->conn = getDBConnection();
+        
+        if (!$this->conn) {
+            throw new Exception("No se pudo establecer conexión a la base de datos");
+        }
     }
 
     // Convertir status de DB a frontend
@@ -54,38 +63,77 @@ class TaskModel {
     // Obtener todas las tareas del usuario actual
     public function getUserTasks($userId) {
         try {
-            $query = "SELECT DISTINCT
-                        t.id,
-                        t.title,
-                        t.description,
-                        t.board_id,
-                        b.title as board_title,
-                        t.status,
-                        t.priority,
-                        t.due_date,
-                        t.created_by,
-                        t.created_at,
-                        t.updated_at,
-                        GROUP_CONCAT(DISTINCT u.name SEPARATOR ', ') as assigned_users,
-                        GROUP_CONCAT(DISTINCT ta.user_id) as assigned_user_ids
-                    FROM {$this->table} t
-                    LEFT JOIN boards b ON t.board_id = b.id
-                    LEFT JOIN {$this->assignmentsTable} ta ON t.id = ta.task_id
-                    LEFT JOIN users u ON ta.user_id = u.id
-                    WHERE t.is_active = 1
-                    AND (
-                        t.created_by = :user_id1
-                        OR ta.user_id = :user_id2
-                        OR b.owner_id = :user_id3
-                    )
-                    GROUP BY t.id
-                    ORDER BY t.created_at DESC";
+            // VERIFICAR SI EL USUARIO ES ADMIN
+            $stmtAdmin = $this->conn->prepare("SELECT is_admin FROM users WHERE id = :user_id");
+            $stmtAdmin->execute([':user_id' => $userId]);
+            $user = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
+            $isAdmin = $user['is_admin'] ?? 0;
             
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':user_id1', $userId, PDO::PARAM_INT);
-            $stmt->bindParam(':user_id2', $userId, PDO::PARAM_INT);
-            $stmt->bindParam(':user_id3', $userId, PDO::PARAM_INT);
-            $stmt->execute();
+            if ($isAdmin == 1) {
+                // SI ES ADMIN: Ver TODAS las tareas activas
+                $query = "SELECT DISTINCT
+                            t.id,
+                            t.title,
+                            t.description,
+                            t.board_id,
+                            b.title as board_title,
+                            t.status,
+                            t.priority,
+                            t.due_date,
+                            t.created_by,
+                            t.created_at,
+                            t.updated_at,
+                            GROUP_CONCAT(DISTINCT u.name SEPARATOR ', ') as assigned_users,
+                            GROUP_CONCAT(DISTINCT ta.user_id) as assigned_user_ids
+                        FROM {$this->table} t
+                        LEFT JOIN boards b ON t.board_id = b.id
+                        LEFT JOIN {$this->assignmentsTable} ta ON t.id = ta.task_id
+                        LEFT JOIN users u ON ta.user_id = u.id
+                        WHERE t.is_active = 1
+                        GROUP BY t.id
+                        ORDER BY t.created_at DESC";
+                
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+                
+                error_log("ADMIN: Usuario $userId puede ver TODAS las tareas");
+            } else {
+                // SI NO ES ADMIN: Ver solo sus tareas
+                $query = "SELECT DISTINCT
+                            t.id,
+                            t.title,
+                            t.description,
+                            t.board_id,
+                            b.title as board_title,
+                            t.status,
+                            t.priority,
+                            t.due_date,
+                            t.created_by,
+                            t.created_at,
+                            t.updated_at,
+                            GROUP_CONCAT(DISTINCT u.name SEPARATOR ', ') as assigned_users,
+                            GROUP_CONCAT(DISTINCT ta.user_id) as assigned_user_ids
+                        FROM {$this->table} t
+                        LEFT JOIN boards b ON t.board_id = b.id
+                        LEFT JOIN {$this->assignmentsTable} ta ON t.id = ta.task_id
+                        LEFT JOIN users u ON ta.user_id = u.id
+                        WHERE t.is_active = 1
+                        AND (
+                            t.created_by = :user_id1
+                            OR ta.user_id = :user_id2
+                            OR b.owner_id = :user_id3
+                        )
+                        GROUP BY t.id
+                        ORDER BY t.created_at DESC";
+                
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':user_id1', $userId, PDO::PARAM_INT);
+                $stmt->bindParam(':user_id2', $userId, PDO::PARAM_INT);
+                $stmt->bindParam(':user_id3', $userId, PDO::PARAM_INT);
+                $stmt->execute();
+                
+                error_log("USUARIO NORMAL: Usuario $userId ve solo sus tareas");
+            }
             
             $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -94,14 +142,14 @@ class TaskModel {
                 $task['status'] = $this->statusToFrontend($task['status']);
                 $task['priority'] = $this->priorityToFrontend($task['priority']);
                 
-                // Si no hay usuarios asignados, poner null
+                // Si no hay usuarios asignados
                 if (empty($task['assigned_users'])) {
                     $task['assigned_users'] = null;
                     $task['assigned_user_ids'] = null;
                 }
             }
             
-            error_log("getUserTasks CORREGIDO: " . count($tasks) . " tareas para usuario $userId");
+            error_log("getUserTasks: " . count($tasks) . " tareas para usuario $userId (Admin: " . ($isAdmin ? 'Sí' : 'No') . ")");
             return $tasks;
             
         } catch (PDOException $e) {
@@ -244,23 +292,27 @@ class TaskModel {
     }
 
     // Actualizar una tarea
-    public function updateTask($updateData, $userId) {
+    public function updateTask($updateData, $userId = null) {
         try {
-            // Verificar que el usuario tiene permisos sobre la tarea
-            $checkSql = "SELECT id FROM tasks WHERE id = :task_id AND (created_by = :user_id OR id IN (SELECT task_id FROM task_assignments WHERE user_id = :user_id))";
-            $checkStmt = $this->conn->prepare($checkSql);
-            $checkStmt->execute([
-                ':task_id' => $updateData['task_id'],
-                ':user_id' => $userId
-            ]);
+            $taskId = $updateData['task_id'];
             
-            if (!$checkStmt->fetch()) {
-                throw new Exception('No tienes permisos para editar esta tarea');
+            // Si se proporciona userId, verificar permisos
+            if ($userId) {
+                $checkSql = "SELECT id FROM tasks WHERE id = :task_id AND (created_by = :user_id OR id IN (SELECT task_id FROM task_assignments WHERE user_id = :user_id))";
+                $checkStmt = $this->conn->prepare($checkSql);
+                $checkStmt->execute([
+                    ':task_id' => $taskId,
+                    ':user_id' => $userId
+                ]);
+                
+                if (!$checkStmt->fetch()) {
+                    throw new Exception('No tienes permisos para editar esta tarea');
+                }
             }
             
-            // Construir query dinamica
+            // Construir query dinámica
             $setParts = [];
-            $params = [':task_id' => $updateData['task_id']];
+            $params = [':task_id' => $taskId];
             
             if (isset($updateData['title'])) {
                 $setParts[] = 'title = :title';
@@ -296,25 +348,27 @@ class TaskModel {
             
             $sql = "UPDATE tasks SET " . implode(', ', $setParts) . " WHERE id = :task_id";
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute($params);
+            $result = $stmt->execute($params);
             
-            // Actualizar asignaciones 
+            // Actualizar asignaciones si se proporciona
             if (isset($updateData['assigned_to'])) {
                 // Eliminar asignaciones existentes
                 $deleteSql = "DELETE FROM task_assignments WHERE task_id = :task_id";
                 $deleteStmt = $this->conn->prepare($deleteSql);
-                $deleteStmt->execute([':task_id' => $updateData['task_id']]);
+                $deleteStmt->execute([':task_id' => $taskId]);
                 
-                // Crear nueva asignacion
-                $assignSql = "INSERT INTO task_assignments (task_id, user_id, assigned_at) VALUES (:task_id, :user_id, NOW())";
-                $assignStmt = $this->conn->prepare($assignSql);
-                $assignStmt->execute([
-                    ':task_id' => $updateData['task_id'],
-                    ':user_id' => $updateData['assigned_to']
-                ]);
+                // Crear nueva asignación
+                if ($updateData['assigned_to']) {
+                    $assignSql = "INSERT INTO task_assignments (task_id, user_id, assigned_at) VALUES (:task_id, :user_id, NOW())";
+                    $assignStmt = $this->conn->prepare($assignSql);
+                    $assignStmt->execute([
+                        ':task_id' => $taskId,
+                        ':user_id' => $updateData['assigned_to']
+                    ]);
+                }
             }
             
-            return true;
+            return $result;
             
         } catch (PDOException $e) {
             error_log("Error en updateTask: " . $e->getMessage());
@@ -355,9 +409,10 @@ class TaskModel {
         }
     }
 
-    // Método público para obtener actividad reciente del usuario - LÓGICA CORREGIDA
+    // Método para obtener actividad reciente del usuario
     public function getUserActivity($userId, $limit = 10) {
         try {
+            // SOLO tareas donde el usuario está ASIGNADO 
             $sql = "
                 SELECT DISTINCT
                     t.id,
@@ -367,28 +422,20 @@ class TaskModel {
                     t.priority,
                     t.due_date,
                     t.created_at,
+                    t.updated_at,
                     b.title as board_title,
-                    t.created_by,
-                    GROUP_CONCAT(DISTINCT ta.user_id) as assigned_user_ids
+                    t.created_by
                 FROM tasks t
                 LEFT JOIN boards b ON t.board_id = b.id
-                LEFT JOIN task_assignments ta ON t.id = ta.task_id
+                INNER JOIN task_assignments ta ON t.id = ta.task_id
                 WHERE t.is_active = 1
-                GROUP BY t.id
-                HAVING (
-                    -- El usuario está ASIGNADO a la tarea
-                    FIND_IN_SET(:user_id1, assigned_user_ids) > 0
-                    OR 
-                    -- O el usuario CREÓ la tarea Y NO está asignada a nadie más
-                    (t.created_by = :user_id2 AND (assigned_user_ids IS NULL OR assigned_user_ids = ''))
-                )
+                AND ta.user_id = :user_id
                 ORDER BY t.created_at DESC
                 LIMIT :limit
             ";
             
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':user_id1', $userId, PDO::PARAM_INT);
-            $stmt->bindParam(':user_id2', $userId, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
             
@@ -398,16 +445,9 @@ class TaskModel {
             foreach ($tareas as &$tarea) {
                 $tarea['status'] = $this->statusToFrontend($tarea['status']);
                 $tarea['priority'] = $this->priorityToFrontend($tarea['priority']);
-                // Remover el campo interno assigned_user_ids
-                unset($tarea['assigned_user_ids']);
             }
             
-            error_log("getUserActivity LÓGICA CORREGIDA: " . count($tareas) . " tareas para usuario $userId");
-            
-            // DEBUG: Registrar qué tareas se están mostrando
-            foreach ($tareas as $tarea) {
-                error_log("   - Tarea ID {$tarea['id']}: {$tarea['title']} (creada por: {$tarea['created_by']})");
-            }
+            error_log("getUserActivity CORREGIDO: " . count($tareas) . " tareas ASIGNADAS al usuario $userId");
             
             return $tareas;
             
@@ -474,17 +514,17 @@ class TaskModel {
         }
     }
 
-    //  Eliminar una tarea (marcar como inactiva)
+    // Eliminar una tarea (marcar como inactiva) - MÉTODO INDIVIDUAL
     public function deleteTask($taskId) {
         try {
-            $query = "UPDATE {$this->table} SET is_active = 0 WHERE id = :id";
+            $query = "UPDATE {$this->table} SET is_active = 0, updated_at = NOW() WHERE id = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $taskId, PDO::PARAM_INT);
             
             return $stmt->execute();
             
         } catch (PDOException $e) {
-            error_log("Error eliminando tarea: " . $e->getMessage());
+            error_log("Error eliminando tarea individual: " . $e->getMessage());
             return false;
         }
     }

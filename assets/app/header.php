@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 $user = $_SESSION['user'] ?? null;
 
-// ACTUALIZAR: Cargar datos de la BD incluyendo avatar_url
+// Cargar datos de la BD incluyendo avatar_url
 if ($user && isset($user['id'])) {
     try {
         require_once __DIR__ . '/../../config/db.php';
@@ -44,14 +44,19 @@ $homeLink = '../../index.html';
 $isLocal = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false || 
             strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false);
 
-// CONFIGURAR RUTA BASE SEGÚN EL ENTORNO
+// CONFIGURAR RUTAS BASE SEGÚN EL ENTORNO
 if ($isLocal) {
-    $apiBase = '/PROYECTO_GESTOR_TAREAS/assets/app/endpoints';
+    $basePath = '/PROYECTO_GESTOR_TAREAS';
 } else {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
-    $host = $_SERVER['HTTP_HOST'];
-    $apiBase = $protocol . $host . '/assets/app/endpoints';
+    $basePath = ''; // Para producción (InfinityFree)
 }
+
+// Configurar todas las APIs
+$API_BASE = $basePath . '/assets/app/endpoints';
+$API_BASE_PERFIL = $basePath . '/assets/app/endpointsPerfil';
+$API_BASE_TAREAS = $basePath . '/assets/app/endpointsTareas';
+$API_BASE_TABLEROS = $basePath . '/assets/app/endpointsTableros'; 
+$UPLOADS_BASE = $basePath . '/assets/uploads';
 ?>
 <header class="header">
   <div class="left-section">
@@ -78,29 +83,22 @@ if ($isLocal) {
     <a href="<?php echo $homeLink; ?>"><img src="<?php echo $imgBase; ?>/cerrarsesion.png" alt="cerrar sesión"></a>
   </div>
 
-  <?php
-  $jsCurrentUser = json_encode($user ?? null, JSON_UNESCAPED_UNICODE);
-  ?>
   <script>
-    window.CURRENT_USER = <?php echo $jsCurrentUser; ?>;
-    window.API_BASE = "<?php echo $apiBase; ?>";
-    console.log("API_BASE configurado:", "<?php echo $apiBase; ?>");
-    console.log("Avatar URL:", "<?php echo $avatarUrl ?? 'null'; ?>");
+    // CONFIGURACIÓN UNIFICADA DE TODAS LAS APIS
+    window.API_BASE = "<?php echo $API_BASE; ?>";
+    window.API_BASE_PERFIL = "<?php echo $API_BASE_PERFIL; ?>";
+    window.API_BASE_TAREAS = "<?php echo $API_BASE_TAREAS; ?>";
+    window.API_BASE_TABLEROS = "<?php echo $API_BASE_TABLEROS; ?>"; 
+    window.UPLOADS_BASE = "<?php echo $UPLOADS_BASE; ?>";
+    window.CURRENT_USER = <?php echo json_encode($user ?? null, JSON_UNESCAPED_UNICODE); ?>;
+    
+    console.log("=== CONFIGURACIÓN DE APIs ===");
+    console.log("API_BASE:", window.API_BASE);
+    console.log("API_BASE_TAREAS:", window.API_BASE_TAREAS);
+    console.log("API_BASE_TABLEROS:", window.API_BASE_TABLEROS); 
+    console.log("API_BASE_PERFIL:", window.API_BASE_PERFIL);
+    console.log("=============================");
   </script>
-
-  <script>
-  // APIs de usuarios
-  window.API_BASE = '<?php echo $API_BASE; ?>';
-  
-  // APIs de perfil
-  window.API_BASE_PERFIL = '<?php echo $API_BASE_PERFIL; ?>';
-  
-  // APIs de tareas (NUEVO)
-  window.API_BASE_TAREAS = '/PROYECTO_GESTOR_TAREAS/assets/app/endpointsTareas';
-  
-  // Usuario actual
-  window.CURRENT_USER = <?php echo json_encode($_SESSION['user'] ?? null); ?>;
-</script>
 </header>
 
 <nav class="sidebar">
