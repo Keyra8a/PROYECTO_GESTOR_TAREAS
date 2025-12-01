@@ -230,25 +230,24 @@
       <div class="descripcion-exportar">
           <p class="descripcion-reportes">Ver métricas y estadísticas generales del sistema.</p>
           <button id="btn-exportar-pdf" class="btn-exportar">Exportar PDF</button>
-
-        </div>
+      </div>
 
       <div class="tarjetas-metricas">
-        <div class="tarjeta-metrica">
+        <div class="tarjeta-metrica" data-action="total_tareas">
           <h3>Total de tareas</h3>
-          <p>3</p>
+          <p>0</p>
         </div>
-        <div class="tarjeta-metrica">
+        <div class="tarjeta-metrica" data-action="pendiente">
           <h3>Pendiente</h3>
-          <p>1</p>
+          <p>0</p>
         </div>
-        <div class="tarjeta-metrica">
+        <div class="tarjeta-metrica" data-action="en_proceso">
           <h3>En proceso</h3>
-          <p>1</p>
+          <p>0</p>
         </div>
-        <div class="tarjeta-metrica">
+        <div class="tarjeta-metrica" data-action="completado">
           <h3>Completado</h3>
-          <p>1</p>
+          <p>0</p>
         </div>
       </div>
 
@@ -258,25 +257,23 @@
           <div class="barra">
             <span>Pendiente</span>
             <div class="barra-contenido">
-              <div class="barra-progreso" style="width: 100%"></div>
+              <div class="barra-progreso" style="width: 0%"></div>
             </div>
-            <span class="porcentaje">100%</span>
+            <span class="porcentaje">0%</span>
           </div>
-
           <div class="barra">
             <span>En proceso</span>
             <div class="barra-contenido">
-              <div class="barra-progreso" style="width: 90%"></div>
+              <div class="barra-progreso" style="width: 0%"></div>
             </div>
-            <span class="porcentaje">90%</span>
+            <span class="porcentaje">0%</span>
           </div>
-
           <div class="barra">
             <span>Completado</span>
             <div class="barra-contenido">
-              <div class="barra-progreso" style="width: 50%"></div>
+              <div class="barra-progreso" style="width: 0%"></div>
             </div>
-            <span class="porcentaje">50%</span>
+            <span class="porcentaje">0%</span>
           </div>
         </div>
 
@@ -285,25 +282,23 @@
           <div class="barra">
             <span>Zahir Fernando</span>
             <div class="barra-contenido">
-              <div class="barra-progreso" style="width: 60%"></div>
+              <div class="barra-progreso" style="width: 0%"></div>
             </div>
-            <span class="porcentaje">60%</span>
+            <span class="porcentaje">0%</span>
           </div>
-
           <div class="barra">
-            <span>Renier Lucero</span>
+            <span>Reniery Lucero</span>
             <div class="barra-contenido">
-              <div class="barra-progreso" style="width: 80%"></div>
+              <div class="barra-progreso" style="width: 0%"></div>
             </div>
-            <span class="porcentaje">80%</span>
+            <span class="porcentaje">0%</span>
           </div>
-
           <div class="barra">
             <span>Keyra Yariely</span>
             <div class="barra-contenido">
-              <div class="barra-progreso" style="width: 20%"></div>
+              <div class="barra-progreso" style="width: 0%"></div>
             </div>
-            <span class="porcentaje">20%</span>
+            <span class="porcentaje">0%</span>
           </div>
         </div>
       </div>
@@ -311,8 +306,7 @@
       <div class="recuadro tareas-atrasadas">
         <h3>Tareas atrasadas</h3>
         <div class="contenido-atrasadas">
-          <p>¡En este momento no se encuentran tareas atrasadas!</p>
-          <img src="../../assets/img/like.png" alt="Like" class="icono-like">
+          <p>Cargando tareas atrasadas...</p>
         </div>
       </div>
     </div>
@@ -818,5 +812,6 @@
   <script src="../../assets/javascript/profile.js" defer></script>
   <script src="../../assets/javascript/tasks.js" defer></script>
   <script src="../../assets/javascript/boards.js" defer></script>
+  <script src="../../assets/javascript/reports.js" defer></script>
 </body>
 </html>

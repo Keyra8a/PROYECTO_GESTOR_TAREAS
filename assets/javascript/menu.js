@@ -221,61 +221,61 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- FUNCIONALIDAD PARA EXPORTAR PDF EN REPORTES ---
-  function inicializarExportarPDF() {
-    const btnExportarPDF = document.getElementById("btn-exportar-pdf");
+  // function inicializarExportarPDF() {
+  //   const btnExportarPDF = document.getElementById("btn-exportar-pdf");
     
-    btnExportarPDF?.addEventListener("click", function() {
-      mostrarAlertaExportarPDF();
-    });
-  }
+  //   btnExportarPDF?.addEventListener("click", function() {
+  //     mostrarAlertaExportarPDF();
+  //   });
+  // }
 
-  function mostrarAlertaExportarPDF() {
-    const activa = document.querySelector(".seccion.activa");
-    seccionAntesDeEliminar = activa ? activa.id : null;
+  // function mostrarAlertaExportarPDF() {
+  //   const activa = document.querySelector(".seccion.activa");
+  //   seccionAntesDeEliminar = activa ? activa.id : null;
     
-    window.configurarAlerta(
-      "Exportar PDF",
-      "¿Estás seguro de que deseas exportar el reporte a PDF?",
-      "alerta",
-      {
-        textoConfirmar: "Exportar",
-        onConfirmar: () => {
-          exportarAPDF();
-          mostrarAlertaExitoPDF();
-        },
-        onCancelar: () => {
-          if (seccionAntesDeEliminar) {
-            window.mostrarSeccion(seccionAntesDeEliminar);
-          } else {
-            window.mostrarSeccion("reportes");
-          }
-        }
-      }
-    );
-  }
+  //   window.configurarAlerta(
+  //     "Exportar PDF",
+  //     "¿Estás seguro de que deseas exportar el reporte a PDF?",
+  //     "alerta",
+  //     {
+  //       textoConfirmar: "Exportar",
+  //       onConfirmar: () => {
+  //         exportarAPDF();
+  //         mostrarAlertaExitoPDF();
+  //       },
+  //       onCancelar: () => {
+  //         if (seccionAntesDeEliminar) {
+  //           window.mostrarSeccion(seccionAntesDeEliminar);
+  //         } else {
+  //           window.mostrarSeccion("reportes");
+  //         }
+  //       }
+  //     }
+  //   );
+  // }
 
-  function exportarAPDF() {
-    console.log("Exportando a PDF...");
-    // Aquí implementar con jsPDF
-  }
+  // function exportarAPDF() {
+  //   console.log("Exportando a PDF...");
+  //   // Aquí implementar con jsPDF
+  // }
 
-  function mostrarAlertaExitoPDF() {
-    window.configurarAlerta(
-      "Exportar PDF",
-      "Reporte exportado a PDF correctamente",
-      "exito",
-      {
-        soloAceptar: true,
-        onConfirmar: () => {
-          if (seccionAntesDeEliminar) {
-            window.mostrarSeccion(seccionAntesDeEliminar);
-          } else {
-            window.mostrarSeccion("reportes");
-          }
-        }
-      }
-    );
-  }
+  // function mostrarAlertaExitoPDF() {
+  //   window.configurarAlerta(
+  //     "Exportar PDF",
+  //     "Reporte exportado a PDF correctamente",
+  //     "exito",
+  //     {
+  //       soloAceptar: true,
+  //       onConfirmar: () => {
+  //         if (seccionAntesDeEliminar) {
+  //           window.mostrarSeccion(seccionAntesDeEliminar);
+  //         } else {
+  //           window.mostrarSeccion("reportes");
+  //         }
+  //       }
+  //     }
+  //   );
+  // }
 
   // --- NAVEGACIÓN LATERAL ---
   document.querySelectorAll(".sidebar a").forEach((link) => {
@@ -1237,7 +1237,7 @@ document.addEventListener("DOMContentLoaded", () => {
       inicializarSistemaTareas();
       // inicializarTablaUsuarios(); // DESHABILITADO - users.js lo maneja
       // inicializarBotonesDetalles(); // DESHABILITADO - users.js lo maneja
-      inicializarExportarPDF();
+      // inicializarExportarPDF();
       inicializarPerfil();
       inicializarEliminarCuenta();
       inicializarNavegacionReportes();

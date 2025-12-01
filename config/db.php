@@ -79,4 +79,3 @@ function getDBConnection() {
 if (!isset($pdo) && isset($GLOBALS['pdo'])) {
     $pdo = $GLOBALS['pdo'];
 }
-?>

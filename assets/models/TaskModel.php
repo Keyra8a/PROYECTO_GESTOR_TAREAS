@@ -528,4 +528,232 @@ class TaskModel {
             return false;
         }
     }
+
+    // === MÉTODOS DE REPORTES ===
+
+    public function getUserTasksCount($userId) {
+        try {
+            $sql = "SELECT COUNT(DISTINCT t.id) as count 
+                    FROM tasks t
+                    WHERE t.is_active = 1
+                    AND (
+                        t.created_by = ?
+                        OR EXISTS (
+                            SELECT 1 
+                            FROM task_assignments ta 
+                            WHERE ta.task_id = t.id 
+                            AND ta.user_id = ?
+                        )
+                    )";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$userId, $userId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'] ?? 0;
+        } catch (Exception $e) {
+            error_log("Error en getUserTasksCount: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function getUserTasksCountByStatus($userId, $status) {
+        try {
+            // Mapear estados de español a inglés
+            $statusMap = [
+                'pendiente' => 'pending',
+                'en_proceso' => 'in_progress', 
+                'completado' => 'done'
+            ];
+            
+            $dbStatus = $statusMap[$status] ?? $status;
+            
+            $sql = "SELECT COUNT(DISTINCT t.id) as count 
+                    FROM tasks t
+                    WHERE t.is_active = 1
+                    AND (
+                        t.created_by = ?
+                        OR EXISTS (
+                            SELECT 1 
+                            FROM task_assignments ta 
+                            WHERE ta.task_id = t.id 
+                            AND ta.user_id = ?
+                        )
+                    )
+                    AND t.status = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$userId, $userId, $dbStatus]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'] ?? 0;
+        } catch (Exception $e) {
+            error_log("Error en getUserTasksCountByStatus: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function getBoardProgress($userId) {
+        try {
+            $sql = "
+                SELECT 
+                    t.status,
+                    COUNT(DISTINCT t.id) as total_tasks,
+                    (COUNT(DISTINCT t.id) * 100.0 / GREATEST(
+                        (SELECT COUNT(DISTINCT t2.id) 
+                        FROM tasks t2
+                        WHERE t2.is_active = 1
+                        AND (
+                            t2.created_by = ?
+                            OR EXISTS (
+                                SELECT 1 
+                                FROM task_assignments ta2 
+                                WHERE ta2.task_id = t2.id 
+                                AND ta2.user_id = ?
+                            )
+                        )), 1
+                    )) as percentage
+                FROM tasks t
+                WHERE t.is_active = 1
+                AND (
+                    t.created_by = ?
+                    OR EXISTS (
+                        SELECT 1 
+                        FROM task_assignments ta 
+                        WHERE ta.task_id = t.id 
+                        AND ta.user_id = ?
+                    )
+                )
+                GROUP BY t.status
+            ";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$userId, $userId, $userId, $userId]);
+            $progress = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Convertir estados a español para la UI
+            $statusMap = [
+                'pending' => 'Pendiente',
+                'in_progress' => 'En Proceso',
+                'done' => 'Completado'
+            ];
+            
+            foreach ($progress as &$item) {
+                $item['status_display'] = $statusMap[$item['status']] ?? $item['status'];
+                $item['percentage'] = floatval($item['percentage']);
+            }
+            
+            return $progress;
+        } catch (Exception $e) {
+            error_log("Error en getBoardProgress: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getActiveUsers($userId) {
+        try {
+            // Consulta mejorada para usuarios realmente activos
+            $sql = "
+                SELECT 
+                    u.id,
+                    u.name as usuario,
+                    u.email,
+                    COUNT(DISTINCT ta.task_id) as tareas_asignadas,
+                    SUM(CASE WHEN t.status = 'done' THEN 1 ELSE 0 END) as tareas_completadas
+                FROM users u
+                INNER JOIN task_assignments ta ON u.id = ta.user_id
+                INNER JOIN tasks t ON ta.task_id = t.id AND t.is_active = 1
+                WHERE u.is_active = 1 
+                AND u.id != ?
+                GROUP BY u.id, u.name, u.email
+                HAVING tareas_asignadas > 0
+                ORDER BY tareas_asignadas DESC
+                LIMIT 5
+            ";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$userId]);
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Calcular total para porcentajes
+            $totalTareas = array_sum(array_column($users, 'tareas_asignadas'));
+            
+            $result = [];
+            foreach ($users as $user) {
+                $porcentaje = $totalTareas > 0 ? ($user['tareas_asignadas'] / $totalTareas) * 100 : 0;
+                $result[] = [
+                    'usuario' => $user['usuario'],
+                    'tareas_asignadas' => intval($user['tareas_asignadas']),
+                    'tareas_completadas' => intval($user['tareas_completadas']),
+                    'porcentaje' => round($porcentaje)
+                ];
+            }
+            
+            return $result;
+        } catch (Exception $e) {
+            error_log("Error en getActiveUsers: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getOverdueTasks($userId) {
+        try {
+            // Obtener TODAS las tareas del usuario primero
+            $sql = "
+                SELECT DISTINCT
+                    t.id,
+                    t.title,
+                    t.description,
+                    t.due_date,
+                    t.status,
+                    t.priority
+                FROM tasks t
+                WHERE t.is_active = 1
+                AND t.status != 'done'
+                AND (
+                    t.created_by = ?
+                    OR t.id IN (
+                        SELECT DISTINCT ta.task_id 
+                        FROM task_assignments ta 
+                        WHERE ta.user_id = ?
+                    )
+                )
+                ORDER BY t.due_date ASC
+            ";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$userId, $userId]);
+            $allTasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Filtrar en PHP 
+            $overdueTasks = [];
+            $today = date('Y-m-d');
+            
+            foreach ($allTasks as $task) {
+                // Extraer solo la fecha (sin hora) para comparar
+                $dueDate = date('Y-m-d', strtotime($task['due_date']));
+                
+                // Comparar con la fecha actual del servidor PHP
+                if ($dueDate < $today) {
+                    $overdueTasks[] = $task;
+                }
+            }
+            
+            // Limitar a 10 resultados
+            $overdueTasks = array_slice($overdueTasks, 0, 10);
+            
+            $priorityMap = [
+                'high' => 'Alta',
+                'medium' => 'Media',
+                'low' => 'Baja'
+            ];
+            
+            foreach ($overdueTasks as &$task) {
+                $task['priority_display'] = $priorityMap[$task['priority']] ?? $task['priority'];
+                $task['due_date_display'] = date('d/m/Y', strtotime($task['due_date']));
+            }
+            
+            error_log("Tareas atrasadas encontradas (PHP filter): " . count($overdueTasks));
+            
+            return $overdueTasks;
+        } catch (Exception $e) {
+            error_log("Error en getOverdueTasks: " . $e->getMessage());
+            return [];
+        }
+    }
 }
