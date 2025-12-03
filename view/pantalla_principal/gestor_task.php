@@ -714,16 +714,16 @@
 
         <form id="form-usuario-admin">
           <label>Nombre completo</label>
-          <input type="text" placeholder="Jonathan Giovanni Soto Muñoz" required>
+          <input type="text" name="name" placeholder="Jonathan Giovanni Soto Muñoz" required>
 
           <label>Correo electrónico</label>
-          <input type="email" placeholder="jsoto@uabcs.mx" required>
+          <input type="email" name="email" placeholder="jsoto@uabcs.mx" required>
 
-          <label>Tareas asignadas</label>
-          <input type="text" placeholder="Calificar la revisión del diseño" required>
+          <label style="margin-bottom: 8px;">Tareas asignadas</label>
+          <div class="tasks-checkbox-container"></div>
 
           <label>Notas</label>
-          <textarea placeholder="Se la rifaron con el diseño" required></textarea>
+          <textarea name="notes" placeholder="Se la rifaron con el diseño"></textarea>
 
           <div class="botones">
             <button type="button" class="cancelar">Cancelar</button>
@@ -732,6 +732,7 @@
         </form>
       </div>
     </section>
+
     <!-- FORMULARIO EDITAR USUARIO ADMIN -->
     <section id="editar-usuario-admin" class="seccion">
       <h2 class="titulo-seccion">Usuarios - Admin</h2>
@@ -741,28 +742,16 @@
 
         <form id="form-editar-usuario-admin">
           <label>Nombre completo</label>
-          <input type="text" id="edit-nombre-completo" placeholder="Nombre completo" required>
+          <input type="text" id="edit-nombre-completo" name="name" placeholder="Nombre completo" required>
 
           <label>Correo electrónico</label>
-          <input type="email" id="edit-correo-electronico" placeholder="correo@ejemplo.com" required>
+          <input type="email" id="edit-correo-electronico" name="email" placeholder="correo@ejemplo.com" required>
 
-          <div class="tareas-asignadas-editar">
-            <label><strong>Tareas asignadas</strong></label>
-            
-            <div class="select-tareas-container">
-              <select id="select-tareas" multiple size="3" class="form-control">
-                <!-- Las tareas se agregarán aquí dinámicamente -->
-              </select>
-              
-              <div class="agregar-tarea-input">
-                <input type="text" id="nueva-tarea-input" placeholder="Añadir nueva tarea" class="form-control">
-                <button type="button" id="btn-añadir-tarea" class="btn-añadir-tarea">+</button>
-              </div>
-            </div>
-          </div>
+          <label style="margin-bottom: 8px;">Tareas asignadas</label>
+          <div class="tasks-checkbox-container"></div>
 
           <label>Notas</label>
-          <textarea id="edit-notas" placeholder="Notas del usuario" required></textarea>
+          <textarea id="edit-notas" name="notes" placeholder="Notas del usuario"></textarea>
 
           <div class="botones">
             <button type="button" class="cancelar">Cancelar</button>
@@ -808,10 +797,11 @@
   </script>
 
   <script src="../../assets/javascript/menu.js" defer></script>
+  <script src="../../assets/javascript/admin.js" defer></script>
   <script src="../../assets/javascript/users.js" defer></script>
-  <script src="../../assets/javascript/profile.js" defer></script>
   <script src="../../assets/javascript/tasks.js" defer></script>
   <script src="../../assets/javascript/boards.js" defer></script>
   <script src="../../assets/javascript/reports.js" defer></script>
+  <script src="../../assets/javascript/profile.js" defer></script>
 </body>
 </html>

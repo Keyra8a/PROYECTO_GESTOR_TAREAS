@@ -65,7 +65,7 @@ $UPLOADS_BASE = $basePath . '/assets/uploads';
     </div>
     <div class="tab-container">
       <h2 class="tab">Pestaña 1</h2>
-      <button class="add-tab">+</button>
+      <!-- <button class="add-tab">+</button> -->
     </div>
   </div>
 

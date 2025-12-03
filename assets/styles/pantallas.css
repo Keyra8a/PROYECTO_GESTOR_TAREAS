@@ -2596,6 +2596,180 @@ select {
   }
 }
 
+/* Estilos para checkboxes en admin */
+.tasks-checkbox-container label:hover {
+    background: rgba(27, 92, 255, 0.15) !important;
+    border-color: #1b5cff !important;
+}
+
+.tasks-checkbox-container input[type="checkbox"]:checked + span {
+    color: #1b5cff !important;
+    font-weight: 500;
+}
+
+.tasks-checkbox-container {
+    margin-bottom: 15px;
+    color: #2897FF !important;
+}
+
+/* === SCROLLBAR PARA CHECKBOXES EN ADMIN === */
+.tasks-checkbox-container > div::-webkit-scrollbar {
+    width: 10px;
+}
+
+.tasks-checkbox-container > div::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.tasks-checkbox-container > div::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 5px;
+}
+
+.tasks-checkbox-container > div::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+/* === MEJORAS PARA EL CONTENEDOR DE CHECKBOXES === */
+.tasks-checkbox-container {
+    margin-bottom: 15px;
+}
+
+.tasks-counter {
+    user-select: none;
+}
+
+/* === TABLA ADMIN - VERSIÓN ARREGLADA === */
+.tabla-admin {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: separate; /* Cambiado de collapse a separate */
+  border-spacing: 0; /* Sin espacios entre celdas */
+  border: 3px solid #007bff;
+  background-color: #ffffff;
+  font-size: 20px;
+  text-align: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Headers */
+.tabla-admin thead th {
+  background-color: #ffffff;
+  color: #000;
+  font-weight: bold;
+  font-size: 25px;
+  padding: 12px;
+  border-bottom: 3px solid #007bff;
+  border-right: 3px solid #007bff;
+}
+
+.tabla-admin thead th:last-child {
+  border-right: none;
+}
+
+/* Celdas del body */
+.tabla-admin tbody td {
+  padding: 12px;
+  border-bottom: 3px solid #007bff;
+  border-right: 3px solid #007bff;
+  color: #000;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+.tabla-admin tbody td:last-child {
+  border-right: none;
+}
+
+/* Última fila sin borde inferior */
+.tabla-admin tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Hover mejorado para las filas */
+.tabla-admin tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: #ffffff;
+}
+
+.tabla-admin tbody tr:hover {
+  background-color: #e9f2ff;
+}
+
+/* Fila de añadir con hover especial */
+.tabla-admin .fila-agregar {
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tabla-admin .fila-agregar td {
+  color: #888;
+  font-style: italic;
+}
+
+.tabla-admin .fila-agregar:hover {
+  background-color: #e3f2fd;
+}
+
+.tabla-admin .fila-agregar:hover td {
+  color: #007bff;
+  font-weight: 500;
+}
+
+/* Columna de acciones */
+.tabla-admin .acciones-celda {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding:12px;
+  background-color: #fff;
+  min-height: 50px;
+}
+
+/* Botones de acciones */
+.btn-editar-admin,
+.btn-eliminar-admin {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-editar-admin:hover {
+  transform: scale(1.15);
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.btn-eliminar-admin:hover {
+  transform: scale(1.15);
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.btn-editar-admin img,
+.btn-eliminar-admin img {
+  width: 35px;
+  height: 35px;
+  transition: all 0.3s ease;
+}
+
+.btn-editar-admin:hover img {
+  filter: drop-shadow(0 0 4px rgba(33, 150, 243, 0.8));
+}
+
+.btn-eliminar-admin:hover img {
+  filter: drop-shadow(0 0 4px rgba(244, 67, 54, 0.8));
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .modal-contenido {

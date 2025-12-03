@@ -763,6 +763,71 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Evento 'actualizarConteoTareas' disparado para users.js");
     }
 
+    async function cargarUsuariosParaAsignar() {
+        if (!selectUsuario) return;
+
+        try {
+            const apiUsuarios = window.API_BASE || '/assets/app/endpoints';
+            const res = await fetch(`${apiUsuarios}/list_users.php`);
+
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+            const json = await res.json();
+            console.log('Usuarios para asignar:', json);
+
+            if (json.ok && json.users) {
+                const usuariosActivos = json.users.filter(user =>
+                    user.is_active == 1 || user.is_active === "1" || user.is_active === true
+                );
+
+                const currentUser = window.CURRENT_USER;
+                const isAdmin = currentUser && currentUser.is_admin == 1;
+
+                selectUsuario.innerHTML = '<option value="">Seleccionar usuario</option>';
+
+                if (isAdmin) {
+                    // ADMIN: Ver todos los usuarios activos
+                    usuariosActivos.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = user.name;
+                        selectUsuario.appendChild(option);
+                    });
+                    console.log(`Admin: ${usuariosActivos.length} usuarios cargados`);
+                } else {
+                    // USUARIO NORMAL: Solo puede asignarse a sí mismo
+                    const currentUserActive = usuariosActivos.find(user =>
+                        user.id == currentUser.id
+                    );
+
+                    if (currentUserActive) {
+                        const option = document.createElement('option');
+                        option.value = currentUser.id;
+                        option.textContent = currentUser.name + ' (Yo)';
+                        selectUsuario.appendChild(option);
+                        console.log('Usuario normal: Solo puede asignarse a sí mismo');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error cargando usuarios:', error);
+            selectUsuario.innerHTML = '<option value="">Error al cargar usuarios</option>';
+        }
+    }
+
+    // Función específica para manejar tareas asignadas desde Admin
+    async function manejarTareasAsignadasAdmin(event) {
+        console.log('📋 BOARDS: Tareas asignadas desde Admin', event.detail);
+        console.log('📋 User ID afectado:', event.detail.userId);
+        console.log('📋 Tareas asignadas:', event.detail.taskIds?.length || 0);
+        
+        // Recargar el tablero completo
+        console.log('🔄 Recargando tablero...');
+        await loadBoard();
+        
+        console.log('✅ Tablero actualizado después de asignación desde Admin');
+    }
+
     // === ESCUCHAR EVENTOS DE ACTUALIZACIÓN DESDE TAREAS ===
     window.addEventListener('tareaCreadaDesdeTareas', async (event) => {
         console.log("EVENTO RECIBIDO: Tarea creada desde Tareas", event.detail);
@@ -771,6 +836,75 @@ document.addEventListener('DOMContentLoaded', function() {
         await loadBoard();
         
         console.log("Tablero actualizado después de creación en Tareas");
+    });
+
+
+    // === LISTENERS PARA AUTO-REFRESH ===
+    window.addEventListener('tareaCreadaDesdeTareas', async (event) => {
+        console.log('BOARDS: Tarea creada desde Tareas', event.detail);
+        await loadBoard();
+        console.log('Tablero actualizado después de creación en Tareas');
+    });
+
+    window.addEventListener('tareaEliminadaDesdeTareas', async (event) => {
+        console.log('BOARDS: Tarea eliminada desde Tareas', event.detail);
+        await loadBoard();
+        console.log('Tablero actualizado después de eliminación en Tareas');
+    });
+
+    window.addEventListener('tareaActualizadaDesdeTareas', async (event) => {
+        console.log('BOARDS: Tarea actualizada desde Tareas', event.detail);
+        await loadBoard();
+        console.log('Tablero actualizado después de modificación en Tareas');
+    });
+
+    window.addEventListener('usuarioActualizado', async (event) => {
+        console.log('BOARDS: Usuario actualizado', event.detail);
+        await loadBoard();
+        console.log('Tablero actualizado después de cambio de usuario');
+    });
+
+    // === LISTENERS PARA AUTO-REFRESH DESDE ADMIN ===
+    window.addEventListener('tareasAsignadasDesdeAdmin', manejarTareasAsignadasAdmin);
+
+    window.addEventListener('usuarioCreadoDesdeAdmin', async (event) => {
+        console.log('BOARDS: Usuario creado desde Admin', event.detail);
+        await loadBoard();
+        await cargarUsuariosParaAsignar(); // Si tienes esta función
+        console.log('Tablero y usuarios actualizados');
+    });
+
+    window.addEventListener('usuarioEliminadoDesdeAdmin', async (event) => {
+        console.log('BOARDS: Usuario eliminado desde Admin', event.detail);
+        await loadBoard();
+        await cargarUsuariosParaAsignar(); // Si tienes esta función
+        console.log('Tablero y usuarios actualizados');
+    });
+
+    window.addEventListener('usuarioActualizadoDesdeAdmin', async (event) => {
+        console.log('BOARDS: Usuario actualizado desde Admin', event.detail);
+        await loadBoard();
+        console.log('Tablero actualizado después de edición en Admin');
+    });
+
+    // === LISTENERS PARA ACTUALIZACIÓN DE TAREAS ASIGNADAS ===
+    window.addEventListener('tareasAsignadasDesdeAdmin', async (event) => {
+        console.log('BOARDS: Tareas asignadas desde Admin', event.detail);
+        console.log('User ID afectado:', event.detail.userId);
+        
+        // Recargar el tablero completo
+        await loadBoard();
+        
+        // También recargar usuarios para el formulario de creación
+        await cargarUsuariosParaAsignar();
+        
+        console.log('Tablero actualizado después de asignación desde Admin');
+    });
+
+    window.addEventListener('usuarioActualizadoDesdeAdmin', async (event) => {
+        console.log('BOARDS: Usuario actualizado desde Admin', event.detail);
+        await cargarUsuariosParaAsignar();
+        console.log('Usuarios actualizados en formulario de tableros');
     });
 
     console.log("Boards.js inicializado correctamente");

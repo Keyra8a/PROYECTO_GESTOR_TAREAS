@@ -258,135 +258,213 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // --- CREAR NUEVA TAREA ---
-  async function crearTarea(datos) {
-      console.log("=== INICIO crearTarea ===");
-      console.log("Datos recibidos del formulario:", datos);
-      
-      const { titulo, descripcion, usuarioId, estado, prioridad, fechaLimite } = datos;
-      
-      // Validaciones
-      if (!titulo || titulo.trim() === '') {
-          console.error("Validación falló: Título vacío");
-          if (typeof configurarAlerta === 'function') {
-              configurarAlerta(
-                  "Campo requerido",
-                  "El título de la tarea es obligatorio",
-                  "alerta",
-                  { soloAceptar: true }
-              );
-          }
-          return;
-      }
-      
-      console.log("Validaciones pasadas, creando tarea...");
-      
-      // CONVERTIR ESTADOS Y PRIORIDADES AL FORMATO BACKEND
-      const backendStatus = statusToBackend(estado);
-      const backendPriority = priorityToBackend(prioridad);
-      
-      console.log("Valores convertidos:", {
-          estadoFrontend: estado,
-          estadoBackend: backendStatus,
-          prioridadFrontend: prioridad,
-          prioridadBackend: backendPriority
-      });
-      
-      const payload = {
-          title: titulo,
-          description: descripcion || '',
-          assigned_to: usuarioId ? parseInt(usuarioId) : null,
-          status: backendStatus,  
-          priority: backendPriority, 
-          due_date: fechaLimite || null
-      };
-      
-      console.log("Paylisto para enviar al backend:", payload);
-      
-      try {
-          const url = `${apiBase}/create_task.php`;
-          
-          const res = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-          });
-          
-          const json = await res.json();
-          console.log("Respuesta del servidor:", json);
-          
-        if (json.ok) {
-            console.log('Tarea creada exitosamente');
-            
-            // Limpiar formulario
-            formAnadirTarea?.reset();
-            if (inputTitulo) inputTitulo.value = '';
-            if (inputDescripcion) inputDescripcion.value = '';
-            if (selectUsuario) selectUsuario.value = '';
-            if (selectEstado) selectEstado.value = 'pending';
-            if (selectPrioridad) selectPrioridad.value = 'medium';
-            if (inputFecha) inputFecha.value = '';
-            
-            // Recargar tareas
-            await loadTasks();
-            
-            // DISPARAR EVENTO PARA TABLEROS
-            console.log('Disparando evento para Tableros...');
-            const eventoTableros = new CustomEvent('tareaCreadaDesdeTareas', {
-                detail: {
-                    taskId: json.task_id,
-                    timestamp: new Date().getTime(),
-                    action: 'create',
-                    source: 'tasks'
-                }
-            });
-            window.dispatchEvent(eventoTableros);
-            console.log("Evento 'tareaCreadaDesdeTareas' disparado");
-            
-            // Alerta de éxito
+    async function crearTarea(datos) {
+        console.log("=== INICIO crearTarea ===");
+        console.log("Datos recibidos del formulario:", datos);
+        
+        const { titulo, descripcion, usuarioId, estado, prioridad, fechaLimite } = datos;
+        
+        // Validaciones
+        if (!titulo || titulo.trim() === '') {
+            console.error("Validación falló: Título vacío");
             if (typeof configurarAlerta === 'function') {
                 configurarAlerta(
-                    "Éxito",
-                    json.message || "Tarea creada exitosamente",
-                    "exito",
-                    {
+                    "Campo requerido",
+                    "El título de la tarea es obligatorio",
+                    "alerta",
+                    { soloAceptar: true }
+                );
+            }
+            return;
+        }
+        
+        console.log("Validaciones pasadas, creando tarea...");
+        
+        // CONVERTIR ESTADOS Y PRIORIDADES AL FORMATO BACKEND
+        const backendStatus = statusToBackend(estado);
+        const backendPriority = priorityToBackend(prioridad);
+        
+        console.log("Valores convertidos:", {
+            estadoFrontend: estado,
+            estadoBackend: backendStatus,
+            prioridadFrontend: prioridad,
+            prioridadBackend: backendPriority
+        });
+        
+        const payload = {
+            title: titulo,
+            description: descripcion || '',
+            assigned_to: usuarioId ? parseInt(usuarioId) : null,
+            status: backendStatus,  
+            priority: backendPriority, 
+            due_date: fechaLimite || null
+        };
+        
+        console.log("Payload para enviar al backend:", payload);
+        
+        try {
+            const url = `${apiBase}/create_task.php`;
+            
+            console.log("Enviando a:", url);
+            
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            console.log("Respuesta HTTP:", res.status);
+            
+            const json = await res.json();
+            console.log("Respuesta del servidor:", json);
+            
+            if (json.ok) {
+                console.log('Tarea creada exitosamente, ID:', json.task_id);
+                
+                // Limpiar formulario
+                formAnadirTarea?.reset();
+                if (inputTitulo) inputTitulo.value = '';
+                if (inputDescripcion) inputDescripcion.value = '';
+                if (selectUsuario) selectUsuario.value = '';
+                if (selectEstado) selectEstado.value = 'pending';
+                if (selectPrioridad) selectPrioridad.value = 'medium';
+                if (inputFecha) inputFecha.value = '';
+                
+                // Recargar tareas
+                await loadTasks();
+                
+                // DISPARAR EVENTOS PARA ACTUALIZAR OTROS MÓDULOS
+                console.log('Disparando eventos para actualizar otros módulos...');
+                
+                // Evento para Tableros
+                const eventoTableros = new CustomEvent('tareaCreadaDesdeTareas', {
+                    detail: {
+                        taskId: json.task_id,
+                        timestamp: new Date().getTime(),
+                        action: 'create',
+                        source: 'tasks'
+                    }
+                });
+                window.dispatchEvent(eventoTableros);
+                console.log("Evento 'tareaCreadaDesdeTareas' disparado para boards.js");
+                
+                // Evento para Usuarios (actualizar conteos)
+                const eventoUsuarios = new CustomEvent('actualizarConteoTareas', {
+                    detail: {
+                        timestamp: new Date().getTime(),
+                        task_id: json.task_id,
+                        action: 'create'
+                    }
+                });
+                window.dispatchEvent(eventoUsuarios);
+                console.log("Evento 'actualizarConteoTareas' disparado para users.js");
+                
+                // Evento para Perfil (actualizar actividad)
+                const eventoPerfil = new CustomEvent('tareaCreada', {
+                    detail: {
+                        taskId: json.task_id,
+                        timestamp: new Date().getTime(),
+                        action: 'create'
+                    }
+                });
+                window.dispatchEvent(eventoPerfil);
+                console.log("Evento 'tareaCreada' disparado para profile.js");
+                
+                // Evento para Admin (actualizar tareas disponibles)
+                const eventoAdmin = new CustomEvent('tareaCreadaDesdeTareas', {
+                    detail: {
+                        taskId: json.task_id,
+                        timestamp: new Date().getTime(),
+                        action: 'create',
+                        source: 'tasks'
+                    }
+                });
+                window.dispatchEvent(eventoAdmin);
+                console.log("Evento 'tareaCreadaDesdeTareas' disparado para admin.js");
+                
+                // Mostrar alerta de éxito
+                if (typeof configurarAlerta === 'function') {
+                    configurarAlerta(
+                        "Éxito",
+                        json.message || "Tarea creada exitosamente",
+                        "exito",
+                        {
+                            soloAceptar: true,
+                            onConfirmar: () => {
+                                if (typeof mostrarSeccion === 'function') {
+                                    console.log("Regresando a sección tareas...");
+                                    mostrarSeccion('tareas');
+                                }
+                            }
+                        }
+                    );
+                } else {
+                    alert("Tarea creada exitosamente");
+                    if (typeof mostrarSeccion === 'function') {
+                        mostrarSeccion('tareas');
+                    }
+                }
+                
+            } else {
+                // ERROR del servidor
+                console.error("Error del servidor:", json.message);
+                
+                // Mostrar error amigable
+                let mensajeError = json.message || "No se pudo crear la tarea";
+                
+                if (json.message === 'Campo requerido: assigned_to') {
+                    mensajeError = "Debes asignar la tarea a un usuario. Por favor, selecciona un usuario en el campo 'Asignar a'.";
+                } else if (json.message.includes('assigned_to')) {
+                    mensajeError = "Error en la asignación de usuario. Verifica que el usuario seleccionado sea válido.";
+                }
+                
+                if (typeof configurarAlerta === 'function') {
+                    configurarAlerta(
+                        "Error",
+                        mensajeError,
+                        "alerta",
+                        { 
+                            soloAceptar: true,
+                            onConfirmar: () => {
+                                console.log("Alerta de error cerrada");
+                            }
+                        }
+                    );
+                } else {
+                    alert(mensajeError);
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error creando tarea:', error);
+            
+            let mensajeError = "Error de conexión. Intenta nuevamente.";
+            
+            if (error.message.includes('Failed to fetch')) {
+                mensajeError = "Error de conexión con el servidor. Verifica tu conexión a internet.";
+            } else if (error.message.includes('NetworkError')) {
+                mensajeError = "Error de red. Verifica tu conexión.";
+            }
+            
+            if (typeof configurarAlerta === 'function') {
+                configurarAlerta(
+                    "Error de Conexión",
+                    mensajeError,
+                    "alerta",
+                    { 
                         soloAceptar: true,
                         onConfirmar: () => {
-                            if (typeof mostrarSeccion === 'function') {
-                                mostrarSeccion('tareas');
-                            }
+                            console.log("Alerta de error de conexión cerrada");
                         }
                     }
                 );
+            } else {
+                alert(mensajeError);
             }
-        } else {
-              console.error("Error del servidor:", json.message);
-              if (typeof configurarAlerta === 'function') {
-                  configurarAlerta(
-                      "Error",
-                      json.message || "No se pudo crear la tarea",
-                      "alerta",
-                      { soloAceptar: true }
-                  );
-              }
-
-              // Después de crear una tarea exitosamente
-                dispararEventoActualizacionTareas('creacion', {
-                    taskId: nuevaTareaId, 
-                    action: 'create'
-                });
-          }
-      } catch (error) {
-          console.error('Error creando tarea:', error);
-          if (typeof configurarAlerta === 'function') {
-              configurarAlerta(
-                  "Error",
-                  "Error de conexión. Intenta nuevamente.",
-                  "alerta",
-                  { soloAceptar: true }
-              );
-          }
-      }
-  }
+        }
+        
+        console.log("=== FIN crearTarea ===");
+    }
 
   // === BOTÓN CANCELAR ===
   btnCancelarTarea?.addEventListener('click', () => {
@@ -515,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-  // ACTUALIZAR: Función mostrarExito corregida
+  // Función mostrarExito 
   function mostrarExito(mensaje) {
       if (typeof window.configurarAlerta === 'function') {
           window.configurarAlerta("Éxito", mensaje, "exito", { 
@@ -692,6 +770,66 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function cargarUsuariosParaAsignar() {
+        try {
+            if (!selectUsuario) return;
+            
+            const apiUsuarios = (window.API_BASE && window.API_BASE.trim()) ? 
+                window.API_BASE.replace(/\/$/, '') : '/assets/app/endpoints';
+            
+            const res = await fetch(`${apiUsuarios}/list_users.php`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            
+            const json = await res.json();
+            console.log("Usuarios para asignar:", json);
+
+            if (json.ok && json.users) {
+                // Filtrar solo usuarios activos
+                const usuariosActivos = json.users.filter(user => 
+                    user.is_active == 1 || user.is_active === "1" || user.is_active === true
+                );
+                
+                const currentUser = window.CURRENT_USER;
+                const isAdmin = currentUser && currentUser.is_admin == 1;
+                
+                console.log('Usuario actual:', currentUser);
+                console.log('Es admin:', isAdmin);
+                
+                selectUsuario.innerHTML = '<option value="">Seleccionar usuario</option>';
+                
+                if (isAdmin) {
+                    // ADMIN: Ver todos los usuarios activos
+                    usuariosActivos.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = user.name;
+                        selectUsuario.appendChild(option);
+                    });
+                    console.log(`Admin: ${usuariosActivos.length} usuarios activos cargados`);
+                } else {
+                    // USUARIO NORMAL: Solo puede asignarse a sí mismo
+                    const currentUserActive = usuariosActivos.find(user => 
+                        user.id == currentUser.id
+                    );
+                    
+                    if (currentUserActive) {
+                        const option = document.createElement('option');
+                        option.value = currentUser.id;
+                        option.textContent = currentUser.name + ' (Yo)';
+                        selectUsuario.appendChild(option);
+                        console.log('Usuario normal: Solo puede asignarse a sí mismo');
+                    } else {
+                        console.warn('Usuario actual no encontrado en usuarios activos');
+                        selectUsuario.innerHTML = '<option value="">No disponible</option>';
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar usuarios:', error);
+            selectUsuario.innerHTML = '<option value="">Error al cargar usuarios</option>';
+        }
+    }
+
     // === ESCUCHAR EVENTOS DE ACTUALIZACIÓN DESDE TABLEROS ===
     window.addEventListener('tareaMovidaEnTableros', async (event) => {
         console.log("EVENTO RECIBIDO: Tarea movida en Tableros", event.detail);
@@ -759,6 +897,98 @@ document.addEventListener('DOMContentLoaded', function() {
         window.dispatchEvent(eventoUsuarios);
         console.log("Evento 'actualizarConteoTareas' disparado para users.js");
     }
+
+    // Función específica para manejar tareas asignadas desde Admin
+    async function manejarTareasAsignadasAdmin(event) {
+        console.log('TASKS: Tareas asignadas desde Admin', event.detail);
+        console.log('Detalles completos:', {
+            userId: event.detail.userId,
+            taskCount: event.detail.taskIds?.length || 0,
+            assignedCount: event.detail.assignedCount,
+            userName: event.detail.userName,
+            action: event.detail.action
+        });
+        
+        // Recargar las tareas para reflejar los cambios
+        console.log('Recargando lista de tareas...');
+        await loadTasks();
+        
+        console.log('Tareas actualizadas después de asignación desde Admin');
+        
+        // También recargar usuarios si el select está visible
+        const seccionTareas = document.getElementById('tareas');
+        if (seccionTareas && seccionTareas.classList.contains('activa')) {
+            console.log('Sección tareas activa - recargando usuarios para asignar');
+            await cargarUsuariosParaAsignar();
+            console.log('Usuarios para asignar actualizados');
+        }
+    }
+
+    // === LISTENERS PARA AUTO-REFRESH ===
+    window.addEventListener('tareaCreadadesdeTableros', async (event) => {
+        console.log('TASKS: Tarea creada desde Tableros', event.detail);
+        await loadTasks();
+        console.log('Tareas actualizadas después de creación en Tableros');
+    });
+
+    window.addEventListener('tareaEliminadaDesdeTableros', async (event) => {
+        console.log('TASKS: Tarea eliminada desde Tableros', event.detail);
+        await loadTasks();
+        console.log('Tareas actualizadas después de eliminación en Tableros');
+    });
+
+    window.addEventListener('tareaActualizadaDesdeTableros', async (event) => {
+        console.log('TASKS: Tarea actualizada desde Tableros', event.detail);
+        await loadTasks();
+        console.log('Tareas actualizadas después de modificación en Tableros');
+    });
+
+    window.addEventListener('usuarioActualizado', async (event) => {
+        console.log('TASKS: Usuario actualizado', event.detail);
+        await loadTasks();
+        console.log('Tareas actualizadas después de cambio de usuario');
+    });
+
+    window.addEventListener('usuarioCreado', async (event) => {
+        console.log('TASKS: Usuario creado', event.detail);
+        await cargarUsuariosParaAsignar();
+        console.log('Lista de usuarios actualizada en Tareas');
+    });
+
+    // === LISTENERS PARA AUTO-REFRESH DESDE ADMIN ===
+    window.addEventListener('tareasAsignadasDesdeAdmin', async (event) => {
+        console.log('TASKS: Tareas asignadas/modificadas desde Admin', event.detail);
+        await loadTasks();
+        console.log('Tareas actualizadas después de cambios en Admin');
+    });
+
+    window.addEventListener('usuarioCreadoDesdeAdmin', async (event) => {
+        console.log('TASKS: Usuario creado desde Admin', event.detail);
+        await loadTasks();
+        await cargarUsuariosParaAsignar();
+        console.log('Tareas y usuarios actualizados');
+    });
+
+    window.addEventListener('usuarioEliminadoDesdeAdmin', async (event) => {
+        console.log('TASKS: Usuario eliminado desde Admin', event.detail);
+        await loadTasks();
+        await cargarUsuariosParaAsignar();
+        console.log('Tareas y usuarios actualizados');
+    });
+
+    // === LISTENERS PARA ACTUALIZACIÓN DE TAREAS ASIGNADAS ===
+    window.addEventListener('tareasAsignadasDesdeAdmin', manejarTareasAsignadasAdmin);
+
+    window.addEventListener('usuarioActualizadoDesdeAdmin', async (event) => {
+        console.log('TASKS: Usuario actualizado desde Admin', event.detail);
+        
+        // Solo recargar usuarios si estamos en la sección de crear tarea
+        const seccionFormTarea = document.getElementById('formulario-tarea');
+        if (seccionFormTarea && seccionFormTarea.classList.contains('activa')) {
+            await cargarUsuariosParaAsignar();
+            console.log('Lista de usuarios actualizada en formulario');
+        }
+    });
 
     console.log("Tasks.js inicializado correctamente");
 });

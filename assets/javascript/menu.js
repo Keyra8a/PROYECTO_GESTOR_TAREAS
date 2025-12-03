@@ -220,6 +220,170 @@ document.addEventListener("DOMContentLoaded", () => {
     window.mostrarSeccion("perfil");
   }
 
+  function actualizarHeaderDinamicamente(datos) {
+      console.log('Actualizando header dinámicamente:', datos);
+      
+      // 1. Actualizar CURRENT_USER en memoria
+      if (window.CURRENT_USER) {
+          window.CURRENT_USER.name = datos.nombre || window.CURRENT_USER.name;
+          window.CURRENT_USER.email = datos.email || window.CURRENT_USER.email;
+          if (datos.avatar_url !== undefined) {
+              window.CURRENT_USER.avatar_url = datos.avatar_url;
+          }
+          console.log('CURRENT_USER actualizado:', window.CURRENT_USER);
+      }
+      
+      // 2. Actualizar nombre en el header
+      const headerName = document.querySelector('.user-info h3');
+      if (headerName && datos.nombre) {
+          headerName.textContent = datos.nombre;
+          console.log('Nombre en header actualizado:', datos.nombre);
+      }
+      
+      // 3. Actualizar inicial en el círculo (si no hay avatar)
+      const profileCircle = document.querySelector('.profile-circle');
+      if (profileCircle && datos.nombre && !datos.avatar_url) {
+          const initial = datos.nombre.charAt(0).toUpperCase();
+          profileCircle.textContent = initial;
+          console.log('Inicial actualizada:', initial);
+      }
+      
+      // 4. Actualizar avatar si existe
+      if (profileCircle && datos.avatar_url) {
+          const timestamp = new Date().getTime();
+          const avatarUrl = `${datos.avatar_url}?t=${timestamp}`;
+          profileCircle.innerHTML = `
+              <img src="${avatarUrl}" 
+                  alt="Avatar" 
+                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+          `;
+          console.log('Avatar actualizado:', avatarUrl);
+      }
+      
+      // 5. Actualizar perfil si está abierto
+      const nombreInputPerfil = document.querySelector('#perfil .nombre-usuario');
+      const correoInputPerfil = document.querySelector('#perfil .correo-usuario');
+      
+      if (nombreInputPerfil && datos.nombre) {
+          nombreInputPerfil.value = datos.nombre;
+      }
+      if (correoInputPerfil && datos.email) {
+          correoInputPerfil.value = datos.email;
+      }
+      
+      // 6. Actualizar también en otras secciones si están visibles
+      actualizarNombreEnOtrasSecciones(datos.nombre, datos.email);
+  }
+
+  function actualizarNombreEnOtrasSecciones(nombre, email) {
+      console.log('Actualizando nombre en otras secciones:', nombre);
+      
+      // Actualizar en usuarios.js si está visible
+      const seccionUsuarios = document.getElementById('usuarios');
+      if (seccionUsuarios && seccionUsuarios.classList.contains('activa')) {
+          // Buscar y actualizar fila del usuario actual
+          const currentId = window.CURRENT_USER?.id;
+          if (currentId) {
+              const filaUsuario = document.querySelector(`.tabla-usuarios tr[data-id="${currentId}"]`);
+              if (filaUsuario) {
+                  const primeraCelda = filaUsuario.querySelector('td:first-child');
+                  if (primeraCelda) {
+                      const textoActual = primeraCelda.textContent;
+                      // Reemplazar solo el nombre, mantener "(Tú)"
+                      if (textoActual.includes('(Tú)')) {
+                          primeraCelda.textContent = `${nombre} (Tú)`;
+                      } else {
+                          primeraCelda.textContent = nombre;
+                      }
+                      console.log('Nombre actualizado en tabla usuarios');
+                  }
+              }
+          }
+      }
+      
+      // Actualizar en admin.js si está visible
+      const seccionAdmin = document.getElementById('admin');
+      if (seccionAdmin && seccionAdmin.classList.contains('activa')) {
+          const currentId = window.CURRENT_USER?.id;
+          if (currentId) {
+              const filaAdmin = document.querySelector(`.tabla-admin tbody tr[data-user-id="${currentId}"]`);
+              if (filaAdmin) {
+                  const primeraCelda = filaAdmin.querySelector('td:first-child');
+                  if (primeraCelda) {
+                      primeraCelda.textContent = nombre;
+                      console.log('Nombre actualizado en tabla admin');
+                  }
+              }
+          }
+      }
+      
+      // Actualizar en tareas (select de asignar a)
+      const selectAsignarA = document.getElementById('asignar-a');
+      if (selectAsignarA) {
+          const options = selectAsignarA.options;
+          for (let i = 0; i < options.length; i++) {
+              const option = options[i];
+              if (option.value === String(window.CURRENT_USER?.id)) {
+                  option.textContent = nombre + ' (Yo)';
+                  break;
+              }
+          }
+      }
+  }
+
+  // Escuchar cuando se actualiza el usuario en sesión
+  window.addEventListener('usuarioActualizadoEnSesion', (event) => {
+      console.log('EVENTO RECIBIDO: usuarioActualizadoEnSesion', event.detail);
+      actualizarHeaderDinamicamente(event.detail);
+  });
+
+  // También escuchar cuando se actualiza desde users.js
+  window.addEventListener('usuarioActualizado', (event) => {
+      console.log('EVENTO RECIBIDO: usuarioActualizado', event.detail);
+      if (event.detail.nombre || event.detail.email) {
+          actualizarHeaderDinamicamente({
+              nombre: event.detail.nombre,
+              email: event.detail.email,
+              avatar_url: event.detail.user?.avatar_url
+          });
+      }
+  });
+
+  // Escuchar cuando se actualiza desde admin (para otros usuarios)
+  window.addEventListener('usuarioActualizadoDesdeAdmin', async (event) => {
+      console.log('EVENTO RECIBIDO: usuarioActualizadoDesdeAdmin', event.detail);
+      
+      // Si es el usuario actual, refrescar la sesión
+      if (event.detail.userId === window.CURRENT_USER?.id) {
+          console.log('Usuario actual actualizado desde Admin - Refrescando sesión');
+          
+          // Hacer una petición para refrescar datos de sesión
+          try {
+              const response = await fetch(`${window.API_BASE}/refresh_session.php`);
+              if (response.ok) {
+                  const data = await response.json();
+                  if (data.ok && data.user) {
+                      // Actualizar CURRENT_USER
+                      window.CURRENT_USER.name = data.user.name;
+                      window.CURRENT_USER.email = data.user.email;
+                      window.CURRENT_USER.avatar_url = data.user.avatar_url;
+                      
+                      // Actualizar header
+                      actualizarHeaderDinamicamente({
+                          nombre: data.user.name,
+                          email: data.user.email,
+                          avatar_url: data.user.avatar_url
+                      });
+                      
+                      console.log('Sesión refrescada desde servidor');
+                  }
+              }
+          } catch (error) {
+              console.error('Error refrescando sesión:', error);
+          }
+      }
+  });
+
   // --- FUNCIONALIDAD PARA EXPORTAR PDF EN REPORTES ---
   // function inicializarExportarPDF() {
   //   const btnExportarPDF = document.getElementById("btn-exportar-pdf");
@@ -561,281 +725,281 @@ document.addEventListener("DOMContentLoaded", () => {
     return tareasArray.length > 0 ? tareasArray.length : 1;
   }
 
-  // === SECCION ADMIN - USUARIOS ===
-  const filasAgregar = document.querySelectorAll('.fila-agregar[data-action="añadir-usuario"]');
-  const formUsuarioAdmin = document.getElementById('form-usuario-admin');
-  const tablaAdmin = document.querySelector('.tabla-admin tbody');
+  // // === SECCION ADMIN - USUARIOS ===
+  // const filasAgregar = document.querySelectorAll('.fila-agregar[data-action="añadir-usuario"]');
+  // const formUsuarioAdmin = document.getElementById('form-usuario-admin');
+  // const tablaAdmin = document.querySelector('.tabla-admin tbody');
 
-  function manejarEditarUsuarioDesdeFila(fila) {
-    const celdas = fila.querySelectorAll('td');
-    if (celdas.length < 4) return;
+  // function manejarEditarUsuarioDesdeFila(fila) {
+  //   const celdas = fila.querySelectorAll('td');
+  //   if (celdas.length < 4) return;
     
-    const nombre = celdas[0].textContent;
-    const correo = celdas[1].textContent;
-    const tareasTexto = celdas[2].textContent;
-    const notas = celdas[3].textContent;
+  //   const nombre = celdas[0].textContent;
+  //   const correo = celdas[1].textContent;
+  //   const tareasTexto = celdas[2].textContent;
+  //   const notas = celdas[3].textContent;
     
-    filaEditando = fila;
+  //   filaEditando = fila;
     
-    document.getElementById('edit-nombre-completo').value = nombre;
-    document.getElementById('edit-correo-electronico').value = correo;
-    document.getElementById('edit-notas').value = notas;
+  //   document.getElementById('edit-nombre-completo').value = nombre;
+  //   document.getElementById('edit-correo-electronico').value = correo;
+  //   document.getElementById('edit-notas').value = notas;
     
-    const selectTareas = document.getElementById('select-tareas');
-    if (selectTareas) {
-      selectTareas.innerHTML = '';
+  //   const selectTareas = document.getElementById('select-tareas');
+  //   if (selectTareas) {
+  //     selectTareas.innerHTML = '';
       
-      if (tareasTexto && tareasTexto !== 'Añadir' && tareasTexto !== 'Sin tareas') {
-        const tareasArray = tareasTexto.split(', ').filter(t => t.trim());
-        if (tareasArray.length > 0) {
-          tareasArray.forEach(tarea => {
-            agregarTareaAlSelect(tarea.trim());
-          });
-        } else {
-          agregarTareaAlSelect(tareasTexto);
-        }
-      }
-    }
+  //     if (tareasTexto && tareasTexto !== 'Añadir' && tareasTexto !== 'Sin tareas') {
+  //       const tareasArray = tareasTexto.split(', ').filter(t => t.trim());
+  //       if (tareasArray.length > 0) {
+  //         tareasArray.forEach(tarea => {
+  //           agregarTareaAlSelect(tarea.trim());
+  //         });
+  //       } else {
+  //         agregarTareaAlSelect(tareasTexto);
+  //       }
+  //     }
+  //   }
     
-    window.mostrarSeccion('editar-usuario-admin');
-  }
+  //   window.mostrarSeccion('editar-usuario-admin');
+  // }
 
-  tablaAdmin?.addEventListener('click', function(e) {
-    const btnEditar = e.target.closest('.btn-editar-admin');
-    const btnEliminar = e.target.closest('.btn-eliminar-admin');
+  // tablaAdmin?.addEventListener('click', function(e) {
+  //   const btnEditar = e.target.closest('.btn-editar-admin');
+  //   const btnEliminar = e.target.closest('.btn-eliminar-admin');
     
-    if (btnEditar) {
-      e.preventDefault();
-      e.stopPropagation();
-      const fila = btnEditar.closest('tr');
-      manejarEditarUsuarioDesdeFila(fila);
-    }
+  //   if (btnEditar) {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //     const fila = btnEditar.closest('tr');
+  //     manejarEditarUsuarioDesdeFila(fila);
+  //   }
     
-    if (btnEliminar) {
-      e.preventDefault();
-      e.stopPropagation();
-      const fila = btnEliminar.closest('tr');
-      mostrarAlertaEliminarUsuarioAdmin(fila);
-    }
-  });
+  //   if (btnEliminar) {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //     const fila = btnEliminar.closest('tr');
+  //     mostrarAlertaEliminarUsuarioAdmin(fila);
+  //   }
+  // });
 
-  filasAgregar.forEach(fila => {
-    fila.addEventListener('click', function(e) {
-      if (!e.target.closest('.btn-editar-admin') && !e.target.closest('.btn-eliminar-admin')) {
-        window.mostrarSeccion('formulario-admin');
-      }
-    });
-  });
+  // filasAgregar.forEach(fila => {
+  //   fila.addEventListener('click', function(e) {
+  //     if (!e.target.closest('.btn-editar-admin') && !e.target.closest('.btn-eliminar-admin')) {
+  //       window.mostrarSeccion('formulario-admin');
+  //     }
+  //   });
+  // });
 
-  if (formUsuarioAdmin) {
-    const btnCancelarAdmin = formUsuarioAdmin.querySelector('.cancelar');
-    if (btnCancelarAdmin) {
-      btnCancelarAdmin.addEventListener('click', function() {
-        window.mostrarSeccion('admin');
-      });
-    }
+  // if (formUsuarioAdmin) {
+  //   const btnCancelarAdmin = formUsuarioAdmin.querySelector('.cancelar');
+  //   if (btnCancelarAdmin) {
+  //     btnCancelarAdmin.addEventListener('click', function() {
+  //       window.mostrarSeccion('admin');
+  //     });
+  //   }
 
-    formUsuarioAdmin.addEventListener('submit', function(e) {
-      e.preventDefault();
+  //   formUsuarioAdmin.addEventListener('submit', function(e) {
+  //     e.preventDefault();
       
-      const inputs = this.querySelectorAll('input');
-      const nombre = inputs[0].value.trim();
-      const correo = inputs[1].value.trim();
-      const tareas = inputs[2].value.trim();
-      const notas = this.querySelector('textarea').value.trim();
+  //     const inputs = this.querySelectorAll('input');
+  //     const nombre = inputs[0].value.trim();
+  //     const correo = inputs[1].value.trim();
+  //     const tareas = inputs[2].value.trim();
+  //     const notas = this.querySelector('textarea').value.trim();
       
-      if (!nombre || !correo || !tareas || !notas) {
-        window.configurarAlerta(
-          "Error",
-          "Por favor completa todos los campos.",
-          "alerta",
-          {
-            soloAceptar: true,
-            onConfirmar: () => window.mostrarSeccion("formulario-admin")
-          }
-        );
-        return;
-      }
+  //     if (!nombre || !correo || !tareas || !notas) {
+  //       window.configurarAlerta(
+  //         "Error",
+  //         "Por favor completa todos los campos.",
+  //         "alerta",
+  //         {
+  //           soloAceptar: true,
+  //           onConfirmar: () => window.mostrarSeccion("formulario-admin")
+  //         }
+  //       );
+  //       return;
+  //     }
       
-      seccionAntesDeEliminar = "formulario-admin";
-      window.configurarAlerta(
-        "Añadir Usuario",
-        `¿Estás seguro de que deseas añadir a <strong>${nombre}</strong>?`,
-        "alerta",
-        {
-          textoConfirmar: "Añadir",
-          onConfirmar: () => {
-            añadirUsuarioATabla(nombre, correo, tareas, notas);
-            formUsuarioAdmin.reset();
-            mostrarAlertaExito("Usuario añadido correctamente", "admin");
-          },
-          onCancelar: () => {
-            window.mostrarSeccion("formulario-admin");
-          }
-        }
-      );
-    });
-  }
+  //     seccionAntesDeEliminar = "formulario-admin";
+  //     window.configurarAlerta(
+  //       "Añadir Usuario",
+  //       `¿Estás seguro de que deseas añadir a <strong>${nombre}</strong>?`,
+  //       "alerta",
+  //       {
+  //         textoConfirmar: "Añadir",
+  //         onConfirmar: () => {
+  //           añadirUsuarioATabla(nombre, correo, tareas, notas);
+  //           formUsuarioAdmin.reset();
+  //           mostrarAlertaExito("Usuario añadido correctamente", "admin");
+  //         },
+  //         onCancelar: () => {
+  //           window.mostrarSeccion("formulario-admin");
+  //         }
+  //       }
+  //     );
+  //   });
+  // }
 
-  function añadirUsuarioATabla(nombre, correo, tareas, notas) {
-    const nuevaFila = document.createElement('tr');
-    nuevaFila.innerHTML = `
-      <td>${nombre}</td>
-      <td>${correo}</td>
-      <td>${tareas}</td>
-      <td>${notas}</td>
-      <td class="acciones-celda">
-        <button class="btn-editar-admin">
-          <img src="../../assets/img/editar.png" alt="Editar">
-        </button>
-        <button class="btn-eliminar-admin">
-          <img src="../../assets/img/eliminar.png" alt="Eliminar">
-        </button>
-      </td>
-    `;
+  // function añadirUsuarioATabla(nombre, correo, tareas, notas) {
+  //   const nuevaFila = document.createElement('tr');
+  //   nuevaFila.innerHTML = `
+  //     <td>${nombre}</td>
+  //     <td>${correo}</td>
+  //     <td>${tareas}</td>
+  //     <td>${notas}</td>
+  //     <td class="acciones-celda">
+  //       <button class="btn-editar-admin">
+  //         <img src="../../assets/img/editar.png" alt="Editar">
+  //       </button>
+  //       <button class="btn-eliminar-admin">
+  //         <img src="../../assets/img/eliminar.png" alt="Eliminar">
+  //       </button>
+  //     </td>
+  //   `;
     
-    const filaAgregar = document.querySelector('.fila-agregar');
-    if (filaAgregar) {
-      tablaAdmin.insertBefore(nuevaFila, filaAgregar);
-    } else {
-      tablaAdmin.appendChild(nuevaFila);
-    }
-  }
+  //   const filaAgregar = document.querySelector('.fila-agregar');
+  //   if (filaAgregar) {
+  //     tablaAdmin.insertBefore(nuevaFila, filaAgregar);
+  //   } else {
+  //     tablaAdmin.appendChild(nuevaFila);
+  //   }
+  // }
 
-  function mostrarAlertaEliminarUsuarioAdmin(fila) {
-    const nombreUsuario = fila.querySelector('td').textContent;
-    seccionAntesDeEliminar = "admin";
+  // function mostrarAlertaEliminarUsuarioAdmin(fila) {
+  //   const nombreUsuario = fila.querySelector('td').textContent;
+  //   seccionAntesDeEliminar = "admin";
     
-    window.configurarAlerta(
-      "Eliminar Usuario",
-      `¿Eliminar a <strong>${nombreUsuario}</strong>?<br>Esta acción no se puede deshacer.`,
-      "alerta",
-      {
-        textoConfirmar: "Eliminar",
-        onConfirmar: () => {
-          fila.remove();
-          mostrarAlertaExito("Usuario eliminado correctamente", "admin");
-        }
-      }
-    );
-  }
+  //   window.configurarAlerta(
+  //     "Eliminar Usuario",
+  //     `¿Eliminar a <strong>${nombreUsuario}</strong>?<br>Esta acción no se puede deshacer.`,
+  //     "alerta",
+  //     {
+  //       textoConfirmar: "Eliminar",
+  //       onConfirmar: () => {
+  //         fila.remove();
+  //         mostrarAlertaExito("Usuario eliminado correctamente", "admin");
+  //       }
+  //     }
+  //   );
+  // }
 
-  // === SISTEMA DE TAREAS PARA EDITAR USUARIO ===
-  function inicializarSistemaTareas() {
-    const btnAgregar = document.getElementById('btn-añadir-tarea');
-    const inputTarea = document.getElementById('nueva-tarea-input');
-    const selectTareas = document.getElementById('select-tareas');
+  // // === SISTEMA DE TAREAS PARA EDITAR USUARIO ===
+  // function inicializarSistemaTareas() {
+  //   const btnAgregar = document.getElementById('btn-añadir-tarea');
+  //   const inputTarea = document.getElementById('nueva-tarea-input');
+  //   const selectTareas = document.getElementById('select-tareas');
     
-    if (!btnAgregar || !inputTarea || !selectTareas) return;
+  //   if (!btnAgregar || !inputTarea || !selectTareas) return;
 
-    btnAgregar.addEventListener('click', function() {
-      agregarTareaAlSelect();
-    });
+  //   btnAgregar.addEventListener('click', function() {
+  //     agregarTareaAlSelect();
+  //   });
     
-    inputTarea.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        agregarTareaAlSelect();
-      }
-    });
+  //   inputTarea.addEventListener('keypress', function(e) {
+  //     if (e.key === 'Enter') {
+  //       e.preventDefault();
+  //       agregarTareaAlSelect();
+  //     }
+  //   });
     
-    selectTareas.addEventListener('keydown', function(e) {
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectTareas.selectedIndex !== -1) {
-        e.preventDefault();
-        selectTareas.options[selectTareas.selectedIndex].remove();
-        actualizarTamañoSelect();
-      }
-    });
-  }
+  //   selectTareas.addEventListener('keydown', function(e) {
+  //     if ((e.key === 'Delete' || e.key === 'Backspace') && selectTareas.selectedIndex !== -1) {
+  //       e.preventDefault();
+  //       selectTareas.options[selectTareas.selectedIndex].remove();
+  //       actualizarTamañoSelect();
+  //     }
+  //   });
+  // }
 
-  function agregarTareaAlSelect(textoTarea = null) {
-    const inputTarea = document.getElementById('nueva-tarea-input');
-    const selectTareas = document.getElementById('select-tareas');
+  // function agregarTareaAlSelect(textoTarea = null) {
+  //   const inputTarea = document.getElementById('nueva-tarea-input');
+  //   const selectTareas = document.getElementById('select-tareas');
     
-    const texto = textoTarea || inputTarea.value.trim();
+  //   const texto = textoTarea || inputTarea.value.trim();
     
-    if (texto !== '') {
-      const nuevaOpcion = document.createElement('option');
-      nuevaOpcion.value = texto;
-      nuevaOpcion.textContent = texto;
-      selectTareas.appendChild(nuevaOpcion);
+  //   if (texto !== '') {
+  //     const nuevaOpcion = document.createElement('option');
+  //     nuevaOpcion.value = texto;
+  //     nuevaOpcion.textContent = texto;
+  //     selectTareas.appendChild(nuevaOpcion);
       
-      if (!textoTarea) {
-        inputTarea.value = '';
-      }
+  //     if (!textoTarea) {
+  //       inputTarea.value = '';
+  //     }
       
-      actualizarTamañoSelect();
+  //     actualizarTamañoSelect();
       
-      if (!textoTarea) {
-        inputTarea.focus();
-      }
-    }
-  }
+  //     if (!textoTarea) {
+  //       inputTarea.focus();
+  //     }
+  //   }
+  // }
 
-  function actualizarTamañoSelect() {
-    const selectTareas = document.getElementById('select-tareas');
-    if (!selectTareas) return;
+  // function actualizarTamañoSelect() {
+  //   const selectTareas = document.getElementById('select-tareas');
+  //   if (!selectTareas) return;
     
-    const cantidadTareas = selectTareas.options.length;
-    selectTareas.size = Math.min(Math.max(3, cantidadTareas), 6);
-  }
+  //   const cantidadTareas = selectTareas.options.length;
+  //   selectTareas.size = Math.min(Math.max(3, cantidadTareas), 6);
+  // }
 
-  function obtenerTextoDeTareas() {
-    const selectTareas = document.getElementById('select-tareas');
-    if (!selectTareas) return 'Sin tareas';
+  // function obtenerTextoDeTareas() {
+  //   const selectTareas = document.getElementById('select-tareas');
+  //   if (!selectTareas) return 'Sin tareas';
     
-    const tareas = [];
-    for (let option of selectTareas.options) {
-      tareas.push(option.value);
-    }
+  //   const tareas = [];
+  //   for (let option of selectTareas.options) {
+  //     tareas.push(option.value);
+  //   }
     
-    return tareas.length > 0 ? tareas.join(', ') : 'Sin tareas';
-  }
+  //   return tareas.length > 0 ? tareas.join(', ') : 'Sin tareas';
+  // }
 
-  // === FORMULARIO EDITAR USUARIO ===
-  const formEditarUsuario = document.getElementById('form-editar-usuario-admin');
-  if (formEditarUsuario) {
-    inicializarSistemaTareas();
+  // // === FORMULARIO EDITAR USUARIO ===
+  // const formEditarUsuario = document.getElementById('form-editar-usuario-admin');
+  // if (formEditarUsuario) {
+  //   inicializarSistemaTareas();
     
-    const btnCancelarEditar = formEditarUsuario.querySelector('.cancelar');
-    if (btnCancelarEditar) {
-      btnCancelarEditar.addEventListener('click', function() {
-        window.mostrarSeccion('admin');
-      });
-    }
+  //   const btnCancelarEditar = formEditarUsuario.querySelector('.cancelar');
+  //   if (btnCancelarEditar) {
+  //     btnCancelarEditar.addEventListener('click', function() {
+  //       window.mostrarSeccion('admin');
+  //     });
+  //   }
 
-    formEditarUsuario.addEventListener('submit', function(e) {
-      e.preventDefault();
+  //   formEditarUsuario.addEventListener('submit', function(e) {
+  //     e.preventDefault();
       
-      const nombre = document.getElementById('edit-nombre-completo').value.trim();
-      const correo = document.getElementById('edit-correo-electronico').value.trim();
-      const notas = document.getElementById('edit-notas').value.trim();
-      const tareasTexto = obtenerTextoDeTareas();
+  //     const nombre = document.getElementById('edit-nombre-completo').value.trim();
+  //     const correo = document.getElementById('edit-correo-electronico').value.trim();
+  //     const notas = document.getElementById('edit-notas').value.trim();
+  //     const tareasTexto = obtenerTextoDeTareas();
       
-      if (!nombre || !correo || !notas) {
-        window.configurarAlerta(
-          "Error",
-          "Completa todos los campos.",
-          "alerta",
-          {
-            soloAceptar: true,
-            onConfirmar: () => window.mostrarSeccion("editar-usuario-admin")
-          }
-        );
-        return;
-      }
+  //     if (!nombre || !correo || !notas) {
+  //       window.configurarAlerta(
+  //         "Error",
+  //         "Completa todos los campos.",
+  //         "alerta",
+  //         {
+  //           soloAceptar: true,
+  //           onConfirmar: () => window.mostrarSeccion("editar-usuario-admin")
+  //         }
+  //       );
+  //       return;
+  //     }
       
-      if (filaEditando) {
-        const celdas = filaEditando.querySelectorAll('td');
-        celdas[0].textContent = nombre;
-        celdas[1].textContent = correo;
-        celdas[2].textContent = tareasTexto;
-        celdas[3].textContent = notas;
-      }
+  //     if (filaEditando) {
+  //       const celdas = filaEditando.querySelectorAll('td');
+  //       celdas[0].textContent = nombre;
+  //       celdas[1].textContent = correo;
+  //       celdas[2].textContent = tareasTexto;
+  //       celdas[3].textContent = notas;
+  //     }
       
-      mostrarAlertaExito("Los cambios se guardaron correctamente", "admin");
-    });
-  }
+  //     mostrarAlertaExito("Los cambios se guardaron correctamente", "admin");
+  //   });
+  // }
 
   function inicializarPerfil() {
     console.log("Inicializando perfil...");
@@ -1234,13 +1398,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === INICIALIZACIÓN COMPLETA ===
   function inicializarTodo() {
-      inicializarSistemaTareas();
+      // NO inicializarSistemaTareas() - AdminManager.js lo maneja
       // inicializarTablaUsuarios(); // DESHABILITADO - users.js lo maneja
       // inicializarBotonesDetalles(); // DESHABILITADO - users.js lo maneja
       // inicializarExportarPDF();
       inicializarPerfil();
       inicializarEliminarCuenta();
       inicializarNavegacionReportes();
+      window.actualizarHeaderDinamicamente = actualizarHeaderDinamicamente;
+      window.actualizarNombreEnOtrasSecciones = actualizarNombreEnOtrasSecciones;
   }
 
   // Inicializar cuando se carga la página

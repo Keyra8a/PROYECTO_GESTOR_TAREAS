@@ -1073,6 +1073,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return date.toLocaleDateString('es-MX');
     }
 
+    // Función específica para manejar tareas asignadas desde Admin
+    async function manejarTareasAsignadasAdmin(event) {
+        console.log('📋 PROFILE: Tareas asignadas desde Admin', event.detail);
+        
+        // Solo actualizar si afecta al usuario actual
+        if (event.detail.userId === window.CURRENT_USER?.id) {
+            console.log('👤 Afecta al usuario actual, recargando actividad...');
+            await cargarActividadUsuario(true);
+            console.log('Actividad del perfil actualizada');
+        }
+    }
+
     // === ESCUCHAR EVENTOS DE ACTUALIZACIÓN DESDE TABLEROS ===
     window.addEventListener('actividadTareaActualizada', async (event) => {
         console.log("EVENTO RECIBIDO: Actividad de tarea actualizada", event.detail);
@@ -1094,6 +1106,55 @@ document.addEventListener('DOMContentLoaded', function() {
         await cargarActividadUsuario(true);
     });
 
-    console.log("Profile.js inicializado con listeners para eventos de actividad");
+    // === LISTENERS PARA AUTO-REFRESH ===
+    window.addEventListener('tareaCreadaDesdeTareas', async (event) => {
+        console.log('PROFILE: Tarea creada desde Tareas', event.detail);
+        await cargarActividadUsuario(true);
+        console.log('Actividad del perfil actualizada');
+    });
 
+    window.addEventListener('tareaCreadadesdeTableros', async (event) => {
+        console.log('PROFILE: Tarea creada desde Tableros', event.detail);
+        await cargarActividadUsuario(true);
+        console.log('Actividad del perfil actualizada');
+    });
+
+    window.addEventListener('tareaEliminadaDesdeTareas', async (event) => {
+        console.log('PROFILE: Tarea eliminada desde Tareas', event.detail);
+        await cargarActividadUsuario(true);
+        console.log('Actividad del perfil actualizada');
+    });
+
+    window.addEventListener('tareaEliminadaDesdeTableros', async (event) => {
+        console.log('PROFILE: Tarea eliminada desde Tableros', event.detail);
+        await cargarActividadUsuario(true);
+        console.log('Actividad del perfil actualizada');
+    });
+
+    window.addEventListener('tareaActualizadaDesdeTareas', async (event) => {
+        console.log('PROFILE: Tarea actualizada desde Tareas', event.detail);
+        await cargarActividadUsuario(true);
+        console.log('Actividad del perfil actualizada');
+    });
+
+    window.addEventListener('tareaActualizadaDesdeTableros', async (event) => {
+        console.log('PROFILE: Tarea actualizada desde Tableros', event.detail);
+        await cargarActividadUsuario(true);
+        console.log('Actividad del perfil actualizada');
+    });
+
+    // === LISTENERS PARA AUTO-REFRESH DESDE ADMIN ===
+    window.addEventListener('tareasAsignadasDesdeAdmin', manejarTareasAsignadasAdmin);
+
+    window.addEventListener('usuarioActualizadoDesdeAdmin', async (event) => {
+        console.log('PROFILE: Usuario actualizado desde Admin', event.detail);
+        
+        // Solo actualizar si es el usuario actual
+        if (event.detail.userId === window.CURRENT_USER?.id) {
+            await cargarActividadUsuario(true);
+            console.log('Actividad del perfil actualizada');
+        }
+    });
+
+    console.log("Profile.js inicializado con listeners para eventos de actividad");
 });

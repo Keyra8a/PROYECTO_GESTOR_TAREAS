@@ -33,6 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
       timeout: null
   };
 
+  // Función para manejar eventos de tareas asignadas
+    async function manejarTareasAsignadas(event) {
+        console.log("===== USERS.JS: EVENTO 'tareasAsignadasDesdeAdmin' =====");
+        console.log("Detalles:", event.detail);
+        console.log("Usuario ID:", event.detail.userId);
+        console.log("Tareas asignadas:", event.detail.taskIds?.length || 0);
+        console.log("Hora:", new Date().toLocaleTimeString());
+        
+        // FORZAR recarga inmediata sin debounce
+        console.log("FORZANDO RECARGA INMEDIATA DE USUARIOS");
+        
+        try {
+            await loadUsers();
+            console.log("Usuarios recargados después de asignación de tareas");
+        } catch (error) {
+            console.error("Error recargando usuarios:", error);
+        }
+        
+        console.log("===== FIN EVENTO =====\n");
+    }
+
+    // FUNCIÓN ESPECÍFICA PARA MANEJAR actualizarConteoTareas
+    async function manejarActualizarConteo(event) {
+        console.log("===== USERS.JS: EVENTO 'actualizarConteoTareas' =====");
+        console.log("Detalles:", event.detail);
+        console.log("Hora:", new Date().toLocaleTimeString());
+        
+        // Recargar usuarios inmediatamente
+        console.log("Recargando tabla de usuarios...");
+        await loadUsers();
+        
+        console.log("Tabla de usuarios actualizada");
+        console.log("===== FIN EVENTO =====\n");
+    }
+
   // API base
   const apiBase = (window.API_BASE && window.API_BASE.trim()) ? 
       window.API_BASE.replace(/\/$/, '') : '/assets/app/endpoints';
@@ -189,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (detalleEstado) {
             const esActivo = user.is_active == 1;
             detalleEstado.textContent = esActivo ? 'Activo' : 'Inactivo';
-            // Quitamos colores y estilos
         }
         
         // FECHA
@@ -372,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       if (btnEliminarDesdeDetalle) {
-          btnEliminarDesdeDetalle.style.display = 'none'; // Siempre oculto
+          btnEliminarDesdeDetalle.style.display = 'none'; 
       }
 
       if (typeof mostrarSeccion === 'function') {
@@ -577,7 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnEliminarDesdeDetalle?.addEventListener('click', () => {
-      return; // Deshabilitado
+      return; 
   });
 
   // === FUNCIONES UTILITARIAS ===
@@ -603,6 +637,58 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
       loadUsers();
   }, 500);
+
+    // === LISTENERS PARA AUTO-REFRESH ===
+    window.addEventListener('tareaCreadadesdeTableros', async (event) => {
+        console.log('USERS: Tarea creada desde Tableros', event.detail);
+        await loadUsers();
+        console.log('Usuarios actualizados después de creación de tarea');
+    });
+
+    window.addEventListener('tareaCreadaDesdeTareas', async (event) => {
+        console.log('USERS: Tarea creada desde Tareas', event.detail);
+        await loadUsers();
+        console.log('Usuarios actualizados después de creación de tarea');
+    });
+
+    window.addEventListener('tareaEliminadaDesdeTareas', async (event) => {
+        console.log('USERS: Tarea eliminada desde Tareas', event.detail);
+        await loadUsers();
+        console.log('Usuarios actualizados después de eliminación de tarea');
+    });
+
+    window.addEventListener('tareaEliminadaDesdeTableros', async (event) => {
+        console.log('USERS: Tarea eliminada desde Tableros', event.detail);
+        await loadUsers();
+        console.log('Usuarios actualizados después de eliminación de tarea');
+    });
+
+    window.addEventListener('usuarioCreadoDesdeAdmin', async (event) => {
+        console.log('USERS: Usuario creado desde Admin', event.detail);
+        await loadUsers();
+        console.log('Lista de usuarios actualizada');
+    });
+
+    window.addEventListener('usuarioEliminadoDesdeAdmin', async (event) => {
+        console.log('USERS: Usuario eliminado desde Admin', event.detail);
+        await loadUsers();
+        console.log('Lista de usuarios actualizada');
+    });
+
+    // === LISTENERS PARA AUTO-REFRESH DESDE ADMIN ===
+
+    // Evento de tareas asignadas desde Admin
+    window.addEventListener('tareasAsignadasDesdeAdmin', manejarTareasAsignadas);
+
+    // Evento de actualización de conteo de tareas
+    window.addEventListener('actualizarConteoTareas', manejarActualizarConteo);
+
+    // Evento de usuario actualizado desde Admin
+    window.addEventListener('usuarioActualizadoDesdeAdmin', async (event) => {
+        console.log('USERS: Usuario actualizado desde Admin', event.detail);
+        await loadUsers();
+        console.log('Lista de usuarios actualizada');
+    });
 
   console.log("users.js inicializado correctamente");
 });
