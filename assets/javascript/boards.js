@@ -685,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Ejecutar callback después de cerrar
                         if (callback && typeof callback === 'function') {
-                            console.log("✅ Ejecutando callback...");
+                            console.log("Ejecutando callback...");
                             setTimeout(() => {
                                 callback();
                             }, 100);
@@ -817,15 +817,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función específica para manejar tareas asignadas desde Admin
     async function manejarTareasAsignadasAdmin(event) {
-        console.log('📋 BOARDS: Tareas asignadas desde Admin', event.detail);
-        console.log('📋 User ID afectado:', event.detail.userId);
-        console.log('📋 Tareas asignadas:', event.detail.taskIds?.length || 0);
+        console.log('BOARDS: Tareas asignadas desde Admin', event.detail);
+        console.log('User ID afectado:', event.detail.userId);
+        console.log('Tareas asignadas:', event.detail.taskIds?.length || 0);
         
         // Recargar el tablero completo
-        console.log('🔄 Recargando tablero...');
+        console.log('Recargando tablero...');
         await loadBoard();
         
-        console.log('✅ Tablero actualizado después de asignación desde Admin');
+        console.log('Tablero actualizado después de asignación desde Admin');
     }
 
     // === ESCUCHAR EVENTOS DE ACTUALIZACIÓN DESDE TAREAS ===
@@ -870,14 +870,14 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('usuarioCreadoDesdeAdmin', async (event) => {
         console.log('BOARDS: Usuario creado desde Admin', event.detail);
         await loadBoard();
-        await cargarUsuariosParaAsignar(); // Si tienes esta función
+        await cargarUsuariosParaAsignar(); 
         console.log('Tablero y usuarios actualizados');
     });
 
     window.addEventListener('usuarioEliminadoDesdeAdmin', async (event) => {
         console.log('BOARDS: Usuario eliminado desde Admin', event.detail);
         await loadBoard();
-        await cargarUsuariosParaAsignar(); // Si tienes esta función
+        await cargarUsuariosParaAsignar(); 
         console.log('Tablero y usuarios actualizados');
     });
 

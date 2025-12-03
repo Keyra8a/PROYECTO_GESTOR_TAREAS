@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 actualizarAvatarEnHeader(json.avatar_url);
                 
-                // ALERTA CORREGIDA - con callback para limpiar
+                // ALERTA con callback para limpiar
                 mostrarExito('Avatar actualizado correctamente', () => {
                     console.log("Alerta cerrada, limpiando datos...");
                     archivoAvatarSeleccionado = null;
@@ -999,7 +999,7 @@ document.addEventListener('DOMContentLoaded', function() {
         inicializarFlujoAvatar();
         inicializarBotonesCancelar();
         
-        // SOLO iniciar actualización automática (sin botón)
+        // SOLO iniciar actualización automática 
         setTimeout(() => {
             iniciarActualizacionAutomatica();
         }, 1000);
@@ -1027,7 +1027,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("====== FIN EVENTO ======");
     });
 
-    // NUEVO: ESCUCHAR EVENTO DE TAREA CREADA
+    // ESCUCHAR EVENTO DE TAREA CREADA
     window.addEventListener('tareaCreada', (event) => {
         console.log("====== EVENTO TAREA CREADA ======");
         console.log("Nueva tarea creada, recargando actividad...");
@@ -1075,11 +1075,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función específica para manejar tareas asignadas desde Admin
     async function manejarTareasAsignadasAdmin(event) {
-        console.log('📋 PROFILE: Tareas asignadas desde Admin', event.detail);
+        console.log('PROFILE: Tareas asignadas desde Admin', event.detail);
         
         // Solo actualizar si afecta al usuario actual
         if (event.detail.userId === window.CURRENT_USER?.id) {
-            console.log('👤 Afecta al usuario actual, recargando actividad...');
+            console.log('Afecta al usuario actual, recargando actividad...');
             await cargarActividadUsuario(true);
             console.log('Actividad del perfil actualizada');
         }
